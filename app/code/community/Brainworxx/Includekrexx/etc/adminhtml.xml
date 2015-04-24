@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<config>
+  <menu>
+    <system>
+      <children>
+        <krexx translate="title" module="includekrexx">
+          <title>kreXX</title>
+          <sort_order>15</sort_order>
+          <children>
+            <edit translate="title" module="includekrexx">
+              <title>Edit kreXX config</title>
+              <sort_order>5</sort_order>
+              <action>adminhtml/krexx/config</action>
+            </edit>
+            <editfe translate="title" module="includekrexx">
+              <title>Administer FE editing</title>
+              <sort_order>10</sort_order>
+              <action>adminhtml/krexx/feconfig</action>
+            </editfe>
+            <docu translate="title" module="includekrexx">
+              <title>kreXX quick docu</title>
+              <sort_order>15</sort_order>
+              <action>adminhtml/krexx/docu</action>
+            </docu>
+          </children>
+        </krexx>
+      </children>
+    </system>
+  </menu>
+  <acl>
+    <resources>
+      <admin>
+        <children>
+          <system>
+            <children>
+              <krexx>
+              <title>kreXX</title>
+                <children>
+                  <edit>
+                    <title>Edit kreXX Config</title>
+                  </edit>
+                  <editfe>
+                    <title>Administer kreXX FE Editing</title>
+                  </editfe>
+                  <docu>
+                    <title>kreXX quick docu</title>
+                  </docu>
+                </children>
+              </krexx>
+            </children>
+          </system>
+        </children>
+      </admin>
+    </resources>
+  </acl>
+</config>
