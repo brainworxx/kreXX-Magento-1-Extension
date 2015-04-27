@@ -36,11 +36,6 @@ maxfiles = "10"
 ; destination = "file"
 destination = "frontend"
 
-; Do you need to authentificate via cookie?
-; To get the cookie, simply click on the "Toggle Debug Cookie" on the frontend.
-; useCookies = "true"
-useCookies = "false"
-
 ; How often can you call kreXX in one run?
 ; kreXX can generate a lot of data, and depending on your settings
 ; increasing this number might not be a good idea.
@@ -125,7 +120,6 @@ maxRuntime = "full"
 folder = "none"
 maxfiles = "none"
 destination = "full"
-useCookies = "none"
 maxCall = "full"
 disabled = "full"
 detectAjax = "full"

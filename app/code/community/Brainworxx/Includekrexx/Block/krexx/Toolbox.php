@@ -183,7 +183,6 @@ class Toolbox {
       $config_output .= Render::renderSingleEditableChild('Local open function', Config::getDevHandler(), '\krexx::', 'Input', 'localFunction');
       // Render the reset-button which will delete the debug-cookie.
       $config_output .= Render::renderButton('resetbutton', 'Reset local settings', 'resetbutton');
-      $config_output .= Render::renderButton('debugcookie', 'Toggle debug cookie', 'debugcookie');
       return $config_output;
     };
 
@@ -408,12 +407,13 @@ class Toolbox {
       $type = 'Stack Frame';
       $parameter = $step_data;
       $anon_function = function($parameter){
-        // We are handeling the following values here:
+        $output = '';
+        // We are handling the following values here:
         // file, line, function, object, type, args, sourcecode.
         $step_data = $parameter;
         // File.
         if (isset($step_data['file'])) {
-          $output = \Krexx\Render::renderSingleChild($step_data['file'], 'File', $step_data['file'], FALSE, 'string ', strlen($step_data['file']));
+          $output .= \Krexx\Render::renderSingleChild($step_data['file'], 'File', $step_data['file'], FALSE, 'string ', strlen($step_data['file']));
         }
         // Line.
         if (isset($step_data['line'])) {

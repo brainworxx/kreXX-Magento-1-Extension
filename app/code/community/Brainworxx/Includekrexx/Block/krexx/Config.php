@@ -50,7 +50,6 @@ class Config {
     ),
     'output' => array(
       'destination' => 'frontend',
-      'useCookies' => 'false',
       'maxCall' => '10',
       'disabled' => 'false',
       'detectAjax' => 'true',
@@ -114,10 +113,6 @@ class Config {
       'type' => 'Select',
       'editable' => 'true',
     ),
-    'useCookies' => array(
-      'type' => 'None',
-      'editable' => 'false',
-    ),
     'destination' => array(
       'type' => 'Select',
       'editable' => 'true',
@@ -158,6 +153,10 @@ class Config {
       'type' => 'Input',
       'editable' => 'true',
     ),
+    'Local open function' => array(
+      'type' => 'Input',
+      'editable' => 'true',
+    )
   );
 
   /**
@@ -189,7 +188,7 @@ class Config {
   public Static Function isEnabled($state = NULL, $ignore_local_settings = FALSE) {
 
     // Enable kreXX.
-    if (isset($state)) {
+    if (!is_null($state)) {
       self::$isEnabled = $state;
       return self::$isEnabled;
     }
@@ -203,24 +202,6 @@ class Config {
     // Check for ajax and cli.
     if (Toolbox::isRequestAjaxOrCli()) {
       return FALSE;
-    }
-
-    // Are we using Debug cookies?
-    if (Config::getConfigValue('output', 'useCookies', $ignore_local_settings) == 'true') {
-      $krexx_debug = getConfigFromCookies('', 'KrexxDebug');
-      if (is_null($krexx_debug) && $krexx_debug == 'yes') {
-        $debug_session = TRUE;
-      }
-      else {
-        $debug_session = FALSE;
-      }
-
-      if ($debug_session === TRUE && self::$isEnabled === TRUE) {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
     }
 
     return self::$isEnabled;
@@ -252,7 +233,7 @@ class Config {
       $local_setting = self::getConfigFromCookies($group, $name);
       if (isset($local_setting)) {
         // We must not overwrite a disabled=true with local cookie settings!
-        // Otherwise it couldget enabled locally,
+        // Otherwise it could get enabled locally,
         // which might be a security issue.
         if ($name == 'disabled' && $local_setting == 'false') {
           // Do nothing.
@@ -268,12 +249,16 @@ class Config {
     // Do we have a value in the ini?
     $ini_settings = self::getConfigFromFile($group, $name);
     if (isset($ini_settings)) {
-      self::$localConfig[$group][$name] = $ini_settings;
+      if ($ignore_local_settings == FALSE) {
+        self::$localConfig[$group][$name] = $ini_settings;
+      }
       return $ini_settings;
     }
 
     // Nothing yet? Give back factory settings.
-    self::$localConfig[$group][$name] = self::$configFallback[$group][$name];
+    if ($ignore_local_settings == FALSE) {
+      self::$localConfig[$group][$name] = self::$configFallback[$group][$name];
+    }
     return self::$configFallback[$group][$name];
   }
 
@@ -329,7 +314,7 @@ class Config {
    * is also included. We need this one for the display
    * on the frontend.
    * We display here the invalid settings (if we have
-   * any,so the user can corrent it.
+   * any,so the user can correct it.
    *
    * @return array
    *   The configuration with the source.
@@ -345,6 +330,17 @@ class Config {
     // so the dev can correct them, in case there are wrong values.
     if (isset($_COOKIE['KrexxDebugSettings'])) {
       $cookie_config = json_decode($_COOKIE['KrexxDebugSettings'], TRUE);
+    }
+
+    // We must remove the cookie settings for which we do not accept
+    // any values. They might contain wrong values.
+    foreach ($cookie_config as $name => $data) {
+      $param_config = self::getFeConfig($name);
+      if ($param_config[0] === FALSE) {
+        // We act as if we have not found the value. Configurations that are
+        // not editable on the frontend will be ignored!
+        unset($cookie_config[$name]);
+      }
     }
 
     // Get Settings from the cookies. We do not valuate them,
@@ -596,14 +592,6 @@ class Config {
           }
           break;
 
-        case "useCookies":
-          // We expect a bool.
-          $result = self::evalBool($value);
-          if (!$result) {
-            Messages::addMessage('Wrong configuration for: "output => useCookies"! Expected boolean. The configured setting was not applied!');
-          }
-          break;
-
         case "destination":
           // We expect 'frontend' or 'file'
           if ($value == 'frontend' || $value == 'file') {
@@ -771,10 +759,6 @@ class Config {
 
           case 'maxfiles':
             $type = 'Input';
-            break;
-
-          case 'useCookies':
-            $type = 'Select';
             break;
 
           default:

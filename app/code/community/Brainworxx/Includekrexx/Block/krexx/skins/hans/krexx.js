@@ -133,22 +133,6 @@
     });
 
     /*
-     * Register getDebugCookie on getDebugCookie Button.
-     *
-     * @event click
-     *   Toggels the debug-cookie.
-     *   When it is active, it deactivates it, ans vice versa.
-     */
-    $krexxQuery('.kwrapper .debugcookie').on('click', function (event) {
-      // Prevents the default event behavior (ie: click).
-      event.preventDefault();
-      // Prevents the event from propagating (ie: "bubbling").
-      event.stopPropagation();
-
-      krexx.toggleDebugCookie();
-    });
-
-    /*
      * Register krexx close button function.
      *
      * @event click
@@ -634,27 +618,6 @@
   };
 
   /**
-   * Toggels the debug cookie.
-   * When the debug cookie is enabled, it switches it off.
-   * When it is disabled, is switches it on.
-   */
-  krexx.toggleDebugCookie = function () {
-    var oldValue = krexx.readSettings('KrexxDebug'), newValue;
-    var date = new Date();
-    date.setTime(date.getTime() + (99 * 24 * 60 * 60 * 1000));
-    var expires = 'expires=' + date.toUTCString();
-    if (oldValue === 'yes') {
-      newValue = 'no';
-      alert("The Debug-Cookie was deactivated.");
-    }
-    else {
-      newValue = 'yes';
-      alert("The Debug-Cookie was activated.");
-    }
-    document.cookie = 'KrexxDebug=' + newValue + '; ' + expires + '; path=/';
-  };
-
-  /**
    * Disables the editing functions, when a krexx output is loaded as a file.
    *
    * These local settings would actually do
@@ -664,6 +627,5 @@
   krexx.disableForms = function () {
     $krexxQuery('.kwrapper .editable').children().prop('disabled', true);
     $krexxQuery('.kwrapper .resetbutton').prop('disabled', true);
-    $krexxQuery('.kwrapper .debugcookie').prop('disabled', true);
   };
 })();

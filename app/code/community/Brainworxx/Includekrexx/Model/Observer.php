@@ -30,7 +30,7 @@ class Brainworxx_Includekrexx_Model_Observer {
     static $been_here = FALSE;
     if (!$been_here) {
       $filename = Mage::getModuleDir('Block', 'Brainworxx_Includekrexx') . '/Block/krexx/Krexx.php';
-      if (file_exists($filename) && !class_exists('Krexx')) {
+      if (file_exists($filename) && !class_exists('Krexx', FALSE)) {
         include_once $filename;
       }
       $been_here = TRUE;

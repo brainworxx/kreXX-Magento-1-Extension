@@ -18,7 +18,6 @@
 
 namespace Krexx;
 
-use TYPO3\CMS\Extbase\Error\Message;
 /**
  * This class hosts the internal analysis functions.
  *
@@ -393,12 +392,10 @@ class Internals {
 
     if ($result) {
       // Check this only, if we have enough time left.
-      $limit = ini_get('memory_limit');
-      if ($limit === FALSE) {
-        // No vaule?
-        return TRUE;
-      }
+      $limit = strtoupper(ini_get('memory_limit'));
+      $memory_limit = 0;
       if (preg_match('/^(\d+)(.)$/', $limit, $matches)) {
+
         if ($matches[2] == 'M') {
           // Megabyte.
           $memory_limit = $matches[1] * 1024 * 1024;
@@ -408,10 +405,14 @@ class Internals {
           $memory_limit = $matches[1] * 1024;
         }
       }
-      $usage = memory_get_usage();
-      $left = $memory_limit - $usage;
-      // Is more left than is configured?
-      $result = $left >= (int) Config::getConfigValue('render', 'memoryLeft') * 1024 * 1024;
+      // Were we able to determine a limit?
+
+      if ($memory_limit > 2) {
+        $usage = memory_get_usage();
+        $left = $memory_limit - $usage;
+        // Is more left than is configured?
+        $result = $left >= (int) Config::getConfigValue('render', 'memoryLeft') * 1024 * 1024;
+      }
     }
 
     if (!$result) {
