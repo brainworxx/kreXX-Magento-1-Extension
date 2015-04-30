@@ -136,28 +136,6 @@
       </td>
     </tr>
     <tr>
-      <td class=""><label for="useCookies">Use debug cookies:</label></td>
-      <td class=""><div class="link-store-scope" title="<?php echo $help['useCookies']; ?>"></div></td>
-      <td class="">
-        <select name="output[useCookies]" id="useCookies">
-          <?php foreach($this->getSelectBool() as $key => $value) {
-                if ($value == $settings['output']['useCookies']) {
-                  $selected = 'selected="selected"';
-                }
-                else {
-                  $selected = '';
-                }
-          ?>
-          <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
-          <?php } ?>
-        </select>
-      </td>
-      <td class="">
-        <input id="factory.useCookies" class="checkbox" type="checkbox" value="1" name="factory"  <?php echo $factory['useCookies']; ?>/>
-        <label for="factory.useCookies">Use factory settings</label>
-      </td>
-    </tr>
-    <tr>
       <td class=""><label for="maxCall">Maximum amount of calls:</label></td>
       <td class=""><div class="link-store-scope" title="<?php echo $help['maxCall']; ?>"></div></td>
       <td class="">

@@ -57,7 +57,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
     $settings['logging']['folder'] = $this->convertKrexxFeSetting(\Krexx\Config::getFeConfigFromFile('folder'));
     $settings['logging']['maxfiles'] = $this->convertKrexxFeSetting(\Krexx\Config::getFeConfigFromFile('maxfiles'));
     $settings['output']['destination'] = $this->convertKrexxFeSetting(\Krexx\Config::getFeConfigFromFile('destination'));
-    $settings['output']['useCookies'] = $this->convertKrexxFeSetting(\Krexx\Config::getFeConfigFromFile('useCookies'));
     $settings['output']['maxCall'] = $this->convertKrexxFeSetting(\Krexx\Config::getFeConfigFromFile('maxCall'));
     $settings['output']['disabled'] = $this->convertKrexxFeSetting(\Krexx\Config::getFeConfigFromFile('disabled'));
     $settings['output']['detectAjax'] = $this->convertKrexxFeSetting(\Krexx\Config::getFeConfigFromFile('detectAjax'));

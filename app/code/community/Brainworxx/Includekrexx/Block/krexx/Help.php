@@ -1,19 +1,34 @@
 <?php
 /**
  * @file
- * Helptexts for kreXX
- * kreXX: Krumo eXXtended
+ *   Helptexts for kreXX
+ *   kreXX: Krumo eXXtended
  *
- * This is a debugging tool, which displays structured information
- * about any PHP object. It is a nice replacement for print_r() or var_dump()
- * which are used by a lot of PHP developers.
+ *   This is a debugging tool, which displays structured information
+ *   about any PHP object. It is a nice replacement for print_r() or var_dump()
+ *   which are used by a lot of PHP developers.
+ *
+ *   kreXX is a fork of Krumo, which was originally written by:
+ *   Kaloyan K. Tsvetkov <kaloyan@kaloyan.info>
+ *
  * @author brainworXX GmbH <info@brainworxx.de>
  *
- * kreXX is a fork of Krumo, which was originally written by:
- * Kaloyan K. Tsvetkov <kaloyan@kaloyan.info>
+ * @license http://opensource.org/licenses/LGPL-2.1
+ *   GNU Lesser General Public License Version 2.1
  *
- * @license http://opensource.org/licenses/LGPL-2.1 GNU Lesser General Public License Version 2.1
- * @package Krexx
+ *   kreXX Copyright (C) 2014-2015 Brainworxx GmbH
+ *
+ *   This library is free software; you can redistribute it and/or modify it
+ *   under the terms of the GNU Lesser General Public License as published by
+ *   the Free Software Foundation; either version 2.1 of the License, or (at
+ *   your option) any later version.
+ *   This library is distributed in the hope that it will be useful, but WITHOUT
+ *   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ *   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ *   for more details.
+ *   You should have received a copy of the GNU Lesser General Public License
+ *   along with this library; if not, write to the Free Software Foundation,
+ *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
 namespace Krexx;
@@ -46,11 +61,12 @@ class Help {
     'registerAutomatically' => 'This option registers the fatal errorhandler as soon as kreXX is included. When a fatal error occures,<br/> kreXX will offer a backtrace and an analysis of the all objects in it. PHP always clears the stack in case of a fatal error,<br/> so kreXX has to keep track of it. <strong>Be warned:</strong> This option will dramatically slow down your requests. Use this only when you have to.<br/> It is by far better to register the errorhandler yourself with <strong>\krexx::registerFatal();</strong> and later unregister it<br/> with <strong>\krexx::unregisterFatal();</strong> tp prevent a slowdown.',
     'detectAjax' => 'kreXX tries to detect whether a request is made via ajax. When it is detected, it will do no output at all. The AJAX detection can be disabled here.',
     'backtraceAnalysis' => 'Shall kreXX do a "deep" analysis of  the backtrace? Be warned, a deep analysis can produce a lot of output.<br/> A "normal" analysis will use the configured settings, while a "deep" analysis will get as much data from the objects as possible.',
-    'memoryLeft' => 'kreXX checks regularely how much memory is left. Here you can adjust the amount where it will trigger an emergengy break.<br />Unit of measurement is MB.',
+    'memoryLeft' => 'kreXX checks regularly how much memory is left. Here you can adjust the amount where it will trigger an emergengy break.<br />Unit of measurement is MB.',
     'maxRuntime' => 'kreXX checks during the analysis how much time has elapsed since start. Here you can adjust the amount where it will trigger an emergengy break.<br />Unit of measurement is seconds.',
     'analysePublicMethods' => 'Here you can toggle if kreXX shall analyse the public methods of a class.',
     'analyseProtectedMethods' => 'Here you can toggle if kreXX shall analyse the protected methods of a class.',
     'analysePrivateMethods' => 'Here you can toggle if kreXX shall analyse the private methods of a class.',
+    'hiddenInternal' => 'These are unreachable internal properties of predefined classes in PHP.<br /> @see: https://bugs.php.net/bug.php?id=49382',
   );
 
   /**

@@ -31,7 +31,6 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
     'folder',
     'maxfiles',
     'destination',
-    'useCookies',
     'maxCall',
     'disabled',
     'detectAjax',

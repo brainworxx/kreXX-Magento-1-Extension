@@ -197,27 +197,6 @@
       </td>
     </tr>
     <tr>
-      <td><label for="useCookies">Use debug cookies:</label></td>
-      <td>
-        <select name="output[useCookies]" id="useCookies">
-          <?php foreach($data['settings'] as $key => $value) {
-                if ($key == $settings['output']['useCookies']) {
-                  $selected = 'selected="selected"';
-                }
-                else {
-                  $selected = '';
-                }
-          ?>
-          <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
-          <?php }?>
-        </select>
-      </td>
-      <td>
-        <input id="factory.useCookies" class="checkbox" type="checkbox" value="1" name="factory"  <?php echo $factory['useCookies']; ?>/>
-        <label for="factory.useCookies">Use factory settings</label>
-      </td>
-    </tr>
-    <tr>
       <td><label for="maxCall">Maximum amount of calls:</label></td>
       <td>
         <select name="output[maxCall]" id="maxCall">

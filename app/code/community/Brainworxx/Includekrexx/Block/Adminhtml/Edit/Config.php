@@ -39,7 +39,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
     $help['folder'] = htmlspecialchars(strip_tags(\Krexx\Help::getHelp('folder')));
     $help['maxfiles'] = htmlspecialchars(strip_tags(\Krexx\Help::getHelp('maxfiles')));
     $help['destination'] = htmlspecialchars(strip_tags(\Krexx\Help::getHelp('destination')));
-    $help['useCookies'] = htmlspecialchars(strip_tags(\Krexx\Help::getHelp('useCookies')));
     $help['maxCall'] = htmlspecialchars(strip_tags(\Krexx\Help::getHelp('maxCall')));
     $help['disabled'] = 'Here you can disable kreXX without uninstalling the whole module.';
     $help['detectAjax'] = htmlspecialchars(strip_tags(\Krexx\Help::getHelp('detectAjax')));
@@ -73,7 +72,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
     $settings['logging']['folder'] = \Krexx\Config::getConfigFromFile('logging', 'folder');
     $settings['logging']['maxfiles'] = \Krexx\Config::getConfigFromFile('logging', 'maxfiles');
     $settings['output']['destination'] = \Krexx\Config::getConfigFromFile('output', 'destination');
-    $settings['output']['useCookies'] = \Krexx\Config::getConfigFromFile('output', 'useCookies');
     $settings['output']['maxCall'] = \Krexx\Config::getConfigFromFile('output', 'maxCall');
     $settings['output']['disabled'] = \Krexx\Config::getConfigFromFile('output', 'disabled');
     $settings['output']['detectAjax'] = \Krexx\Config::getConfigFromFile('output', 'detectAjax');
