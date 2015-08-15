@@ -40,7 +40,6 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
    */
   protected $allowedSettingsNames = array(
     'skin',
-    'jsLib',
     'memoryLeft',
     'maxRuntime',
     'folder',
