@@ -39,7 +39,7 @@
           <system>
             <children>
               <krexx>
-              <title>kreXX</title>
+                <title>kreXX</title>
                 <children>
                   <edit>
                     <title>Edit kreXX Config</title>
