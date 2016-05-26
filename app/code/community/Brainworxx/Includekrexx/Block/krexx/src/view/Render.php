@@ -169,24 +169,15 @@ class Render extends Help {
    *   We might want to tell the user what this actually is.
    * @param string $dom_id
    *   The id of the analysis data, a click on the recursion should jump to it.
-<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/view/Render.php
    * @param string $connector1
    *   The connector1 type to the parent class / array.
    * @param string $connector2
    *   The connector2 type to the parent class / array.
-=======
-   * @param string $connector
-   *   The connector type to the parent class / array.
->>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Render.php
    *
    * @return string
    *   The generated markup from the template files.
    */
-<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/view/Render.php
   Public Static Function renderRecursion($name = '', $type = '', $value = '', $dom_id = '', $connector1 = '', $connector2 = '') {
-=======
-  Public Static Function renderRecursion($name = '', $value = '', $dom_id = '', $connector = '=>') {
->>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Render.php
     $template = self::getTemplateFileContent('recursion');
 
     // Generating our code and adding the Codegen button, if there is
@@ -207,12 +198,8 @@ class Render extends Help {
     $template = str_replace('{name}', $name, $template);
     $template = str_replace('{domId}', $dom_id, $template);
     $template = str_replace('{value}', $value, $template);
-<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/view/Render.php
     $template = str_replace('{connector1}', self::renderConnector($connector1), $template);
     return str_replace('{connector2}', self::renderConnector($connector2), $template);
-=======
-    return $template = str_replace('{connector}', $connector, $template);
->>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Render.php
   }
 
   /**
@@ -357,24 +344,15 @@ class Render extends Help {
    * @param bool $is_expanded
    *   Is this one expanded from the beginning?
    *   TRUE when we render the settings menu only.
-<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/view/Render.php
    * @param string $connector1
    *   The connector1 type to the parent class / array.
    * @param string $connector2
    *   The connector2 type to the parent class / array.
-=======
-   * @param string $connector
-   *   The connector type to the parent class / array.
->>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Render.php
    *
    * @return string
    *   The generated markup from the template files.
    */
-<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/view/Render.php
   Public static function renderExpandableChild($name, $type, \Closure $anon_function, &$parameter, $additional = '', $dom_id = '', $help_id = '', $is_expanded = FALSE, $connector1 = '', $connector2 = '', $json = array()) {
-=======
-  Public static function renderExpandableChild($name, $type, \Closure $anon_function, &$parameter, $additional = '', $dom_id = '', $help_id = '', $is_expanded = FALSE, $connector = '=>') {
->>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Render.php
     // Check for emergency break.
     if (!Framework\Internals::checkEmergencyBreak()) {
       // Normally, this should not show up, because the Chunks class will not
@@ -382,7 +360,6 @@ class Render extends Help {
       Messages::addMessage("Emergency break for large output during analysis process.");
       return '';
     }
-
 
     if ($name == '' && $type == '') {
       // Without a Name or Type I only display the Child with a Node.
@@ -407,7 +384,6 @@ class Render extends Help {
 
       $template = str_replace('{additional}', $additional, $template);
       $template = str_replace('{help}', self::renderHelp($help_id), $template);
-<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/view/Render.php
       $template = str_replace('{connector1}', self::renderConnector($connector1), $template);
       $template = str_replace('{connector2}', self::renderConnector($connector2), $template);
 
@@ -424,9 +400,6 @@ class Render extends Help {
         $template = str_replace('{gensource}', $gencode, $template);
         $template = str_replace('{gencode}', self::getTemplateFileContent('gencode'), $template);
       }
-=======
-      $template = str_replace('{connector}', $connector, $template);
->>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Render.php
 
       // Is it expanded?
       if ($is_expanded) {
