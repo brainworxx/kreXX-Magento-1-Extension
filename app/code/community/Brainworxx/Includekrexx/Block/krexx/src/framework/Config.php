@@ -1,7 +1,11 @@
 <?php
 /**
  * @file
+<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/framework/Config.php
  *   Configuration functions for kreXX
+=======
+ *   Configfunctions for kreXX
+>>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Config.php
  *   kreXX: Krumo eXXtended
  *
  *   This is a debugging tool, which displays structured information
@@ -16,7 +20,11 @@
  * @license http://opensource.org/licenses/LGPL-2.1
  *   GNU Lesser General Public License Version 2.1
  *
+<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/framework/Config.php
  *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+=======
+ *   kreXX Copyright (C) 2014-2015 Brainworxx GmbH
+>>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Config.php
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -179,6 +187,7 @@ class Config {
   );
 
   /**
+<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/framework/Config.php
    * The directory where kreXX is stored.
    *
    * @var string
@@ -186,6 +195,8 @@ class Config {
   public static $krexxdir;
 
   /**
+=======
+>>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Config.php
    * Known Problems with debug functions, which will most likely cause a fatal.
    *
    * Used by \Krexx\Objects::pollAllConfiguredDebugMethods() to determine
@@ -200,7 +211,11 @@ class Config {
     // $viewHelperNode might not be an object, and trying to render it might
     // cause a fatal error!
     'TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper' => '__toString',
+<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/framework/Config.php
     'ReflectionClass' => '__toString',
+=======
+
+>>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Config.php
   );
 
   /**
@@ -254,6 +269,10 @@ class Config {
     if (Toolbox::isRequestAjaxOrCli()) {
       return FALSE;
     }
+<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/framework/Config.php
+=======
+
+>>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Config.php
     return self::$isEnabled;
   }
 
@@ -662,8 +681,12 @@ class Config {
           // We expect a bool.
           $result = self::evalBool($value);
           if (!$result) {
+<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/framework/Config.php
             View\Messages::addMessage('Wrong configuration for: "output => detectAjax"! Expected boolean. The configured setting was not applied!');
             View\Messages::addKey('output.detectAjax.error');
+=======
+            Messages::addMessage('Wrong configuration for: "output => detectAjax"! Expected boolean. The configured setting was not applied!');
+>>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Config.php
           }
           break;
 

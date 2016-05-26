@@ -16,7 +16,11 @@
  * @license http://opensource.org/licenses/LGPL-2.1
  *   GNU Lesser General Public License Version 2.1
  *
+<<<<<<< HEAD
  *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+=======
+ *   kreXX Copyright (C) 2014-2015 Brainworxx GmbH
+>>>>>>> v1.3.2
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -104,6 +108,7 @@ class Krexx {
    */
   public static function bootstrapKrexx() {
 
+<<<<<<< HEAD
     $krexxdir = dirname(__FILE__) . DIRECTORY_SEPARATOR;;
     include_once $krexxdir . 'src/view/Help.php';
     include_once $krexxdir . 'src/view/Render.php';
@@ -127,6 +132,30 @@ class Krexx {
     // Setting the skin info.
     if (is_null(View\Render::$skin)) {
       View\Render::$skin = Framework\Config::getConfigValue('render', 'skin');
+=======
+    if (!defined('KREXXDIR')) {
+      define("KREXXDIR", self::getKrexxDir());
+    }
+    include_once KREXXDIR . 'Help.php';
+    include_once KREXXDIR . 'Render.php';
+    include_once KREXXDIR . 'Hive.php';
+    include_once KREXXDIR . 'Config.php';
+    include_once KREXXDIR . 'Toolbox.php';
+    include_once KREXXDIR . 'Internals.php';
+    include_once KREXXDIR . 'Objects.php';
+    include_once KREXXDIR . 'Variables.php';
+    include_once KREXXDIR . 'Messages.php';
+    include_once KREXXDIR . 'Chunks.php';
+    include_once KREXXDIR . 'ShutdownHandler.php';
+    include_once KREXXDIR . 'Flection.php';
+
+    include_once KREXXDIR . 'errorhandler/AbstractHandler.php';
+    include_once KREXXDIR . 'errorhandler/Fatal.php';
+
+    // Setting template info.
+    if (is_null(\Krexx\Render::$skin)) {
+      \Krexx\Render::$skin = \Krexx\Config::getConfigValue('render', 'skin');
+>>>>>>> v1.3.2
     }
     // Every skin has an own implementation of the render class. We need to
     // include this one, too.
