@@ -119,7 +119,6 @@ class Render extends Help {
     $type_classes = '';
     foreach ($type_array as $type_class) {
       $type_class = 'k' . $type_class;
-<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/view/Render.php
       $type_classes .= $type_class . ' ';
     }
 
@@ -135,9 +134,6 @@ class Render extends Help {
       // We add the buttton and the code.
       $template = str_replace('{gensource}', $gencode, $template);
       $template = str_replace('{gencode}', self::getTemplateFileContent('gencode'), $template);
-=======
-      $type_classes .= $type_class .  ' ';
->>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Render.php
     }
 
     // Stitching it together.

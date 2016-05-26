@@ -16,11 +16,7 @@
  * @license http://opensource.org/licenses/LGPL-2.1
  *   GNU Lesser General Public License Version 2.1
  *
-<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/framework/Chunks.php
  *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
-=======
- *   kreXX Copyright (C) 2014-2015 Brainworxx GmbH
->>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Chunks.php
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -181,15 +177,12 @@ class Chunks {
 
     // No more chunk keys, we send what is left.
     echo $string;
-<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/framework/Chunks.php
 
     if (!$all_ok) {
       // We had an emergency break. Not everything was send to the browser,
       // so we need to do some housekeeping.
       self::cleanupNewChunks();
     }
-=======
->>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/Chunks.php
   }
 
   /**

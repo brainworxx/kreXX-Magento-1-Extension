@@ -16,11 +16,7 @@
  * @license http://opensource.org/licenses/LGPL-2.1
  *   GNU Lesser General Public License Version 2.1
  *
-<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/errorhandler/AbstractHandler.php
  *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
-=======
- *   kreXX Copyright (C) 2014-2015 Brainworxx GmbH
->>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/errorhandler/AbstractHandler.php
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -35,7 +31,6 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-<<<<<<< HEAD:app/code/community/Brainworxx/Includekrexx/Block/krexx/src/errorhandler/AbstractHandler.php
 namespace Brainworxx\Krexx\Errorhandler;
 
 use Brainworxx\Krexx\Analysis;
@@ -45,13 +40,6 @@ use Brainworxx\Krexx\View;
 /**
  * This class hosts all functions which all error handlers will share
  * (as soon as they are written . . .)
-=======
-namespace Krexx\Errorhandler;
-
-/**
- * This class hosts all functions which all error handlers will share
- * (as soon as they are wrttten . . .)
->>>>>>> v1.3.2:app/code/community/Brainworxx/Includekrexx/Block/krexx/errorhandler/AbstractHandler.php
  *
  * @package Krexx
  */
