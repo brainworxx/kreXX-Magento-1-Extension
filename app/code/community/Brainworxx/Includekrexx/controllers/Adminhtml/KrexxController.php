@@ -89,6 +89,8 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      */
     protected function init()
     {
+        Mage::helper('includekrexx')->relayMessages();
+
         $this->loadLayout();
         $this->_setActiveMenu('system/krexxdocu');
         $this->_addBreadcrumb(

@@ -31,4 +31,21 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-class Brainworxx_Includekrexx_Helper_Data extends Mage_Core_Helper_Abstract {}
+use Brainworxx\Krexx\View\Messages;
+
+/**
+ * Class Brainworxx_Includekrexx_Helper_Data
+ */
+class Brainworxx_Includekrexx_Helper_Data extends Mage_Core_Helper_Abstract {
+
+    public function relayMessages()
+    {
+        // Has kreXX something to say? Maybe a writeprotected logfolder?
+        // We are only faciong error messages here, normally.
+        $messages = strip_tags(Messages::outputMessages());
+
+        if (!empty($messages)) {
+            Mage::getSingleton('core/session')->addError(strip_tags(Messages::outputMessages()), 'Message from kreXX:');
+        }
+    }
+}

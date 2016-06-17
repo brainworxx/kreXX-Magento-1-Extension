@@ -33,7 +33,8 @@
  */
 
 use Brainworxx\Krexx\View\Help;
-use \Brainworxx\Krexx\Framework\Config;
+use Brainworxx\Krexx\Framework\Config;
+use Brainworxx\Krexx\View\Messages;
 
 /**
  * Class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config
