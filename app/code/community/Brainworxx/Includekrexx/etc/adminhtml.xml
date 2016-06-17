@@ -19,15 +19,21 @@
               <action>adminhtml/krexx/feconfig</action>
             </editfe>
 
+            <krexxlog translate="title" module="includekrexx">
+              <title>Access logfiles</title>
+              <sort_order>15</sort_order>
+               <action>adminhtml/krexxlog/index</action>
+            </krexxlog>
+
             <editlocalconfig translate="title" module="includekrexx">
               <title>Edit local cookie settings</title>
-              <sort_order>15</sort_order>
+              <sort_order>20</sort_order>
               <action>adminhtml/krexx/editlocalconfig</action>
             </editlocalconfig>
 
             <docu translate="title" module="includekrexx">
               <title>kreXX quick docu</title>
-              <sort_order>20</sort_order>
+              <sort_order>25</sort_order>
               <action>adminhtml/krexx/docu</action>
             </docu>
           </children>
@@ -51,6 +57,10 @@
                   <editfe>
                     <title>Edit FE configuration</title>
                   </editfe>
+
+                  <krexxlog>
+                    <title>Access logfiles</title>
+                  </krexxlog>
 
                   <editlocalconfig>
                     <title>Edit local cookie settings</title>
