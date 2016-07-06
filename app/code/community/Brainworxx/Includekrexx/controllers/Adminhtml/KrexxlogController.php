@@ -40,10 +40,16 @@ use Brainworxx\Krexx\Framework\Config;
 class Brainworxx_Includekrexx_Adminhtml_KrexxlogController extends Mage_Adminhtml_Controller_Action
 {
 
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('system/krexx/krexxlog');
+    }
+
     /**
      * Standard initilaizing actions.
      *
-     * @return Brainworxx_Includekrexx_Adminhtml_KrexxdocuController
+     * @return Brainworxx_Includekrexx_Adminhtml_KrexxlogController
      *   Return $this for chaining.
      */
     protected function init()

@@ -81,10 +81,31 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         'backtraceAndError',
     );
 
+    protected function _isAllowed()
+    {
+        $actionName = $this->getFullActionName();
+
+        if ($actionName == 'adminhtml_krexx_config') {
+            return Mage::getSingleton('admin/session')->isAllowed('system/krexx/edit');
+        }
+        if ($actionName == 'adminhtml_krexx_feconfig') {
+            return Mage::getSingleton('admin/session')->isAllowed('system/krexx/editfe');
+        }
+        if ($actionName == 'adminhtml_krexx_editlocalconfig') {
+            return Mage::getSingleton('admin/session')->isAllowed('system/krexx/editlocalconfig');
+        }
+        if ($actionName == 'adminhtml_krexx_docu') {
+            return Mage::getSingleton('admin/session')->isAllowed('system/krexx/docu');
+        }
+
+        // Still here?
+        return parent::_isAllowed();
+    }
+
     /**
      * Standard initilaizing actions.
      *
-     * @return Brainworxx_Includekrexx_Adminhtml_KrexxdocuController
+     * @return Brainworxx_Includekrexx_Adminhtml_KrexxController
      *   Return $this for chaining.
      */
     protected function init()
