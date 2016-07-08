@@ -10,7 +10,7 @@ This is a Magento 1 extension, providing backend configuration masks for kreXX.
 | Magento Repository: https://www.magentocommerce.com/magento-connect/krexx-debugger.html
 | 
 | The TYPO3 and the Magento extension are essentially the same, so the Documentation can be found here:
-| Documentation: https://docs.typo3.org/typo3cms/extensions/includekrexx/1.4.0/
+| Documentation: https://docs.typo3.org/typo3cms/extensions/includekrexx/1.4.2/
 |
 |
 
