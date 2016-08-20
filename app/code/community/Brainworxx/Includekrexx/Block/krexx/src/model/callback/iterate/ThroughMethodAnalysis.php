@@ -1,8 +1,7 @@
 <?php
-
 /**
  * @file
- *   Event observer for kreXX
+ *   Model for the view rendering, hosting the object method info closure.
  *   kreXX: Krumo eXXtended
  *
  *   This is a debugging tool, which displays structured information
@@ -31,26 +30,44 @@
  *   along with this library; if not, write to the Free Software Foundation,
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-class Brainworxx_Includekrexx_Model_Observer
-{
 
+namespace Brainworxx\Krexx\Model\Callback\Iterate;
+
+use Brainworxx\Krexx\Model\Callback\AbstractCallback;
+use Brainworxx\Krexx\Model\Simple;
+
+/**
+ * Class MethodInfo
+ *
+ * @package Brainworxx\Krexx\Model\Callback\Iterate
+ *
+ * @uses array data
+ *   Associative array, the analysis result.
+ */
+class ThroughMethodAnalysis extends AbstractCallback
+{
     /**
-     * Includes the kreXX mainfile
+     * Renders the info of a single method.
      *
-     * @param Varien_Event_Observer $observer
-     *   The event observer of the event we are listening to.
+     * @return string
+     *   The generated markup.
      */
-    public function includeKreXX(Varien_Event_Observer $observer)
+    public function callMe()
     {
-        // We need to do this only once
-        // the static should save some time.
-        static $beenHere = false;
-        if (!$beenHere) {
-            $filename = Mage::getModuleDir('Block', 'Brainworxx_Includekrexx') . '/Block/krexx/Krexx.php';
-            if (file_exists($filename) && !class_exists('Krexx', false)) {
-                include_once $filename;
+        $data = $this->parameters['data'];
+        $output = '';
+        foreach ($data as $key => $string) {
+            $model = new Simple($this->storage);
+            $model->setData($string)->setName($key)->setType('reflection')->setConnector2('=');
+
+            if ($key !== 'comments' && $key !== 'declared in' && $key !== 'source') {
+                $model->setNormal($string);
+            } else {
+                $model->setNormal('. . .');
             }
-            $beenHere = true;
+
+            $output .= $this->storage->render->renderSingleChild($model);
         }
+        return $output;
     }
 }

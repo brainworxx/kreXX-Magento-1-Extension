@@ -32,8 +32,6 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-use Brainworxx\Krexx\Framework\Config;
-
 /**
  * Class Brainworxx_Includekrexx_Adminhtml_KrexxController
  */
@@ -79,10 +77,12 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxlogController extends Mage_Adminhtm
      */
     public function getContentAction()
     {
+        $storage = \Krexx::$storage;
+
         // No directory traversal for you!
         $id = preg_replace('/[^0-9]/', '', $this->getRequest()->get('id'));
         // Get the filepath.
-        $file = Config::$krexxdir . Config::getConfigValue('output', 'folder') . DIRECTORY_SEPARATOR . $id . '.Krexx.html';
+        $file = $storage->config->krexxdir . $storage->config->getConfigValue('output', 'folder') . DIRECTORY_SEPARATOR . $id . '.Krexx.html';
 
         $ioFile = new Varien_Io_File();
         if ($ioFile->streamOpen($file, 'rb')) {
@@ -98,7 +98,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxlogController extends Mage_Adminhtm
             }
             $ioFile->streamClose();
         } else {
-             Mage::getSingleton('core/session')->addError('File: ' . $file . ' is not readable!');
+            Mage::getSingleton('core/session')->addError('File: ' . $file . ' is not readable!');
         }
     }
 }

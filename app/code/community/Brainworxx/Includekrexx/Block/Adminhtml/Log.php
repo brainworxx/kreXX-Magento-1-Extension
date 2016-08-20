@@ -32,8 +32,6 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-use \Brainworxx\Krexx\Framework\Config;
-
 /**
  * Class Brainworxx_Includekrexx_Block_Adminhtml_Log
  */
@@ -47,9 +45,10 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
     public function _construct()
     {
         parent::_construct();
+        $storage = \Krexx::$storage;
 
         // 1. Get the log folder.
-        $dir = Config::$krexxdir . Config::getConfigValue('output', 'folder') . DIRECTORY_SEPARATOR;
+        $dir = $storage->config->krexxdir . $storage->config->getConfigValue('output', 'folder') . DIRECTORY_SEPARATOR;
 
         // 2. Get the file list and sort it.
         // Meh, Varien_Io_File does not allow a filter or sorting.

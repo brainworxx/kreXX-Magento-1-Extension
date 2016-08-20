@@ -62,32 +62,12 @@
         // to the bottom.
         kdt.moveToBottom('.kouterwrapper');
 
-        // Initialize the draggable.
-        kdt.draXX(
-            '.kwrapper',
-            '.kheadnote',
-            function () {
-                var searchWrapper = document.querySelectorAll('.search-wrapper');
-                for (var i = 0; i < searchWrapper.length; i++) {
-                    searchWrapper[i].style.position = 'fixed';
-                }
-            },
-            function () {
-                var searchWrapper = document.querySelectorAll('.search-wrapper');
-                for (var i = 0; i < searchWrapper.length; i++) {
-                    searchWrapper[i].style.position = 'absolute';
-                }
-            }
-        );
+        // Get viewport height to set kreXX data payload to max 75% for debug.
+        // The payload for the fatal error handler is set to the remaining space.
+        krexx.setPayloadMaxHeight();
 
-        /**
-         * Register krexx close button function.
-         *
-         * @event click
-         *   Displays a closing animation of the corresponding
-         *   krexx output "window" and then removes it from the markup.
-         */
-        kdt.addEvent('.kwrapper .kheadnote-wrapper .kclose, .kwrapper .kfatal-headnote .kclose', 'click', krexx.close);
+        // Initialize the draggable.
+        kdt.draXX('.kwrapper', '.khandle', function (){},function (){});
 
         /**
          * Register toggling to the elements.
@@ -97,6 +77,36 @@
          *   When it is already expanded, it closes it.
          */
         kdt.addEvent('.kwrapper .kexpand', 'click', krexx.toggle);
+
+        /**
+         * Add the additional data to the footer.
+         *
+         * @event click
+         */
+        kdt.addEvent('.kwrapper .kel', 'click', krexx.setAdditionalData);
+
+        /**
+         * Register the Collapse-All funfions on it's symbol
+         *
+         * @event click
+         */
+        kdt.addEvent('.kwrapper .kcollapse-me', 'click', krexx.collapse);
+
+        /**
+         * Register the code generator on the P symbol.
+         *
+         * @event click
+         */
+        kdt.addEvent('.kwrapper .kgencode', 'click', krexx.generateCode);
+
+        /**
+         * Register krexx close button function.
+         *
+         * @event click
+         *   Displays a closing animation of the corresponding
+         *   krexx output "window" and then removes it from the markup.
+         */
+        kdt.addEvent('.kwrapper .ktool-tabs .kclose, .kwrapper .kheadnote-wrapper .kclose', 'click', krexx.close);
 
         /**
          * Register the click on the tabs.
@@ -158,18 +168,10 @@
         kdt.addEvent('.kwrapper .ksearchfield', 'keyup', krexx.searchfieldReturn);
 
         /**
-         * Register the Collapse-All funfions on it's symbol
-         *
-         * @event click
+         * Always check if the searchfield is inside the viewport, in case we
+         * display the fatal error handler
          */
-        kdt.addEvent('.kwrapper .kcollapse-me', 'click', krexx.collapse);
-
-        /**
-         * Register the code generator on the P symbol.
-         *
-         * @event click
-         */
-        kdt.addEvent('.kwrapper .kgencode', 'click', krexx.generateCode);
+        kdt.addEvent('.kfatalwrapper-outer', 'scroll', krexx.checkSeachInViewport);
 
         /**
          * Prevents the click-event-bubbling on the generated code.
@@ -178,10 +180,14 @@
          */
         kdt.addEvent('.kcodedisplay', 'click', kdt.preventBubble);
 
+        // Expand the configuration info, we have enough space here!
+        krexx.expandConfig();
+
         // Disable form-buttons in case a logfile is opened local.
         if (window.location.protocol === 'file:') {
             krexx.disableForms();
         }
+
     };
 
     /**
@@ -215,6 +221,7 @@
             this.parentNode.insertBefore(newEl, this.nextSibling);
             // Register the events on the new element.
             newEl.addEventListener('click', krexx.toggle);
+            newEl.addEventListener('click', krexx.setAdditionalData);
 
             // The code generation may not be possible here, so we need to check this.
             var kgencode = newEl.querySelector('.kgencode');
@@ -224,10 +231,11 @@
 
             newEl.querySelector('.kcollapse-me').addEventListener('click', krexx.collapse);
 
-            // Register the toggel function.
+            // Register the toggle function.
             var newExpand = newEl.nextElementSibling.querySelectorAll('.kexpand');
             for (i = 0; i < newExpand.length; i++) {
                 newExpand[i].addEventListener('click', krexx.toggle);
+                newExpand[i].addEventListener('click', krexx.setAdditionalData);
             }
             // Register the Collapse function.
             var hideEverythingElse = newEl.nextElementSibling.querySelectorAll('.kcollapse-me');
@@ -238,6 +246,11 @@
             var codegen = newEl.nextElementSibling.querySelectorAll('.kgencode');
             for (i = 0; i < codegen.length; i++) {
                 codegen[i].addEventListener('click', krexx.generateCode);
+            }
+            // Register the additional json data display function
+            var additional = newEl.nextElementSibling.querySelectorAll('.kwrapper .kel');
+            for (i = 0; i < additional.length; i++) {
+                additional[i].addEventListener('click', krexx.setAdditionalData);
             }
             // Register the recursion resolving (this function) on possible recursions
             var recursions = newEl.nextElementSibling.querySelectorAll('.kwrapper .kcopyFrom');
@@ -289,6 +302,7 @@
         // Prevents the event from propagating (ie: "bubbling").
         event.stopPropagation();
 
+        /** @type {EventTarget} */
         var button = event.target;
         var wrapper = kdt.getParents(button, '.kwrapper')[0];
 
@@ -315,6 +329,8 @@
             // Reset the button, since we are un-collapsing nodes here.
             kdt.removeClass('.kcollapsed', 'kcollapsed');
         }
+
+
     };
 
     /**
@@ -325,6 +341,7 @@
      *                                     [pointer]
      * The [pointer] is the key of the [search result] where
      * you would jump to when you click "next"
+     *
      */
     var results = [];
 
@@ -347,7 +364,7 @@
         if (searchtext.length > 2) {
             var instance = kdt.getDataset(this, 'instance');
             var direction = kdt.getDataset(this, 'direction');
-            var payload = document.querySelector('#' + instance + ' .kbg-wrapper');
+            var payload = document.querySelector('#' + instance + ' .kpayload:not(.khidden)');
 
             // We need to un-collapse everything, in case it it collapsed.
             var collapsed = payload.querySelectorAll('.kcollapsed');
@@ -420,6 +437,7 @@
             results[instance][searchtext]['pointer'] = -1;
         }
 
+
     };
 
     /**
@@ -433,23 +451,23 @@
         // Prevents the event from propagating (ie: "bubbling").
         event.stopPropagation();
 
-        var instance = kdt.getDataset(this, 'instance');
+        var instance = kdt.getDataset(this.parentNode, 'instance');
         var search = document.querySelector('#search-' + instance);
         var searchtab = document.querySelector('#' + instance + ' .ksearchbutton');
 
         // Toggle display / hidden.
-        if (kdt.hasClass(search, 'hidden')) {
+        if (kdt.hasClass(search, 'khidden')) {
             // Display it.
-            kdt.toggleClass(search, 'hidden');
+            kdt.toggleClass(search, 'khidden');
+            kdt.toggleClass(searchtab, 'kactive');
             search.querySelector('.ksearchfield').focus();
-            search.style.position = 'fixed';
         }
         else {
             // Hide it.
-            kdt.toggleClass(search, 'hidden');
-            kdt.removeClass('.ksearch-found-highlight', 'ksearch-found-highlight');
-            search.style.position = 'fixed';
+            kdt.toggleClass(search, 'khidden');
+            kdt.toggleClass(searchtab, 'kactive');
             // Clear the results.
+            kdt.removeClass('.ksearch-found-highlight', 'ksearch-found-highlight');
             results = [];
         }
     };
@@ -471,6 +489,11 @@
     };
 
     /**
+     * Here we store our jump-to-scroll-animation interval.
+     */
+    var interval;
+
+    /**
      * "Jumps" to an element in the markup and highlights it.
      *
      * It is used when we are facing a recursion in our analysis.
@@ -482,7 +505,6 @@
 
         var nests = kdt.getParents(el, '.knest');
         var container;
-        var destination;
 
         // Show them.
         kdt.removeClass(nests, 'khidden');
@@ -497,23 +519,15 @@
         kdt.addClass([el], 'highlight-jumpto');
 
         // Getting our scroll container
-        container = document.querySelectorAll('.kfatalwrapper-outer');
+        container = kdt.getParents(el, '.kpayload');
 
-        if (container.length === 0) {
-            // Normal scrolling
-            container = document.querySelectorAll('html');
-            destination = el.getBoundingClientRect().top + container[0].scrollTop - 50;
-        }
-        else {
-            // Fatal Error scrolling.
-            destination = el.getBoundingClientRect().top - container[0].getBoundingClientRect().top + container[0].scrollTop - 50;
-        }
-
-        var diff = Math.abs(container[0].scrollTop - destination);
-
+        container.push(document.querySelector('.kfatalwrapper-outer'));
         if (container.length > 0) {
+            // We need to find out in which direction we must go.
+            // We also must determine the speed we want to travel.
             var step;
-
+            var destination = el.getBoundingClientRect().top - container[0].getBoundingClientRect().top + container[0].scrollTop - 50;
+            var diff = Math.abs(container[0].scrollTop - destination);
             if (container[0].scrollTop < destination) {
                 // Forward.
                 step = Math.round(diff / 12);
@@ -525,9 +539,9 @@
 
             // We stop scrolling, since we have a new target;
             clearInterval(interval);
-            // We also need to check if the setting of the new value was successful.
+            // We also need to check if the setting of the new valkue was successful.
             var lastValue = container[0].scrollTop;
-            var interval = setInterval(function () {
+            interval = setInterval(function () {
                 container[0].scrollTop += step;
                 if (Math.abs(container[0].scrollTop - destination) <= Math.abs(step) || container[0].scrollTop === lastValue) {
                     // We are here now, the next step would take us too far.
@@ -577,7 +591,7 @@
      * for that file, and not for the server.
      */
     krexx.disableForms = function () {
-        var elements = document.querySelectorAll('.kwrapper .keditable input, .kwrapper .keditable select');
+        var elements = document.querySelectorAll('.kwrapper .kconfiguration .keditable input , .kwrapper .kconfiguration .keditable select');
         for (var i = 0; i < elements.length; i++) {
             elements[i].disabled = true;
         }
@@ -628,11 +642,13 @@
                     break;
                 }
                 // Check if we are facing a .stop. instruction
-                if (sourcedata === '.stop.') {
-                    // Return, what we've got so far.
-                    break;
-                }
+                 if (sourcedata === '.stop.') {
+                     // Return, what we've got so far.
+                     break;
+                 }
+                if (sourcedata === '. . .') {
 
+                }
                 // We're good, value can be reached!
                 result = sourcedata + result;
 
@@ -642,6 +658,7 @@
         }
 
         // 3. Add the text
+        console.log(result);
         codedisplay.innerHTML = '<div class="kcode-inner">' + result + '</div>';
         if (codedisplay.style.display === 'none') {
             codedisplay.style.display = '';
@@ -686,23 +703,92 @@
      */
     krexx.setPayloadMaxHeight = function () {
         // Get the height.
-        var height = Math.round(Math.max(document.documentElement.clientHeight, window.innerHeight || 0) * 0.60);
+        var height = Math.round(Math.min(document.documentElement.clientHeight, window.innerHeight || 0) * 0.70);
+        var elements;
+        var i;
 
-        if (height > 0) {
-            var elements = document.querySelectorAll('.krela-wrapper .kpayload');
-            for (var i = 0; i < elements.length; i++) {
+        if (height > 350) {
+            // For the debug display
+            elements = document.querySelectorAll('.krela-wrapper .kpayload');
+            for (i = 0; i < elements.length; i++) {
                 elements[i].style.maxHeight = height + 'px';
             }
         }
+
+        // For the fatal error handler.
+        elements = document.querySelectorAll('.kfatalwrapper-outer .kpayload');
+        if (elements.length > 0) {
+            var header = document.querySelector('.kfatalwrapper-outer ul.knode.kfirst').offsetHeight;
+            var footer = document.querySelector('.kfatalwrapper-outer .kinfo-wrapper').offsetHeight;
+            var handler = document.querySelector('.kfatalwrapper-outer').offsetHeight;
+            // This sets the max payload height to the remaining height of the window,
+            // sending the footer straight to the bottom of the viewport.
+            height = handler - header - footer - 17;
+            if (height > 350) {
+                for (i = 0; i < elements.length; i++) {
+                    elements[i].style.maxHeight = height + 'px';
+                }
+            }
+        }
+
+    };
+
+    /**
+     * Displays the additional data and marks the row that is displayed.
+     *
+     * @param {Event} event
+     */
+    krexx.setAdditionalData = function (event) {
+
+        var wrapper = kdt.getParents(this, '.kwrapper')[0];
+        if (typeof wrapper === 'undefined') {
+            // This only happens, when we are facing a recursion. There is no
+            // additional json data, anyway.
+            return;
+        }
+
+        var body = wrapper.querySelector('.kdatabody');
+        var html = '';
+        var counter = 0;
+
+        // Mark the clicked el, clear the others.
+        kdt.removeClass(wrapper.querySelectorAll('.kcurrent-additional'), 'kcurrent-additional');
+        kdt.addClass([this], 'kcurrent-additional');
+
+        // Load the Json.
+        var json = kdt.getDataset(this, 'addjson', false);
+        json = kdt.parseJson(json);
+
+        if (typeof json === 'object') {
+            // We've got data!
+            for (var prop in json) {
+                if (json[prop].length > 0) {
+                    html += '<tr><td>' + prop + '</td><td>' + json[prop] + '</td></tr>';
+                    counter++;
+                }
+            }
+        }
+        if (counter === 0) {
+            // We have no data. Tell the user that there is nothing to see.
+            html = '<tr><td>No data available for this item.</td><td>Sorry.</td></tr>';
+        }
+
+        // Add it to the DOM.
+        html = '<table><caption class="kheadline">Additional data</caption><tbody class="kdatabody">' + html + '</tbody></table>';
+        // Meh, IE9 does not allow me to edit the contents of a table. I have to
+        // redraw the whole thing.  :-(
+        body.parentNode.parentNode.innerHTML = html;
+
+        // Since the additional data table might now be larger or smaller than,
+        // we need to recalculate the height of the payload.
+        krexx.setPayloadMaxHeight();
     };
 
     /**
      * Checks if the search form is inside the viewport. If not, fixes it on top.
      * Gets triggered on,y when scolling the fatel error handler.
-     *
-     * @param {Event} event
      */
-    krexx.checkSeachInViewport = function (event) {
+    krexx.checkSeachInViewport = function () {
         // Get the search
         var search = document.querySelector('.kfatalwrapper-outer .search-wrapper');
         // Reset the inline styles
@@ -736,5 +822,23 @@
 
         kdt.trigger(this.parentNode.querySelectorAll('.ksearchnow')[1], 'click');
     };
+
+    /**
+     * Expands the display of the configuration.
+     */
+    krexx.expandConfig = function () {
+        // Get all configurations
+        var configs = document.querySelectorAll('.kconfiguration');
+        var elements;
+
+        // Get the second child of every configuration.
+        for (var i = 0; i < configs.length; i++) {
+            elements = configs[i].querySelectorAll('.kchild .kexpand');
+            // We chose the first one.
+            kdt.toggleClass(elements[0], 'kopened');
+            kdt.toggleClass(elements[0].nextElementSibling, 'khidden');
+
+        }
+    }
 
 })(kreXXdomTools);
