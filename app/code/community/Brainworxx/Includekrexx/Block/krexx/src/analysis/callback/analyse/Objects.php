@@ -32,23 +32,23 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-namespace Brainworxx\Krexx\Model\Callback\Analyse;
+namespace Brainworxx\Krexx\Analyse\Callback\Analyse;
 
-use Brainworxx\Krexx\Model\Callback\AbstractCallback;
-use Brainworxx\Krexx\Model\Simple;
-use Brainworxx\Krexx\Analysis\Flection;
+use Brainworxx\Krexx\Analyse\Callback\AbstractCallback;
+use Brainworxx\Krexx\Analyse\Model;
+use Brainworxx\Krexx\Analyse\Flection;
 
 /**
  * Object analysis methods.
  *
- * @package Brainworxx\Krexx\Model\Callback\Analysis
+ * @package Brainworxx\Krexx\Analyse\Callback\Analysis
  *
  * @uses object data
  *   The class we are analysing.
  * @uses string name
  *   The key of the class from the object/array holding this one.
  */
-class Object extends AbstractCallback
+class Objects extends AbstractCallback
 {
     /**
      * Starts the dump of an object.
@@ -99,7 +99,7 @@ class Object extends AbstractCallback
         }
 
         // Dumping protected properties.
-        if ($this->storage->config->getConfigValue('properties', 'analyseProtected') === 'true' ||
+        if ($this->storage->config->getSetting('analyseProtected') ||
             $this->storage->codegenHandler->isInScope()) {
             $refProps = $ref->getProperties(\ReflectionProperty::IS_PROTECTED);
             usort($refProps, $sortingCallback);
@@ -110,7 +110,7 @@ class Object extends AbstractCallback
         }
 
         // Dumping private properties.
-        if ($this->storage->config->getConfigValue('properties', 'analysePrivate') === 'true' ||
+        if ($this->storage->config->getSetting('analysePrivate') ||
             $this->storage->codegenHandler->isInScope()) {
             $refProps = $ref->getProperties(\ReflectionProperty::IS_PRIVATE);
             usort($refProps, $sortingCallback);
@@ -120,7 +120,7 @@ class Object extends AbstractCallback
         }
 
         // Dumping class constants.
-        if ($this->storage->config->getConfigValue('properties', 'analyseConstants') === 'true') {
+        if ($this->storage->config->getSetting('analyseConstants')) {
             $output .= $this->getReflectionConstantsData($ref);
         }
 
@@ -128,7 +128,7 @@ class Object extends AbstractCallback
         $output .= $this->getMethodData($data);
 
         // Dumping traversable data.
-        if ($this->storage->config->getConfigValue('properties', 'analyseTraversable') === 'true') {
+        if ($this->storage->config->getSetting('analyseTraversable')) {
             $output .= $this->getTraversableData($data, $name);
         }
 
@@ -152,22 +152,18 @@ class Object extends AbstractCallback
     protected function getMethodData($data)
     {
         // Dumping all methods but only if we have any.
-        $public = array();
         $protected = array();
         $private = array();
         $ref = new \ReflectionClass($data);
-        if ($this->storage->config->getConfigValue('methods', 'analyseMethodsAtall') === 'true') {
-            $public = $ref->getMethods(\ReflectionMethod::IS_PUBLIC);
 
-            if ($this->storage->config->getConfigValue('methods', 'analyseProtectedMethods') === 'true' ||
-                $this->storage->codegenHandler->isInScope()) {
-                $protected = $ref->getMethods(\ReflectionMethod::IS_PROTECTED);
-            }
+        $public = $ref->getMethods(\ReflectionMethod::IS_PUBLIC);
 
-            if ($this->storage->config->getConfigValue('methods', 'analysePrivateMethods') === 'true' ||
-                $this->storage->codegenHandler->isInScope()) {
-                $private = $ref->getMethods(\ReflectionMethod::IS_PRIVATE);
-            }
+        if ($this->storage->config->getSetting('analyseProtectedMethods') || $this->storage->codegenHandler->isInScope()) {
+            $protected = $ref->getMethods(\ReflectionMethod::IS_PROTECTED);
+        }
+
+        if ($this->storage->config->getSetting('analysePrivateMethods') || $this->storage->codegenHandler->isInScope()) {
+            $private = $ref->getMethods(\ReflectionMethod::IS_PRIVATE);
         }
 
         // Is there anything to analyse?
@@ -178,7 +174,7 @@ class Object extends AbstractCallback
                 return strcmp($a->name, $b->name);
             };
             usort($methods, $sortingCallback);
-            $model = new Simple($this->storage);
+            $model = new Model($this->storage);
             $model->setName('Methods')
                 ->setType('class internals')
                 ->addParameter('data', $methods)
@@ -208,12 +204,12 @@ class Object extends AbstractCallback
     {
         $output = '';
 
-        $funcList = explode(',', $this->storage->config->getConfigValue('methods', 'debugMethods'));
+        $funcList = explode(',', $this->storage->config->getSetting('debugMethods'));
         foreach ($funcList as $funcName) {
             if (is_callable(array(
                     $data,
                     $funcName,
-                )) && $this->storage->config->isAllowedDebugCall($data, $funcName)
+                )) && $this->storage->config->security->isAllowedDebugCall($data, $funcName)
             ) {
                 $foundRequired = false;
                 // We need to check if this method actually exists. Just because it is
@@ -255,7 +251,7 @@ class Object extends AbstractCallback
                         // Do nothing.
                     }
                     if (isset($result)) {
-                        $model = new Simple($this->storage);
+                        $model = new Model($this->storage);
                         $model->setName($funcName)
                             ->setType('debug method')
                             ->setAdditional('. . .')
@@ -288,47 +284,33 @@ class Object extends AbstractCallback
     protected function getTraversableData($data, $name)
     {
         if (is_a($data, 'Traversable')) {
-            $found = false;
+            // Special Array Access here, resulting in multiline source generation.
+            // We need to generate something like:
+            // $kresult = iterator_to_array($data);
+            // $kresult = $kresult[5];
+            // So we tell the callback to to that.
+            $multiline = true;
             $connector2 = '';
 
-            // If we are facing a IteratorAggregate, we can not access the array
-            // directly. To do this, we must get the Iterator from the class.
-            // For our analysis is it not really important, because it does not
-            // change anything. We need this for the automatic code generation.
-            if (is_a($data, 'IteratorAggregate')) {
-                $connector2 = '->getIterator()';
-                // Remove the name, because this would then get added to the source
-                // generation, resulting in unusable code.
-                $name = '';
-                $found = true;
+            // Normal ArrayAccess, direct access to the array. Nothing special
+            if (is_a($data, 'ArrayAccess')) {
+                $multiline = false;
             }
 
-            // Normal Iterator, direct access to the array. Nothing special
-            if (is_a($data, 'Iterator')) {
-                $found = true;
-            }
-
-            // SplObjectStorage objects are something 'special'.
-            // You can only get their value by wrapping then with a
-            // iterator_or_array() or via a foreach and then using the
-            // key. Either can not be generated by the code generator. :-(
+            // SplObject storage use the object as keys, so we need some
+            // multiline stuff!
             if (is_a($data, 'SplObjectStorage')) {
-                $found = false;
+                $multiline = true;
             }
 
-            if (!$found) {
-                // Array access is (currently) not possible. Sorry :-(
-                $name = '';
-                $connector2 = '. . .';
-            }
-
-            $model = new Simple($this->storage);
+            $model = new Model($this->storage);
             $parameter = iterator_to_array($data);
             $model->setName($name)
                 ->setType('Foreach')
                 ->setAdditional('Traversable Info')
                 ->setConnector2($connector2)
                 ->addParameter('data', $parameter)
+                ->addParameter('multiline', $multiline)
                 ->initCallback('Iterate\ThroughArray');
 
             return $this->storage->render->renderExpandableChild($model);
@@ -353,7 +335,7 @@ class Object extends AbstractCallback
 
         if (!empty($refConst)) {
             // We've got some values, we will dump them.
-            $model = new Simple($this->storage);
+            $model = new Model($this->storage);
             $classname =$ref->getName();
             // We need to set al least one connector here to activate
             // code generation, even if it is a space.
@@ -389,7 +371,7 @@ class Object extends AbstractCallback
     {
         // We are dumping public properties direct into the main-level, without
         // any "abstraction level", because they can be accessed directly.
-        $model = new Simple($this->storage);
+        $model = new Model($this->storage);
         $model->addParameter('data', $refProps)
             ->addParameter('ref', $ref)
             ->addParameter('orgObject', $data)

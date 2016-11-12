@@ -34,7 +34,8 @@
 
 namespace Brainworxx\Krexx\View\Smokygrey;
 
-use Brainworxx\Krexx\Model\Simple;
+use Brainworxx\Krexx\Analyse\Model;
+use Brainworxx\Krexx\Controller\OutputActions;
 
 /**
  * Individual render class for the smokey-grey skin.
@@ -47,13 +48,13 @@ class Render extends \Brainworxx\Krexx\Service\View\Render
     /**
      * {@inheritDoc}
      */
-    public function renderSingleChild(Simple $model)
+    public function renderSingleChild(Model $model)
     {
 
         $template = parent::renderSingleChild($model);
         $json = $model->getJson();
 
-        $json['Help'] = $this->getHelp($model->getHelpid());
+        $json['Help'] = $this->storage->messages->getHelp($model->getHelpid());
         // Prepare the json.
         $json = json_encode($json);
 
@@ -66,7 +67,7 @@ class Render extends \Brainworxx\Krexx\Service\View\Render
     /**
      * {@inheritDoc}
      */
-    public function renderExpandableChild(Simple $model, $isExpanded = false)
+    public function renderExpandableChild(Model $model, $isExpanded = false)
     {
 
         // Check for emergency break.
@@ -89,12 +90,13 @@ class Render extends \Brainworxx\Krexx\Service\View\Render
         $template = str_replace('{ktype}', $cssType, $template);
 
         $template = str_replace('{additional}', $model->getAdditional(), $template);
+        $template = str_replace('{connector2}', $this->renderConnector($model->getConnector2()), $template);
 
         // Generating our code and adding the Codegen button, if there is
         // something to generate.
         $gencode = $this->storage->codegenHandler->generateSource($model);
         $template = str_replace('{gensource}', $gencode, $template);
-        if ($gencode == '.stop.' || empty($gencode)) {
+        if ($gencode == ';stop;' || empty($gencode)) {
             // Remove the button marker, because here is nothing to add.
             $template = str_replace('{sourcebutton}', '', $template);
         } else {
@@ -107,7 +109,7 @@ class Render extends \Brainworxx\Krexx\Service\View\Render
         $template = str_replace('{isExpanded}', '', $template);
 
         $json = $model->getJson();
-        $json['Help'] = $this->getHelp($model->getHelpid());
+        $json['Help'] = $this->storage->messages->getHelp($model->getHelpid());
         $json = json_encode($json);
         $template = str_replace('{addjson}', $json, $template);
 
@@ -119,14 +121,14 @@ class Render extends \Brainworxx\Krexx\Service\View\Render
     /**
      * {@inheritDoc}
      */
-    public function renderSingleEditableChild(Simple $model)
+    public function renderSingleEditableChild(Model $model)
     {
 
         $template = parent::renderSingleEditableChild($model);
 
         // Prepare the json. Not much do display for form elements.
         $json = json_encode(array(
-            'Help' => $this->getHelp($model->getHelpid()),
+            'Help' => $this->storage->messages->getHelp($model->getHelpid()),
         ));
         $template = str_replace('{addjson}', $json, $template);
 
@@ -136,14 +138,14 @@ class Render extends \Brainworxx\Krexx\Service\View\Render
     /**
      * {@inheritDoc}
      */
-    public function renderButton(Simple $model)
+    public function renderButton(Model $model)
     {
 
         $template = parent::renderButton($model);
 
         // Prepare the json. Not much do display for form elements.
         $json = json_encode(array(
-            'Help' => $this->getHelp($model->getHelpid()),
+            'Help' => $this->storage->messages->getHelp($model->getHelpid()),
         ));
         $template = str_replace('{addjson}', $json, $template);
 
@@ -209,7 +211,12 @@ class Render extends \Brainworxx\Krexx\Service\View\Render
      */
     public function renderConnector($connector)
     {
-        // Do nothing. There are no connectors in Smoky-Grey.
+        if (strlen($connector) > 17) {
+            // Something big, we should display it.
+            // Most likely the parametes of a method.
+            return parent::renderConnector($connector);
+        }
         return '';
     }
+
 }

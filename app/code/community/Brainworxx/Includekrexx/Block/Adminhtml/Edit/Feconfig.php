@@ -80,12 +80,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
         $settings['output']['skin'] = $this->convertKrexxFeSetting(
             $storage->config->getFeConfigFromFile('skin')
         );
-        $settings['runtime']['memoryLeft'] = $this->convertKrexxFeSetting(
-            $storage->config->getFeConfigFromFile('memoryLeft')
-        );
-        $settings['runtime']['maxRuntime'] = $this->convertKrexxFeSetting(
-            $storage->config->getFeConfigFromFile('maxRuntime')
-        );
         $settings['runtime']['maxCall'] = $this->convertKrexxFeSetting(
             $storage->config->getFeConfigFromFile('maxCall')
         );
@@ -110,9 +104,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
         $settings['runtime']['level'] = $this->convertKrexxFeSetting(
             $storage->config->getFeConfigFromFile('level')
         );
-        $settings['methods']['analyseMethodsAtall'] = $this->convertKrexxFeSetting(
-            $storage->config->getFeConfigFromFile('analyseMethodsAtall')
-        );
         $settings['methods']['analyseProtectedMethods'] = $this->convertKrexxFeSetting(
             $storage->config->getFeConfigFromFile('analyseProtectedMethods')
         );
@@ -121,9 +112,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
         );
         $settings['backtraceAndError']['registerAutomatically'] = $this->convertKrexxFeSetting(
             $storage->config->getFeConfigFromFile('registerAutomatically')
-        );
-        $settings['backtraceAndError']['backtraceAnalysis'] = $this->convertKrexxFeSetting(
-            $storage->config->getFeConfigFromFile('backtraceAnalysis')
         );
 
         // Are these actually set?

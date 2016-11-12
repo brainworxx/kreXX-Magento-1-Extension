@@ -55,27 +55,22 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
         $storage = \Krexx::$storage;
 
         // Initialzing help data for the template.
-        $help['skin'] = htmlspecialchars(strip_tags($storage->render->getHelp('skin')));
-        $help['memoryLeft'] = htmlspecialchars(strip_tags($storage->render->getHelp('memoryLeft')));
-        $help['maxRuntime'] = htmlspecialchars(strip_tags($storage->render->getHelp('maxRuntime')));
-        $help['folder'] = htmlspecialchars(strip_tags($storage->render->getHelp('folder')));
-        $help['maxfiles'] = htmlspecialchars(strip_tags($storage->render->getHelp('maxfiles')));
-        $help['destination'] = htmlspecialchars(strip_tags($storage->render->getHelp('destination')));
-        $help['maxCall'] = htmlspecialchars(strip_tags($storage->render->getHelp('maxCall')));
+        $help['skin'] = htmlspecialchars(strip_tags($storage->messages->getHelp('skin')));
+        $help['maxfiles'] = htmlspecialchars(strip_tags($storage->messages->getHelp('maxfiles')));
+        $help['destination'] = htmlspecialchars(strip_tags($storage->messages->getHelp('destination')));
+        $help['maxCall'] = htmlspecialchars(strip_tags($storage->messages->getHelp('maxCall')));
         $help['disabled'] = 'Here you can disable kreXX without uninstalling the whole module.';
-        $help['detectAjax'] = htmlspecialchars(strip_tags($storage->render->getHelp('detectAjax')));
-        $help['analyseProtected'] = htmlspecialchars(strip_tags($storage->render->getHelp('analyseProtected')));
-        $help['analysePrivate'] = htmlspecialchars(strip_tags($storage->render->getHelp('analysePrivate')));
-        $help['analyseTraversable'] = htmlspecialchars(strip_tags($storage->render->getHelp('analyseTraversable')));
+        $help['detectAjax'] = htmlspecialchars(strip_tags($storage->messages->getHelp('detectAjax')));
+        $help['analyseProtected'] = htmlspecialchars(strip_tags($storage->messages->getHelp('analyseProtected')));
+        $help['analysePrivate'] = htmlspecialchars(strip_tags($storage->messages->getHelp('analysePrivate')));
+        $help['analyseTraversable'] = htmlspecialchars(strip_tags($storage->messages->getHelp('analyseTraversable')));
         $help['debugMethods'] = 'Comma-separated list of used debug callback functions. kreXX will try to call them,' .
             "if they are available and display their provided data.\nWe Recommend for Magento: '__toArray,toString'";
-        $help['level'] = htmlspecialchars(strip_tags($storage->render->getHelp('level')));
-        $help['analyseMethodsAtall'] = htmlspecialchars(strip_tags($storage->render->getHelp('analyseMethodsAtall')));
-        $help['analyseProtectedMethods'] = htmlspecialchars(strip_tags($storage->render->getHelp('analyseProtectedMethods')));
-        $help['analysePrivateMethods'] = htmlspecialchars(strip_tags($storage->render->getHelp('analysePrivateMethods')));
-        $help['registerAutomatically'] = htmlspecialchars(strip_tags($storage->render->getHelp('registerAutomatically')));
-        $help['backtraceAnalysis'] = htmlspecialchars(strip_tags($storage->render->getHelp('backtraceAnalysis')));
-        $help['analyseConstants'] = htmlspecialchars(strip_tags($storage->render->getHelp('analyseConstants')));
+        $help['level'] = htmlspecialchars(strip_tags($storage->messages->getHelp('level')));
+        $help['analyseProtectedMethods'] = htmlspecialchars(strip_tags($storage->messages->getHelp('analyseProtectedMethods')));
+        $help['analysePrivateMethods'] = htmlspecialchars(strip_tags($storage->messages->getHelp('analysePrivateMethods')));
+        $help['registerAutomatically'] = htmlspecialchars(strip_tags($storage->messages->getHelp('registerAutomatically')));
+        $help['analyseConstants'] = htmlspecialchars(strip_tags($storage->messages->getHelp('analyseConstants')));
         $this->assign('help', $help);
 
         // Initializing the select data for the template.
@@ -90,7 +85,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
         ));
         $skins = array();
 
-        foreach ($storage->config->getSkinList() as $skin) {
+        foreach ($storage->render->getSkinList() as $skin) {
             $skins[$skin] = $skin;
         }
 
@@ -98,18 +93,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
         $settings['output']['skin'] = $storage->config->getConfigFromFile(
             'output',
             'skin'
-        );
-        $settings['runtime']['memoryLeft'] = $storage->config->getConfigFromFile(
-            'runtime',
-            'memoryLeft'
-        );
-        $settings['runtime']['maxRuntime'] = $storage->config->getConfigFromFile(
-            'runtime',
-            'maxRuntime'
-        );
-        $settings['output']['folder'] = $storage->config->getConfigFromFile(
-            'output',
-            'folder'
         );
         $settings['output']['maxfiles'] = $storage->config->getConfigFromFile(
             'output',
@@ -155,10 +138,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
             'runtime',
             'level'
         );
-        $settings['methods']['analyseMethodsAtall'] = $storage->config->getConfigFromFile(
-            'methods',
-            'analyseMethodsAtall'
-        );
         $settings['methods']['analyseProtectedMethods'] = $storage->config->getConfigFromFile(
             'methods',
             'analyseProtectedMethods'
@@ -170,10 +149,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
         $settings['backtraceAndError']['registerAutomatically'] = $storage->config->getConfigFromFile(
             'backtraceAndError',
             'registerAutomatically'
-        );
-        $settings['backtraceAndError']['backtraceAnalysis'] = $storage->config->getConfigFromFile(
-            'backtraceAndError',
-            'backtraceAnalysis'
         );
 
         // Are these actually set?

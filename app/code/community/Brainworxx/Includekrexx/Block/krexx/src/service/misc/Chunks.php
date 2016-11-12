@@ -48,7 +48,7 @@ use Brainworxx\Krexx\Service\Storage;
  * chunks. We also use this class stitch back together this
  * string for output.
  *
- * @see \Brainworxx\Krexx\Framework\Toolbox->encodeString()
+ * @see \Brainworxx\Krexx\Service\Storage->encodeString()
  *   We use '@@@' to mark a chunk key. This function escapes the @
  *   so we have no collusion with data from strings.
  *
@@ -89,6 +89,11 @@ class Chunks
      * @var string
      */
     protected $krexxDir;
+
+    /**
+     * @var string
+     */
+    protected $logDir = 'log';
 
     /**
      * Injects the storage.
@@ -221,20 +226,15 @@ class Chunks
         $this->cleanupOldChunks();
 
         // Cleanup old logfiles to prevent a overflow.
-        static $logDir;
-        if (is_null($logDir)) {
-            $logDir = $this->storage->config->getConfigValue('output', 'folder') . DIRECTORY_SEPARATOR;
-        }
-        $this->cleanupOldLogs($logDir);
+        $this->cleanupOldLogs($this->logDir);
 
         // Determine the filename.
         $timestamp = $this->fileStamp();
-        $filename = $this->krexxDir . $logDir . $timestamp . '.Krexx.html';
-
+        $filename = $this->krexxDir . $this->logDir . DIRECTORY_SEPARATOR . $timestamp . '.Krexx.html';
         $chunkPos = strpos($string, '@@@');
 
         while ($chunkPos !== false) {
-            // We have a chunk, we send the html part.
+            // We have a chunk, we save the html part.
             $this->putFileContents($filename, substr($string, 0, $chunkPos));
 
             $chunkPart = substr($string, $chunkPos);
@@ -289,10 +289,10 @@ class Chunks
     protected function cleanupOldLogs($logDir)
     {
         // Cleanup old logfiles to prevent a overflow.
-        $logList = glob($this->krexxDir . $logDir . "*.Krexx.html");
+        $logList = glob($this->krexxDir . $logDir . DIRECTORY_SEPARATOR . "*.Krexx.html");
         if (!empty($logList)) {
             array_multisort(array_map('filemtime', $logList), SORT_DESC, $logList);
-            $maxFileCount = (int)$this->storage->config->getConfigValue('output', 'maxfiles');
+            $maxFileCount = (int)$this->storage->config->getSetting('maxfiles');
             $count = 1;
             // Cleanup logfiles.
             foreach ($logList as $file) {

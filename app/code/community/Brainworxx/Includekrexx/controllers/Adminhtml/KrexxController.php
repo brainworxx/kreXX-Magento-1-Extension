@@ -45,9 +45,6 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      */
     protected $allowedSettingsNames = array(
         'skin',
-        'memoryLeft',
-        'maxRuntime',
-        'folder',
         'maxfiles',
         'destination',
         'maxCall',
@@ -58,7 +55,6 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         'analyseTraversable',
         'debugMethods',
         'level',
-        'analyseMethodsAtall',
         'analyseProtectedMethods',
         'analysePrivateMethods',
         'registerAutomatically',
@@ -169,7 +165,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         $all_ok = true;
         $storage = \Krexx::$storage;
 
-        $filepath = $storage->config->getPathToIni();
+        $filepath = $storage->config->krexxdir. 'Krexx.ini';
         // We must preserve the section 'feEditing'.
         // Everything else will be overwritten.
         $old_values = parse_ini_file($filepath, true);
@@ -184,7 +180,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
                         // We escape the value, just in case, since we can not whitelist it.
                         $value = htmlspecialchars(preg_replace('/\s+/', '', $value));
                         // Evaluate the setting!
-                        if ($storage->config->evaluateSetting($section, $setting_name, $value)) {
+                        if ($storage->config->security->evaluateSetting($section, $setting_name, $value)) {
                             $old_values[$section][$setting_name] = $value;
                         } else {
                             // Validation failed! kreXX will generate a message, which we will
@@ -239,7 +235,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         $arguments = $this->getRequest()->getPost();
         $all_ok = true;
         $storage = \Krexx::$storage;
-        $filepath = $storage->config->getPathToIni();
+        $filepath = $storage->config->krexxdir. 'Krexx.ini';
 
         // Whitelist of the vales we are accepting.
         $allowed_values = array('full', 'display', 'none');

@@ -32,15 +32,15 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-namespace Brainworxx\Krexx\Model\Callback\Iterate;
+namespace Brainworxx\Krexx\Analyse\Callback\Iterate;
 
-use Brainworxx\Krexx\Model\Callback\AbstractCallback;
-use Brainworxx\Krexx\Model\Simple;
+use Brainworxx\Krexx\Analyse\Callback\AbstractCallback;
+use Brainworxx\Krexx\Analyse\Model;
 
 /**
  * Array analysis methods.
  *
- * @package Brainworxx\Krexx\Model\Callback\Iterate
+ * @package Brainworxx\Krexx\Analyse\Callback\Iterate
  *
  * @uses array data
  *   The array want to iterate.
@@ -71,7 +71,16 @@ class ThroughArray extends AbstractCallback
             if (is_string($key)) {
                 $key = $this->storage->encodeString($key);
             }
-            $model = new Simple($this->storage);
+
+            $model = new Model($this->storage);
+
+            // Are we dealing with multiline code generation?
+            if ($this->parameters['multiline'] === true) {
+                // Here we tel the Codegen service that we need some
+                // special handling.
+                $model->setMultiLineCodeGen('iterator_to_array');
+            }
+
             if (is_string($key)) {
                 $model->setData($value)
                     ->setName($key)

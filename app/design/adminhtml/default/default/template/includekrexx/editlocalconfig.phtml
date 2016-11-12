@@ -35,12 +35,12 @@ use Brainworxx\Krexx\Framework\Config;
 \Krexx::editSettings();
 ?>
 <h1>Edit local browser settings</h1>
-<?php if (!\Krexx::$storage->config->getEnabled()) { ?>
+<?php if (\Krexx::$storage->config->setDisabled('disabled')) { ?>
     Normally, we would display the menu for the local browser settings here.
     <br/>
     The output of kreXX was <b>disabled</b>, so it will not be displayed.
 <?php } else { ?>
-    <?php if (\Krexx::$storage->config->getConfigValue('output', 'destination') == 'file') { ?>
+    <?php if (\Krexx::$storage->config->getSetting('destination') == 'file') { ?>
         Normally, we would display the menu for the local browser settings here.
         <br/>
         The output of kreXX is switched to <b>file</b>, so it will not be displayed.

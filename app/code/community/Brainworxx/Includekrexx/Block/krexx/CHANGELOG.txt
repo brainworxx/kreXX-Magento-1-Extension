@@ -1,4 +1,18 @@
-1.4.3
+2.0.1
+- Refactored the configuration and introduced models there.
+- Removed the \Krexx::enable() call.
+- Removed configurations, that nobody was editing anyway.
+- Added a ip mask to whitelist ip's that can trigger kreXX.
+- Bugfix: Rendering of the 'extra' part for long string works
+  now correctly.
+- Bugfix: Sourcecode generation for Traversable classes should
+  work now for none ArrayAccess classes.
+- Bugfix: A string with the value of '0' will get displayed again.
+- Bugfix: Fixed a notice in the \Krexx::backtrace();
+- Change: Added the method arguments to the method analysis in the
+  smokygrey skin.
+
+2.0.0
 - Added sourcecode to the closure analysis.
 - Prettified the sourcecode display in the smokygrey skin.
 - Change: Removed the code generation for Traversals that can
@@ -11,8 +25,8 @@
   'Krexx::'.
 - Bugfix: Wrong line number in the fatal error handler.
 - Bugfix: Code generation for class constants now works properly.
-- Bugfix: Removed a stupid warning with the glob() function which
-  may occur on some systems.
+- Bugfix: Removed a  warning with the glob() function which may
+  occur on some systems.
 - Bugfix: Added a check to the developer handle tp prevent warnings.
 
 1.4.2
