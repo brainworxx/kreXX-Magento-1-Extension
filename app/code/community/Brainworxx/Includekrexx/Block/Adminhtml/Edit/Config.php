@@ -56,6 +56,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
 
         // Initialzing help data for the template.
         $help['skin'] = htmlspecialchars(strip_tags($storage->messages->getHelp('skin')));
+        $help['iprange'] = htmlspecialchars(strip_tags($storage->messages->getHelp('iprange')));
         $help['maxfiles'] = htmlspecialchars(strip_tags($storage->messages->getHelp('maxfiles')));
         $help['destination'] = htmlspecialchars(strip_tags($storage->messages->getHelp('destination')));
         $help['maxCall'] = htmlspecialchars(strip_tags($storage->messages->getHelp('maxCall')));
@@ -109,6 +110,10 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
         $settings['runtime']['disabled'] = $storage->config->getConfigFromFile(
             'runtime',
             'disabled'
+        );
+        $settings['runtime']['iprange'] = $storage->config->getConfigFromFile(
+            'runtime',
+            'iprange'
         );
         $settings['runtime']['detectAjax'] = $storage->config->getConfigFromFile(
             'runtime',

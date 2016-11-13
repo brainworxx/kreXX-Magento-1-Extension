@@ -42,7 +42,7 @@ class Brainworxx_Includekrexx_Helper_Data extends Mage_Core_Helper_Abstract
     public function relayMessages()
     {
         // Has kreXX something to say? Maybe a writeprotected logfolder?
-        // We are only faciong error messages here, normally.
+        // We are only facing error messages here, normally.
         $messages = strip_tags(Krexx::$storage->messages->outputMessages());
 
         if (!empty($messages)) {

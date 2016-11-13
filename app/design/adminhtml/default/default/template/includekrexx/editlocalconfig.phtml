@@ -35,7 +35,7 @@ use Brainworxx\Krexx\Framework\Config;
 \Krexx::editSettings();
 ?>
 <h1>Edit local browser settings</h1>
-<?php if (\Krexx::$storage->config->setDisabled('disabled')) { ?>
+<?php if (\Krexx::$storage->config->getSetting('disabled')) { ?>
     Normally, we would display the menu for the local browser settings here.
     <br/>
     The output of kreXX was <b>disabled</b>, so it will not be displayed.

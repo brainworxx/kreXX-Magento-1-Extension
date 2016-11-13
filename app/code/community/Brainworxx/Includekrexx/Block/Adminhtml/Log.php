@@ -48,11 +48,18 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
         $storage = \Krexx::$storage;
 
         // 1. Get the log folder.
-        $dir = $storage->config->krexxdir . $storage->config->getSetting('folder') . DIRECTORY_SEPARATOR;
+        $dir = $storage->config->krexxdir . 'log' . DIRECTORY_SEPARATOR;
 
         // 2. Get the file list and sort it.
         // Meh, Varien_Io_File does not allow a filter or sorting.
         $files = glob($dir . '*.Krexx.html');
+
+        // When we have no files, we stop right here.
+        if (empty($files)) {
+            $this->assign('files', array());
+            return;
+        }
+
         // The function filemtime gets cached by php btw.
         usort($files, function ($a, $b) {
             return filemtime($b) - filemtime($a);

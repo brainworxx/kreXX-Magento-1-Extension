@@ -61,6 +61,22 @@
                 <label for="factory.disabled">Use factory settings</label>
             </td>
         </tr>
+
+        <tr>
+            <td><label for="iprange">IP Range:</label></td>
+            <td>
+                <div class="link-store-scope" title="<?php echo $help['iprange']; ?>"></div>
+            </td>
+            <td>
+                <input type="text" value="<?php echo $settings['runtime']['iprange']; ?>" name="runtime[iprange]" id="iprange">
+            </td>
+            <td>
+                <input id="factory.iprange" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['iprange']; ?>/>
+                <label for="factory.iprange">Use factory settings</label>
+            </td>
+        </tr>
+
+
         <tr>
             <td>
                 <label for="detectAjax">Try to detect AJAX requests:</label>

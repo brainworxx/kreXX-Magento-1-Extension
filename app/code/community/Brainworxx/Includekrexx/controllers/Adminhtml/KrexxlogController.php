@@ -39,6 +39,11 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxlogController extends Mage_Adminhtm
 {
 
 
+    /**
+     * Internal security call, to show if the current backenduser is allowed here.
+     *
+     * @return bool
+     */
     protected function _isAllowed()
     {
         return Mage::getSingleton('admin/session')->isAllowed('system/krexx/krexxlog');
@@ -82,7 +87,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxlogController extends Mage_Adminhtm
         // No directory traversal for you!
         $id = preg_replace('/[^0-9]/', '', $this->getRequest()->get('id'));
         // Get the filepath.
-        $file = $storage->config->krexxdir . $storage->config->getConfigValue('output', 'folder') . DIRECTORY_SEPARATOR . $id . '.Krexx.html';
+        $file = $storage->config->krexxdir . 'log' . DIRECTORY_SEPARATOR . $id . '.Krexx.html';
 
         $ioFile = new Varien_Io_File();
         if ($ioFile->streamOpen($file, 'rb')) {

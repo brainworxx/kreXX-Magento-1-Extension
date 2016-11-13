@@ -60,6 +60,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         'registerAutomatically',
         'backtraceAnalysis',
         'analyseConstants',
+        'iprange',
     );
 
     /**
@@ -75,6 +76,11 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         'backtraceAndError',
     );
 
+    /**
+     * Internal security call, to show if the current backenduser is allowed here.
+     *
+     * @return bool
+     */
     protected function _isAllowed()
     {
         $actionName = $this->getFullActionName();
@@ -247,7 +253,6 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
 
         // We need to correct the allowed settings, since we do not allow anything.
         unset($this->allowedSettingsNames['destination']);
-        unset($this->allowedSettingsNames['folder']);
         unset($this->allowedSettingsNames['maxfiles']);
         unset($this->allowedSettingsNames['debugMethods']);
 
