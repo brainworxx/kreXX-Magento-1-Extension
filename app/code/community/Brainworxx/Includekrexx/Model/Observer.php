@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -49,8 +49,25 @@ class Brainworxx_Includekrexx_Model_Observer
         // We need to do this only once
         // the static should save some time.
         static $beenHere = false;
+
+
         if (!$beenHere) {
-            $filename = Mage::getModuleDir('Block', 'Brainworxx_Includekrexx') . '/Block/krexx/Krexx.php';
+            $blockPath = Mage::getModuleDir('Block', 'Brainworxx_Includekrexx');
+            $filename = $blockPath . '/Block/krexx/Krexx.php';
+            // Tell kreXX that we want to use some special classes for the getter analysis.
+            $GLOBALS['kreXXoverwrites'] = array(
+                'Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter' => 'Brainworxx_Includekrexx_Model_Dynamicgetter'
+            );
+            // Load them.
+            $abstract = $blockPath . '/Block/krexx/src/analysis/callback/AbstractCallback.php';
+            if (file_exists($abstract) && !class_exists('Brainworxx\\Krexx\\Analyse\\Callback\\AbstractCallback', false)) {
+                include_once $abstract;
+            }
+            $getter = $blockPath . '/Block/krexx/src/analysis/callback/iterate/ThroughGetter.php';
+            if (file_exists($blockPath) && !class_exists('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter', false)) {
+                include_once $getter;
+            }
+
             if (file_exists($filename) && !class_exists('Krexx', false)) {
                 include_once $filename;
             }
