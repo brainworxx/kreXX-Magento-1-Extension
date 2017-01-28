@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -35,7 +35,6 @@
 namespace Brainworxx\Krexx\Analyse\Callback\Iterate;
 
 use Brainworxx\Krexx\Analyse\Callback\AbstractCallback;
-use Brainworxx\Krexx\Analyse\Model;
 
 /**
  * Constant analysis methods.
@@ -63,11 +62,14 @@ class ThroughConstants extends AbstractCallback
         // internal stuff. Is it even possible to create a recursion here?
         // Iterate through.
         foreach ($this->parameters['data'] as $k => &$v) {
-            $model = new Model($this->storage);
-            $model->setData($v)
+            $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+                ->setData($v)
                 ->setName($k)
                 ->setConnector1($this->parameters['classname'] . '::');
-            $output .= $this->storage->routing->analysisHub($model);
+
+            $output .= $this->pool
+                ->createClass('Brainworxx\\Krexx\\Analyse\\Routing\\Routing')
+                ->analysisHub($model);
         }
 
         return $output;

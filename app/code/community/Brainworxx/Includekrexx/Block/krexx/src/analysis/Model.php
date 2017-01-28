@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,6 @@
 
 namespace Brainworxx\Krexx\Analyse;
 
-use Brainworxx\Krexx\Service\Storage;
 use Brainworxx\Krexx\Analyse\Callback\AbstractCallback;
 
 /**
@@ -44,13 +43,6 @@ use Brainworxx\Krexx\Analyse\Callback\AbstractCallback;
  */
 class Model
 {
-    /**
-     * Here we store all relevant data.
-     *
-     * @var Storage
-     */
-    protected $storage;
-
     /**
      * The object/string/array/whatever we are analysing right now
      *
@@ -157,14 +149,25 @@ class Model
     protected $multiLineCodeGen = '';
 
     /**
-     * Injects the storage.
+     * Defines if the content of the variable qualifies as a callback.
      *
-     * @param Storage $storage
-     *   The storage, where we store the classes we need.
+     * @var bool
      */
-    public function __construct(Storage $storage)
+    protected $isCallback = false;
+
+    /**
+     * Inject the callback for the renderer
+     *
+     * @param AbstractCallback $object
+     *   The callback.
+     *
+     * @return $this
+     *   $this for chaining
+     */
+    public function injectCallback(AbstractCallback $object)
     {
-        $this->storage = $storage;
+        $this->callback = $object;
+        return $this;
     }
 
     /**
@@ -392,17 +395,20 @@ class Model
     }
 
     /**
-     * Setter for json.
+     * We simply add more info to our info json.
      *
-     * @param array $json
-     *   More analysis data.
+     * @param $key
+     *   The array key.
+     * @param $value
+     *   The value we want to set.
      *
-     * @return Model
-     *   $this, for chaining.
+     * @return $this
+     *   $this for chaining.
      */
-    public function setJson($json)
+    public function addToJson($key, $value)
     {
-        $this->json = $json;
+        // Remove leftover linebreaks.
+        $this->json[$key] = preg_replace("/\r|\n/", "", $value);
         return $this;
     }
 
@@ -461,22 +467,6 @@ class Model
     }
 
     /**
-     * Initializes the callback for the renderMe method
-     *
-     * @param string $name
-     *   The name and part of the namespace of the callback class.
-     *
-     * @return Model
-     *   $this, for chaining.
-     */
-    public function initCallback($name)
-    {
-        $classname = 'Brainworxx\\Krexx\\Analyse\\Callback\\' . $name;
-        $this->callback = new $classname($this->storage);
-        return $this;
-    }
-
-    /**
      * Getter for the hasExtras property.
      *
      * @return bool
@@ -517,5 +507,25 @@ class Model
     public function setMultiLineCodeGen($multiLineCodeGen)
     {
         $this->multiLineCodeGen = $multiLineCodeGen;
+    }
+
+    /**
+     * Getter for the $isCallback.
+     *
+     * @return boolean
+     */
+    public function getIsCallback()
+    {
+        return $this->isCallback;
+    }
+
+    /**
+     * Setter for the $isCallback.
+     *
+     * @param boolean $isCallback
+     */
+    public function setIsCallback($isCallback)
+    {
+        $this->isCallback = $isCallback;
     }
 }

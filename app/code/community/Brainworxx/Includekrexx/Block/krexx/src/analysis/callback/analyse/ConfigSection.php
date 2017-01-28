@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -35,7 +35,6 @@
 namespace Brainworxx\Krexx\Analyse\Callback\Analyse;
 
 use Brainworxx\Krexx\Analyse\Callback\AbstractCallback;
-use Brainworxx\Krexx\Analyse\Model;
 
 /**
  * Configuration "analysis" methods. Meh, naming conventions suck sometimes.
@@ -63,6 +62,7 @@ class ConfigSection extends AbstractCallback
         foreach ($this->parameters['data'] as $name => $setting) {
             // Render the single value.
             // We need to find out where the value comes from.
+            /** @var \Brainworxx\Krexx\Service\Config\Model $setting */
             $value = $setting->getValue();
             if ($setting->getType() != 'None') {
                 // We need to re-translate booleans to something the
@@ -74,7 +74,7 @@ class ConfigSection extends AbstractCallback
                     $value = 'false';
                 }
 
-                $model = new Model($this->storage);
+                $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model');
                 if ($setting->getEditable()) {
                     $model->setData($name)
                         ->setName($value)
@@ -82,14 +82,14 @@ class ConfigSection extends AbstractCallback
                         ->setType($setting->getType())
                         ->setHelpid($name);
 
-                    $sectionOutput .= $this->storage->render->renderSingleEditableChild($model);
+                    $sectionOutput .= $this->pool->render->renderSingleEditableChild($model);
                 } else {
                     $model->setData($value)
                         ->setName($name)
                         ->setNormal($value)
                         ->setType($setting->getSource())
                         ->setHelpid($name);
-                    $sectionOutput .= $this->storage->render->renderSingleChild($model);
+                    $sectionOutput .= $this->pool->render->renderSingleChild($model);
                 }
             }
         }

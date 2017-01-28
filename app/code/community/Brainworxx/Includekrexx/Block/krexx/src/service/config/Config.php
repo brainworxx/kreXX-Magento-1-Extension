@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,8 @@
 
 namespace Brainworxx\Krexx\Service\Config;
 
-use Brainworxx\Krexx\Service\Storage;
+use Brainworxx\Krexx\Service\Factory\Pool;
+use Brainworxx\Krexx\Service\Misc\File;
 
 /**
  * Access the debug settings here.
@@ -52,6 +53,13 @@ class Config extends Fallback
     public $security;
 
     /**
+     * The file service used for reading and writing files.
+     *
+     * @var File
+     */
+    protected $fileService;
+
+    /**
      * The current position of our iterator array.
      *
      * @var int
@@ -66,15 +74,15 @@ class Config extends Fallback
     public $settings = array();
 
     /**
-     * Injection the storage and loading the configuration.
+     * Injection the pool and loading the configuration.
      *
-     * @param \Brainworxx\Krexx\Service\Storage $storage
-     * @param string $krexxdir
+     * @param \Brainworxx\Krexx\Service\Factory\Pool $pool
      */
-    public function __construct(Storage $storage, $krexxdir)
+    public function __construct(Pool $pool)
     {
-        parent::__construct($storage, $krexxdir);
-        $this->security = new Security($storage, $krexxdir);
+        parent::__construct($pool);
+        $this->security = $pool->createClass('Brainworxx\\Krexx\\Service\\Config\\Security');
+        $this->fileService = $pool->createClass('Brainworxx\\Krexx\\Service\\Misc\\File');
 
         // Loading the settings.
         foreach ($this->configFallback as $section => $settings) {
@@ -137,7 +145,7 @@ class Config extends Fallback
     }
 
     /**
-     * Wrapper arroun+d the stored settings array, to intercept settings calls.
+     * Wrapper around the stored settings array, to intercept settings calls.
      *
      * @param string $name
      *   The nbame of the setting.
@@ -219,8 +227,9 @@ class Config extends Fallback
         }
 
         $feConfig = $this->getFeConfig($name);
-        $model = new Model();
-        $model->setSection($section)
+        /** @var Model $model */
+        $model = $this->pool->createClass('Brainworxx\\Krexx\\Service\\Config\Model')
+            ->setSection($section)
             ->setEditable($feConfig[0])
             ->setType($feConfig[1]);
 
@@ -348,7 +357,10 @@ class Config extends Fallback
 
         // Not loaded?
         if (empty($config)) {
-            $config = (array)parse_ini_string($this->storage->getFileContents($this->krexxdir . 'Krexx.ini'), true);
+            $config = (array)parse_ini_string(
+                $this->fileService->getFileContents($this->pool->krexxDir . 'config/Krexx.ini'),
+                true
+            );
             if (empty($config)) {
                 // Still empty means that there is no ini file. We add a dummy.
                 // This will prevent the failing reload of the ini file.

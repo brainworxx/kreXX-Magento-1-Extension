@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -34,9 +34,10 @@
 
 namespace Brainworxx\Krexx\Controller;
 
+use Brainworxx\Krexx\Analyse\Caller\AbstractCaller;
+use Brainworxx\Krexx\Service\Misc\File;
 use Brainworxx\Krexx\Service\Misc\Shutdown;
-use Brainworxx\Krexx\Service\Storage;
-use Brainworxx\Krexx\Analyse\Model;
+use Brainworxx\Krexx\Service\Factory\Pool;
 
 /**
  * Methods for the "controller" that are not directly "actions".
@@ -45,6 +46,13 @@ use Brainworxx\Krexx\Analyse\Model;
  */
 class Internals
 {
+
+    /**
+     * The fileservice, used to read and write files.
+     *
+     * @var File
+     */
+    protected $fileService;
 
     /**
      * Sends the output to the browser during shutdown phase.
@@ -80,126 +88,50 @@ class Internals
     /**
      * Here we save all timekeeping stuff.
      *
-     * @var string array
+     * @var array
      */
     protected $timekeeping = array();
+
+    /**
+     * More timekeeping stuff.
+     *
+     * @var array
+     */
     protected $counterCache = array();
 
     /**
-     * Our storage wher we keep al relevant classes.
+     * Our pool where we keep all relevant classes.
      *
-     * @var Storage
+     * @var Pool
      */
-    protected $storage;
+    protected $pool;
 
     /**
-     * Injects the storage.
+     * Finds our caller.
      *
-     * @param Storage $storage
-     *   The storage, where we store the classes we need.
+     * @var AbstractCaller
      */
-    public function __construct(Storage $storage)
+    protected $callerFinder;
+
+    /**
+     * Injects the pool.
+     *
+     * @param Pool $pool
+     *   The pool, where we store the classes we need.
+     */
+    public function __construct(Pool $pool)
     {
-        $this->storage = $storage;
+        $this->pool = $pool;
+        $this->callerFinder = $pool->createClass('Brainworxx\\Krexx\\Analyse\\Caller\\Php');
+        $this->fileService = $pool->createClass('Brainworxx\\Krexx\\Service\\Misc\\File');
 
         // Register our shutdown handler. He will handle the display
         // of kreXX after the hosting CMS is finished.
-        $this->shutdownHandler = new Shutdown($this->storage);
+        $this->shutdownHandler = $pool->createClass('Brainworxx\\Krexx\\Service\\Misc\\Shutdown');
         register_shutdown_function(array(
             $this->shutdownHandler,
             'shutdownCallback'
         ));
-    }
-
-    /**
-     * Finds the place in the code from where krexx was called.
-     *
-     * @return array
-     *   The code, from where krexx was called
-     */
-    protected function findCaller()
-    {
-        $backtrace = debug_backtrace();
-        while ($caller = array_pop($backtrace)) {
-            if (isset($caller['function']) && strtolower($caller['function']) === 'krexx') {
-                break;
-            }
-            if (isset($caller['class']) && strtolower($caller['class']) === 'krexx') {
-                break;
-            }
-        }
-
-        // We will not keep the whole backtrace im memory. We only return what we
-        // actually need.
-        return array(
-            'file' => htmlspecialchars($caller['file']),
-            'line' => (int)$caller['line'],
-            // We don't need to escape the varname, this will be done in
-            // the model.
-            'varname' => $this->getVarName($caller['file'], $caller['line']),
-        );
-    }
-
-    /**
-     * Tries to extract the name of the variable which we try to analyse.
-     *
-     * @param string $file
-     *   Path to the sourcecode file.
-     * @param string $line
-     *   The line from where kreXX was called.
-     *
-     * @return string
-     *   The name of the variable.
-     */
-    protected function getVarName($file, $line)
-    {
-        // Retrieve the call from the sourcecode file.
-        $source = file($file);
-        // Fallback to '. . .'.
-        $varname = '. . .';
-
-        // Now that we have the line where it was called, we must check if
-        // we have several commands in there.
-        $possibleCommands = explode(';', $source[$line - 1]);
-        // Now we must weed out the none krexx commands.
-        foreach ($possibleCommands as $key => $command) {
-            if (strpos(strtolower($command), 'krexx') === false) {
-                unset($possibleCommands[$key]);
-            }
-        }
-        // I have no idea how to determine the actual call of krexx if we
-        // are dealing with several calls per line.
-        if (count($possibleCommands) === 1) {
-            $sourceCall = reset($possibleCommands);
-
-            // Now that we have our actual call, we must remove the krexx-part
-            // from it.
-            $possibleFunctionnames = array(
-                'krexx',
-                'krexx::open',
-                'krexx::' . $this->storage->config->getDevHandler(),
-                'Krexx::open',
-                'Krexx::' . $this->storage->config->getDevHandler()
-            );
-            foreach ($possibleFunctionnames as $funcname) {
-                // This little baby tries to resolve everything inside the
-                // brackets of the kreXX call.
-                preg_match('/' . $funcname . '\s*\((.*)\)\s*/u', $sourceCall, $name);
-                if (isset($name[1])) {
-                    $varname = $name[1];
-                    break;
-                }
-            }
-        }
-
-        $varname = $this->storage->encodeString(trim($varname, " \t\n\r\0\x0B'\""));
-
-        // Check if we have a value.
-        if (empty($varname)) {
-            $varname = '. . .';
-        }
-
-        return $varname;
     }
 
     /**
@@ -217,9 +149,9 @@ class Internals
         if (!$this->headerSend) {
             // Send doctype and css/js only once.
             $this->headerSend = true;
-            return $this->storage->render->renderHeader('<!DOCTYPE html>', $headline, $this->outputCssAndJs());
+            return $this->pool->render->renderHeader('<!DOCTYPE html>', $headline, $this->outputCssAndJs());
         } else {
-            return $this->storage->render->renderHeader('', $headline, '');
+            return $this->pool->render->renderHeader('', $headline, '');
         }
     }
 
@@ -239,7 +171,7 @@ class Internals
     {
         // Now we need to stitch together the content of the ini file
         // as well as it's path.
-        if (!is_readable($this->storage->config->krexxdir . 'Krexx.ini')) {
+        if (!is_readable($this->pool->krexxDir . 'config/Krexx.ini')) {
             // Project settings are not accessible
             // tell the user, that we are using fallback settings.
             $path = 'Krexx.ini not found, using factory settings';
@@ -248,14 +180,16 @@ class Internals
             $path = 'Current configuration';
         }
 
-        $model = new Model($this->storage);
-        $model->setName($path)
-            ->setType($this->storage->config->krexxdir . 'Krexx.ini')
+        $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            ->setName($path)
+            ->setType($this->pool->krexxDir . 'config/Krexx.ini')
             ->setHelpid('currentSettings')
-            ->initCallback('Iterate\ThroughConfig');
+            ->injectCallback(
+                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughConfig')
+            );
 
-        $configOutput = $this->storage->render->renderExpandableChild($model, $isExpanded);
-        return $this->storage->render->renderFooter($caller, $configOutput, $isExpanded);
+        $configOutput = $this->pool->render->renderExpandableChild($model, $isExpanded);
+        return $this->pool->render->renderFooter($caller, $configOutput, $isExpanded);
     }
 
     /**
@@ -266,12 +200,12 @@ class Internals
      */
     protected function outputCssAndJs()
     {
-        $krexxDir = $this->storage->config->krexxdir;
+        $krexxDir = $this->pool->krexxDir;
         // Get the css file.
-        $css = $this->storage->getFileContents(
+        $css = $this->fileService->getFileContents(
             $krexxDir .
             'resources/skins/' .
-            $this->storage->config->getSetting('skin') .
+            $this->pool->config->getSetting('skin') .
             '/skin.css'
         );
         // Remove whitespace.
@@ -283,18 +217,18 @@ class Internals
         } else {
             $jsFile = $krexxDir . 'resources/jsLibs/kdt.js';
         }
-        $js = $this->storage->getFileContents($jsFile);
+        $js = $this->fileService->getFileContents($jsFile);
 
         // Krexx.js is comes directly form the template.
-        $path = $krexxDir . 'resources/skins/' . $this->storage->config->getSetting('skin');
+        $path = $krexxDir . 'resources/skins/' . $this->pool->config->getSetting('skin');
         if (is_readable($path . '/krexx.min.js')) {
             $jsFile = $path . '/krexx.min.js';
         } else {
             $jsFile = $path . '/krexx.js';
         }
-        $js .= $this->storage->getFileContents($jsFile);
+        $js .= $this->fileService->getFileContents($jsFile);
 
-        return $this->storage->render->renderCssJs($css, $js);
+        return $this->pool->render->renderCssJs($css, $js);
     }
 
     /**

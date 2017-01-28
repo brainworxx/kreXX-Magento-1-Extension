@@ -45,7 +45,7 @@ class Brainworxx_Includekrexx_Helper_Data extends Mage_Core_Helper_Abstract
     {
         // Has kreXX something to say? Maybe a writeprotected logfolder?
         // We are only facing error messages here, normally.
-        $messages = strip_tags(Krexx::$storage->messages->outputMessages());
+        $messages = strip_tags(Krexx::$pool->messages->outputMessages());
 
         if (!empty($messages)) {
             Mage::getSingleton('core/session')->addError(

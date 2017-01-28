@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,6 @@
 
 namespace Brainworxx\Krexx\Analyse\Callback\Analyse;
 
-use Brainworxx\Krexx\Analyse\Model;
 use Brainworxx\Krexx\Analyse\Callback\AbstractCallback;
 
 /**
@@ -55,10 +54,13 @@ class Debug extends AbstractCallback
      */
     public function callMe()
     {
-        $model = new Model($this->storage);
-        $model->setData($this->parameters['data'])
+        $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            ->setData($this->parameters['data'])
             ->setName('result');
         // This could be anything, we need to route it.
-        return $this->storage->routing->analysisHub($model);
+
+        return $this->pool
+            ->createClass('Brainworxx\\Krexx\\Analyse\\Routing\\Routing')
+            ->analysisHub($model);
     }
 }

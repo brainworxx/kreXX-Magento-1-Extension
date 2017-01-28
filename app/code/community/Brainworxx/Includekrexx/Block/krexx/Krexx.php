@@ -1,22 +1,23 @@
 <?php
 /**
- * @file
- *   Sourcecode GUI for kreXX
- *   kreXX: Krumo eXXtended
+ * kreXX: Krumo eXXtended
  *
- *   This is a debugging tool, which displays structured information
- *   about any PHP object. It is a nice replacement for print_r() or var_dump()
- *   which are used by a lot of PHP developers.
+ * kreXX is a debugging tool, which displays structured information
+ * about any PHP object. It is a nice replacement for print_r() or var_dump()
+ * which are used by a lot of PHP developers.
  *
- *   kreXX is a fork of Krumo, which was originally written by:
- *   Kaloyan K. Tsvetkov <kaloyan@kaloyan.info>
+ * kreXX is a fork of Krumo, which was originally written by:
+ * Kaloyan K. Tsvetkov <kaloyan@kaloyan.info>
  *
- * @author brainworXX GmbH <info@brainworxx.de>
+ * @author
+ *   brainworXX GmbH <info@brainworxx.de>
  *
- * @license http://opensource.org/licenses/LGPL-2.1
+ * @license
+ *   http://opensource.org/licenses/LGPL-2.1
+ *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -31,7 +32,7 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-use Brainworxx\Krexx\Service\Storage;
+use Brainworxx\Krexx\Service\Factory\Pool;
 
 /**
  * Alias function for object analysis.
@@ -64,19 +65,19 @@ function krexx($data = null, $handle = '')
  */
 class Krexx
 {
+
     /**
-     * Our storage wher we keep al relevant classes.
+     * Our pool where we keep all relevant classes.
      *
-     * @var Storage
+     * @var Pool
      */
-    public static $storage;
+    public static $pool;
 
     /**
      * Includes all needed files and sets some internal values.
      */
     public static function bootstrapKrexx()
     {
-
         $krexxDir = dirname(__FILE__) . DIRECTORY_SEPARATOR;
         include_once $krexxDir . 'src/service/view/Help.php';
         include_once $krexxDir . 'src/service/view/Render.php';
@@ -87,14 +88,28 @@ class Krexx
         include_once $krexxDir . 'src/service/config/Config.php';
         include_once $krexxDir . 'src/service/misc/Codegen.php';
         include_once $krexxDir . 'src/service/misc/Chunks.php';
+        include_once $krexxDir . 'src/service/misc/File.php';
         include_once $krexxDir . 'src/service/misc/Shutdown.php';
-        include_once $krexxDir . 'src/service/Storage.php';
+        include_once $krexxDir . 'src/service/factory/Factory.php';
+        include_once $krexxDir . 'src/service/factory/Pool.php';
         include_once $krexxDir . 'src/service/flow/Recursion.php';
-
         include_once $krexxDir . 'src/service/flow/Emergency.php';
         include_once $krexxDir . 'src/analysis/Flection.php';
-        include_once $krexxDir . 'src/analysis/Routing.php';
+        include_once $krexxDir . 'src/analysis/routing/AbstractRouting.php';
+        include_once $krexxDir . 'src/analysis/routing/Routing.php';
+        include_once $krexxDir . 'src/analysis/process/AbstractProcess.php';
+        include_once $krexxDir . 'src/analysis/process/ProcessArray.php';
+        include_once $krexxDir . 'src/analysis/process/ProcessBacktrace.php';
+        include_once $krexxDir . 'src/analysis/process/ProcessBoolean.php';
+        include_once $krexxDir . 'src/analysis/process/ProcessClosure.php';
+        include_once $krexxDir . 'src/analysis/process/ProcessFloat.php';
+        include_once $krexxDir . 'src/analysis/process/ProcessInteger.php';
+        include_once $krexxDir . 'src/analysis/process/ProcessNull.php';
+        include_once $krexxDir . 'src/analysis/process/ProcessObject.php';
+        include_once $krexxDir . 'src/analysis/process/ProcessResource.php';
+        include_once $krexxDir . 'src/analysis/process/ProcessString.php';
         include_once $krexxDir . 'src/analysis/Model.php';
+        include_once $krexxDir . 'src/analysis/Scope.php';
         include_once $krexxDir . 'src/analysis/callback/AbstractCallback.php';
         include_once $krexxDir . 'src/analysis/callback/analyse/BacktraceStep.php';
         include_once $krexxDir . 'src/analysis/callback/analyse/ConfigSection.php';
@@ -106,13 +121,61 @@ class Krexx
         include_once $krexxDir . 'src/analysis/callback/iterate/ThroughMethodAnalysis.php';
         include_once $krexxDir . 'src/analysis/callback/iterate/ThroughMethods.php';
         include_once $krexxDir . 'src/analysis/callback/iterate/ThroughProperties.php';
+        include_once $krexxDir . 'src/analysis/callback/iterate/ThroughGetter.php';
+        include_once $krexxDir . 'src/analysis/caller/AbstractCaller.php';
+        include_once $krexxDir . 'src/analysis/caller/Php.php';
+        include_once $krexxDir . 'src/analysis/comment/AbstractComment.php';
+        include_once $krexxDir . 'src/analysis/comment/Methods.php';
+        include_once $krexxDir . 'src/analysis/comment/Functions.php';
         include_once $krexxDir . 'src/errorhandler/Error.php';
         include_once $krexxDir . 'src/errorhandler/Fatal.php';
         include_once $krexxDir . 'src/controller/Internals.php';
         include_once $krexxDir . 'src/controller/OutputActions.php';
 
-        // Create a new storage where we sotre all our classes.
-        self::$storage = new Storage($krexxDir);
+        // Create a new pool where we store all our classes.
+        self::$pool = new Pool($krexxDir);
+
+        // Check our environment.
+        self::checkEnvironment($krexxDir);
+
+        // We might need to register our fatal error handler.
+        if (self::$pool->config->getSetting('registerAutomatically')) {
+            self::$pool->controller->registerFatalAction();
+        }
+    }
+
+    /**
+     * Check if the environment is  as it should be.
+     *
+     * @param string $krexxDir
+     *   The directory where kreXX ist installed.
+     */
+    protected static function checkEnvironment($krexxDir)
+    {
+        // Check chunk folder is writable.
+        // If not, give feedback!
+        $chunkFolder = $krexxDir . 'chunks' . DIRECTORY_SEPARATOR;
+        if (!is_writeable($chunkFolder)) {
+            self::$pool->messages->addMessage(
+                'Chunksfolder ' . $chunkFolder . ' is not writable!' .
+                'This will increase the memory usage of kreXX significantly!',
+                'critical'
+            );
+            self::$pool->messages->addKey('protected.folder.chunk', array($chunkFolder));
+            // We can work without chunks, but this will require much more memory!
+            self::$pool->chunks->setUseChunks(false);
+        }
+
+        // Check if the log folder is writable.
+        // If not, give feedback!
+        $logFolder = $krexxDir . 'log' . DIRECTORY_SEPARATOR;
+        if (!is_writeable($logFolder)) {
+            self::$pool->messages->addMessage('Logfolder ' . $logFolder . ' is not writable !', 'critical');
+            self::$pool->messages->addKey('protected.folder.log', array($logFolder));
+        }
+        // At this point, we won't inform the dev right away. The error message
+        // will pop up, when kreXX is actually displayed, no need to bother the
+        // dev just now.
     }
 
     /**
@@ -125,9 +188,9 @@ class Krexx
      */
     public static function __callStatic($name, array $arguments)
     {
-        self::$storage->controller->noFatalForKrexx();
+        self::$pool->controller->noFatalForKrexx();
         // Do we gave a handle?
-        $handle = self::$storage->config->getDevHandler();
+        $handle = self::$pool->config->getDevHandler();
         if ($name === $handle) {
             // We do a standard-open.
             if (isset($arguments[0])) {
@@ -136,7 +199,7 @@ class Krexx
                 self::open();
             }
         }
-        self::$storage->controller->reFatalAfterKrexx();
+        self::$pool->controller->reFatalAfterKrexx();
     }
 
     /**
@@ -148,13 +211,13 @@ class Krexx
      */
     public static function timerMoment($string)
     {
-        self::$storage->controller->noFatalForKrexx();
+        self::$pool->controller->noFatalForKrexx();
         // Disabled?
-        if (self::$storage->config->getSetting('disabled')) {
+        if (self::$pool->config->getSetting('disabled')) {
             return;
         }
-        self::$storage->controller->timerAction($string);
-        self::$storage->controller->reFatalAfterKrexx();
+        self::$pool->controller->timerAction($string);
+        self::$pool->controller->reFatalAfterKrexx();
     }
 
     /**
@@ -162,13 +225,13 @@ class Krexx
      */
     public static function timerEnd()
     {
-        self::$storage->controller->noFatalForKrexx();
+        self::$pool->controller->noFatalForKrexx();
         // Disabled ?
-        if (self::$storage->config->getSetting('disabled')) {
+        if (self::$pool->config->getSetting('disabled')) {
             return;
         }
-        self::$storage->controller->timerEndAction();
-        self::$storage->controller->reFatalAfterKrexx();
+        self::$pool->controller->timerEndAction();
+        self::$pool->controller->reFatalAfterKrexx();
     }
 
     /**
@@ -179,13 +242,13 @@ class Krexx
      */
     public static function open($data = null)
     {
-        self::$storage->controller->noFatalForKrexx();
+        self::$pool->controller->noFatalForKrexx();
         // Disabled?
-        if (self::$storage->config->getSetting('disabled')) {
+        if (self::$pool->config->getSetting('disabled')) {
             return;
         }
-        self::$storage->controller->dumpAction($data);
-        self::$storage->controller->reFatalAfterKrexx();
+        self::$pool->controller->dumpAction($data);
+        self::$pool->controller->reFatalAfterKrexx();
     }
 
     /**
@@ -196,14 +259,14 @@ class Krexx
      */
     public static function backtrace()
     {
-        self::$storage->controller->noFatalForKrexx();
+        self::$pool->controller->noFatalForKrexx();
         // Disabled?
-        if (self::$storage->config->getSetting('disabled')) {
+        if (self::$pool->config->getSetting('disabled')) {
             return;
         }
         // Render it.
-        self::$storage->controller->backtraceAction();
-        self::$storage->controller->reFatalAfterKrexx();
+        self::$pool->controller->backtraceAction();
+        self::$pool->controller->reFatalAfterKrexx();
     }
 
     /**
@@ -211,8 +274,8 @@ class Krexx
      */
     public static function disable()
     {
-        self::$storage->controller->noFatalForKrexx();
-        self::$storage->config->setDisabled(true);
+        self::$pool->controller->noFatalForKrexx();
+        self::$pool->config->setDisabled(true);
         // We will not re-enable it afterwards, because kreXX
         // is disabled and the handler would not show up anyway.
     }
@@ -224,14 +287,14 @@ class Krexx
      */
     public static function editSettings()
     {
-        self::$storage->controller->noFatalForKrexx();
+        self::$pool->controller->noFatalForKrexx();
         // Disabled?
         // We are ignoring local settings here.
-        if (self::$storage->config->getSetting('disabled')) {
+        if (self::$pool->config->getSetting('disabled')) {
             return;
         }
-        self::$storage->controller->editSettingsAction();
-        self::$storage->controller->reFatalAfterKrexx();
+        self::$pool->controller->editSettingsAction();
+        self::$pool->controller->reFatalAfterKrexx();
     }
 
     /**
@@ -242,10 +305,10 @@ class Krexx
     public static function registerFatal()
     {
         // Disabled?
-        if (self::$storage->config->getSetting('disabled')) {
+        if (self::$pool->config->getSetting('disabled')) {
             return;
         }
-        self::$storage->controller->registerFatalAction();
+        self::$pool->controller->registerFatalAction();
     }
 
     /**
@@ -258,9 +321,9 @@ class Krexx
     public static function unregisterFatal()
     {
         // Disabled?
-        if (self::$storage->config->getSetting('disabled')) {
+        if (self::$pool->config->getSetting('disabled')) {
             return;
         }
-        self::$storage->controller->unregisterFatalAction();
+        self::$pool->controller->unregisterFatalAction();
     }
 }

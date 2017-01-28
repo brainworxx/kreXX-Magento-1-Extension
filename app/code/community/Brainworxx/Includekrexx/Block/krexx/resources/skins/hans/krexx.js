@@ -158,7 +158,7 @@
         kdt.addEvent('.kwrapper .ksearchfield', 'keyup', krexx.searchfieldReturn);
 
         /**
-         * Register the Collapse-All funfions on it's symbol
+         * Register the Collapse-All functions on it's symbol
          *
          * @event click
          */
@@ -177,6 +177,48 @@
          * @event click
          */
         kdt.addEvent('.kcodedisplay', 'click', kdt.preventBubble);
+
+        /**
+         * Clear our search results, because we now have new options.
+         *
+         * @event change
+         */
+        kdt.addEvent('.ksearchcase', 'change', krexx.clearSearch);
+
+        /**
+         * Clear our search results, because we now have new options.
+         *
+         * @event change
+         */
+        kdt.addEvent('.ksearchkeys', 'change', krexx.clearSearch);
+
+        /**
+         * Clear our search results, because we now have new options.
+         *
+         * @event change
+         */
+        kdt.addEvent('.ksearchshort', 'change', krexx.clearSearch);
+
+        /**
+         * Clear our search results, because we now have new options.
+         *
+         * @event change
+         */
+        kdt.addEvent('.ksearchlong', 'change', krexx.clearSearch);
+
+        /**
+         * Clear our search results, because we now have new options.
+         *
+         * @event change
+         */
+        kdt.addEvent('.ksearchwhole', 'change', krexx.clearSearch);
+
+        /**
+         * Display our search options.
+         *
+         * @event click
+         */
+        kdt.addEvent('.koptions', 'click', krexx.displaySearchOptions);
 
         // Disable form-buttons in case a logfile is opened local.
         if (window.location.protocol === 'file:') {
@@ -224,7 +266,7 @@
 
             newEl.querySelector('.kcollapse-me').addEventListener('click', krexx.collapse);
 
-            // Register the toggel function.
+            // Register the toggle function.
             var newExpand = newEl.nextElementSibling.querySelectorAll('.kexpand');
             for (i = 0; i < newExpand.length; i++) {
                 newExpand[i].addEventListener('click', krexx.toggle);
@@ -341,10 +383,24 @@
         // Prevents the event from propagating (ie: "bubbling").
         event.stopPropagation();
 
-        var searchtext = this.parentNode.querySelector('.ksearchfield').value.toLowerCase();
+        // Hide the search options.
+        kdt.addClass([this.parentNode.nextElementSibling], 'khidden');
+
+        // Stitching together our configuration.
+        var searchtext = this.parentNode.querySelector('.ksearchfield').value;
+        var caseSensitive = this.parentNode.parentNode.querySelector('.ksearchcase').checked;
+        var searchKeys = this.parentNode.parentNode.querySelector('.ksearchkeys').checked;
+        var searchShort = this.parentNode.parentNode.querySelector('.ksearchshort').checked;
+        var searchLong = this.parentNode.parentNode.querySelector('.ksearchlong').checked;
+        var searchWhole = this.parentNode.parentNode.querySelector('.ksearchwhole').checked;
+
+        // Appy our configuration.
+        if (caseSensitive === false) {
+            searchtext = searchtext.toLowerCase();
+        }
 
         // we only search for more than 3 chars.
-        if (searchtext.length > 2) {
+        if (searchtext.length > 2 || searchWhole) {
             var instance = kdt.getDataset(this, 'instance');
             var direction = kdt.getDataset(this, 'direction');
             var payload = document.querySelector('#' + instance + ' .kbg-wrapper');
@@ -356,7 +412,7 @@
             }
 
             // Are we already having some results?
-            if (typeof results[instance] != "undefined") {
+            if (typeof results[instance] !== "undefined") {
                 if (typeof results[instance][searchtext] === "undefined") {
                     refreshResultlist();
                 }
@@ -385,7 +441,7 @@
             }
 
             // Feedback about where we are
-            this.parentNode.querySelector('.ksearch-state').textContent = results[instance][searchtext]['pointer'] + ' / ' + (results[instance][searchtext]['data'].length - 1);
+            this.parentNode.querySelector('.ksearch-state').textContent = (results[instance][searchtext]['pointer'] + 1) + ' / ' + (results[instance][searchtext]['data'].length);
             // Now we simply jump to the element in the array.
             if (typeof results[instance][searchtext]['data'][results[instance][searchtext]['pointer']] !== 'undefined') {
                 // We got another one!
@@ -403,23 +459,60 @@
         function refreshResultlist() {
             // Remove all previous highlights
             kdt.removeClass('.ksearch-found-highlight', 'ksearch-found-highlight');
+
+            // Appy our configuration
+            if (caseSensitive === false) {
+                searchtext = searchtext.toLowerCase();
+            }
+            var selector = [];
+            if (searchKeys === true) {
+                selector.push('li.kchild span.kname');
+            }
+            if (searchShort === true) {
+                selector.push('li.kchild span.kshort')
+            }
+            if (searchLong === true) {
+                selector.push('li div.kpreview');
+            }
+
             // Get a new list of elements
             results[instance] = [];
             results[instance][searchtext] = [];
             results[instance][searchtext]['data'] = [];
+
             // Poll out payload for elements to search
-            var list = payload.querySelectorAll("li span, li div.kpreview");
+            var list = payload.querySelectorAll(selector.join(', '));
+            var textContent = '';
             for (var i = 0; i < list.length; ++i) {
                 // Does it contain our search string?
-                if (list[i].textContent.toLowerCase().indexOf(searchtext) > -1) {
-                    kdt.toggleClass(list[i], 'ksearch-found-highlight');
-                    results[instance][searchtext]['data'].push(list[i]);
+                textContent = list[i].textContent;
+                if (caseSensitive === false) {
+                    textContent = textContent.toLowerCase();
                 }
+                if (searchWhole) {
+                    if (textContent === searchtext) {
+                        kdt.toggleClass(list[i], 'ksearch-found-highlight');
+                        results[instance][searchtext]['data'].push(list[i]);
+                    }
+                } else {
+                    if (textContent.indexOf(searchtext) > -1) {
+                        kdt.toggleClass(list[i], 'ksearch-found-highlight');
+                        results[instance][searchtext]['data'].push(list[i]);
+                    }
+                }
+
             }
             // Reset our index.
             results[instance][searchtext]['pointer'] = -1;
         }
 
+    };
+
+    /**
+     * Reset the searchresults, because we now have new search options.
+     */
+    krexx.clearSearch = function () {
+        results = [];
     };
 
     /**
@@ -435,7 +528,6 @@
 
         var instance = kdt.getDataset(this, 'instance');
         var search = document.querySelector('#search-' + instance);
-        var searchtab = document.querySelector('#' + instance + ' .ksearchbutton');
 
         // Toggle display / hidden.
         if (kdt.hasClass(search, 'hidden')) {
@@ -452,6 +544,21 @@
             // Clear the results.
             results = [];
         }
+    };
+
+    /**
+     * Toggle the display of the search options.
+     *
+     * @param {Event} event
+     */
+    krexx.displaySearchOptions = function (event) {
+        // Prevents the default event behavior (ie: click).
+        event.preventDefault();
+        // Prevents the event from propagating (ie: "bubbling").
+        event.stopPropagation();
+
+        // Get the options and switch the display class.
+        kdt.toggleClass(this.parentNode.nextElementSibling, 'khidden');
     };
 
     /**
@@ -643,7 +750,7 @@
 
             // We're good, value can be reached!
             if (resultArray[i].indexOf(';firstMarker;') !== -1) {
-                // We add our result sofar into the "source template"
+                // We add our result so far into the "source template"
                 resultString = resultArray[i].replace(';firstMarker;', resultString);
             } else {
                 // Normal concatenation.

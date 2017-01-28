@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -32,9 +32,11 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-namespace Brainworxx\Krexx\Service;
+namespace Brainworxx\Krexx\Service\Factory;
 
-use Brainworxx\Krexx\Analyse\Routing;
+use Brainworxx\Krexx\Analyse\Caller\AbstractCaller;
+use Brainworxx\Krexx\Analyse\Routing\Routing;
+use Brainworxx\Krexx\Analyse\Scope;
 use Brainworxx\Krexx\Controller\OutputActions;
 use Brainworxx\Krexx\Service\Config\Config;
 use Brainworxx\Krexx\Service\Flow\Emergency;
@@ -49,14 +51,8 @@ use Brainworxx\Krexx\Service\View\Render;
  *
  * @package Brainworxx\Krexx\Service
  */
-class Storage
+class Pool extends Factory
 {
-    /**
-     * The routing class.
-     *
-     * @var Routing
-     */
-    public $routing;
 
     /**
      * An instance of the recursion handler.
@@ -119,6 +115,27 @@ class Storage
     public $controller;
 
     /**
+     * Finds the script caller.
+     *
+     * @var AbstractCaller
+     */
+    public $callerFinder;
+
+    /**
+     * Scope analysis class.
+     *
+     * @var Scope
+     */
+    public $scope;
+
+    /**
+     * The directory where kreXX is installed.
+     *
+     * @var string
+     */
+    public $krexxDir;
+
+    /**
      * Initializes all needed classes.
      *
      * @param $krexxDir
@@ -126,65 +143,43 @@ class Storage
      */
     public function __construct($krexxDir)
     {
-        // Initializes the messages.
-        $this->messages = new Messages($this);
-        // Initializes the configuration
-        $this->config = new Config($this, $krexxDir);
-        // Initialize the emergency handler.
-        $this->emergencyHandler = new Emergency($this);
-        // Initialize the routing.
-        $this->routing = new Routing($this);
-        // Initialize the recursionHandler.
-        $this->recursionHandler = new Recursion($this);
-        // Initialize the code generation.
-        $this->codegenHandler = new Codegen($this);
-        // Initializes the chunks handler.
-        $this->chunks = new Chunks($this);
-        // Initializes the controller.
-        $this->controller = new OutputActions($this);
-        // Initializes the render class.
-        $this->initRenderer();
-        // Check our environment.
-        $this->checkEnvironment($krexxDir);
+        $this->init($krexxDir);
     }
 
     /**
-     * Yes, we do have an output here. We are generation messages to
-     * inform the dev that the environment is not as it should be.
+     * (Re)initializes everything in the pool, in case in-runtime
+     * factory overwrites.
      *
-     * @param string $krexxDir
-     *   The directory where kreXX ist installed.
+     * @param $krexxDir
+     *   The dir where kreXX is stored.
      */
-    protected function checkEnvironment($krexxDir)
+    public function init($krexxDir)
     {
-        // Check chunk folder is writable.
-        // If not, give feedback!
-        $chunkFolder = $krexxDir . 'chunks' . DIRECTORY_SEPARATOR;
-        if (!is_writeable($chunkFolder)) {
-            $this->messages->addMessage(
-                'Chunksfolder ' . $chunkFolder . ' is not writable!' .
-                'This will increase the memory usage of kreXX significantly!',
-                'critical'
-            );
-            $this->messages->addKey('protected.folder.chunk', array($chunkFolder));
-            // We can work without chunks, but this will require much more memory!
-            $this->chunks->setUseChunks(false);
+        // Get the rewrites from the $GLOBALS.
+        if (!empty($GLOBALS['kreXXoverwrites'])) {
+            $this->rewrite = $GLOBALS['kreXXoverwrites'];
         }
+        // Set the directory.
+        $this->krexxDir = $krexxDir;
+        // Initializes the messages.
+        $this->messages = $this->createClass('Brainworxx\\Krexx\\Service\\View\\Messages');
+        // Initializes the configuration
+        $this->config = $this->createClass('Brainworxx\\Krexx\\Service\\Config\\Config');
+        // Initialize the emergency handler.
+        $this->emergencyHandler = $this->createClass('Brainworxx\\Krexx\\Service\\Flow\\Emergency');
+        // Initialize the recursionHandler.
+        $this->recursionHandler = $this->createClass('Brainworxx\\Krexx\\Service\\Flow\\Recursion');
+        // Initialize the code generation.
+        $this->codegenHandler = $this->createClass('Brainworxx\\Krexx\\Service\\Misc\\Codegen');
+        // Initializes the chunks handler.
+        $this->chunks = $this->createClass('Brainworxx\\Krexx\\Service\\Misc\\Chunks');
+        // Initializes the controller.
+        $this->controller = $this->createClass('Brainworxx\\Krexx\\Controller\\OutputActions');
+        // Initializes the scope analysis
+        $this->scope = $this->createClass('Brainworxx\\Krexx\\Analyse\\Scope');
 
-        // Check if the log folder is writable.
-        // If not, give feedback!
-        $logFolder = $krexxDir . 'log' . DIRECTORY_SEPARATOR;
-        if (!is_writeable($logFolder)) {
-            $this->messages->addMessage('Logfolder ' . $logFolder . ' is not writable !', 'critical');
-            $this->messages->addKey('protected.folder.log', array($logFolder));
-        }
-        // At this point, we won't inform the dev right away. The error message
-        // will pop up, when kreXX is actually displayed, no need to bother the
-        // dev just now.
-        // We might need to register our fatal error handler.
-        if ($this->config->getSetting('registerAutomatically')) {
-            $this->controller->registerFatalAction();
-        }
+        // Initializes the render class.
+        $this->initRenderer();
     }
 
     /**
@@ -194,11 +189,12 @@ class Storage
     {
         // We need to reset our recursion handler, because
         // the content of classes might change with another run.
-        $this->recursionHandler = new Recursion($this);
+        $this->recursionHandler = $this->createClass('Brainworxx\\Krexx\\Service\\Flow\\Recursion');
+        // Initialize the code generation.
+        $this->codegenHandler = $this->createClass('Brainworxx\\Krexx\\Service\\Misc\\Codegen');
+        $this->scope = $this->createClass('Brainworxx\\Krexx\\Analyse\\Scope');
         // We also reset our emergency handler timer.
         $this->emergencyHandler->resetTimer();
-        // Initialize the code generation.
-        $this->codegenHandler = new Codegen($this);
     }
 
     /**
@@ -206,7 +202,7 @@ class Storage
      */
     public function resetConfig()
     {
-        $this->config = new Config($this, $this->config->krexxdir);
+        $this->config = $this->createClass('Brainworxx\\Krexx\\Service\\Config\\Config');
     }
 
     /**
@@ -215,95 +211,9 @@ class Storage
     protected function initRenderer()
     {
         $skin = $this->config->getSetting('skin');
-        $path = $this->config->krexxdir . 'resources/skins/' . $skin . '/Render.php';
-        $classname = 'Brainworxx\Krexx\View\\' . ucfirst($skin) . '\\Render';
-        include_once $path;
-        $this->render = new $classname($this);
-    }
-
-
-    /**
-     * Reads sourcecode from files, for the backtrace.
-     *
-     * @param string $file
-     *   Path to the file you want to read.
-     * @param int $highlight
-     *   The line number you want to highlight
-     * @param int $from
-     *   The start line.
-     * @param int $to
-     *   The end line.
-     *
-     * @return string
-     *   The source code.
-     */
-    public function readSourcecode($file, $highlight, $from, $to)
-    {
-        $result = '';
-        if (is_readable($file)) {
-            // Load content and add it to the backtrace.
-            $contentArray = file($file);
-            // Correct the value, in case we are exceeding the line numbers.
-            if ($from < 0) {
-                $from = 0;
-            }
-            if ($to > count($contentArray)) {
-                $to = count($contentArray);
-            }
-
-            for ($currentLineNo = $from; $currentLineNo <= $to; $currentLineNo++) {
-                if (isset($contentArray[$currentLineNo])) {
-                    // Add it to the result.
-                    $realLineNo = $currentLineNo + 1;
-
-                    // Escape it.
-                    $contentArray[$currentLineNo] = $this->encodeString($contentArray[$currentLineNo], true);
-
-                    if ($currentLineNo === $highlight) {
-                        $result .= $this->render->renderBacktraceSourceLine(
-                            'highlight',
-                            $realLineNo,
-                            $contentArray[$currentLineNo]
-                        );
-                    } else {
-                        $result .= $this->render->renderBacktraceSourceLine(
-                            'source',
-                            $realLineNo,
-                            $contentArray[$currentLineNo]
-                        );
-                    }
-                } else {
-                    // End of the file.
-                    break;
-                }
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Reads the content of a file.
-     *
-     * @param string $path
-     *   The path to the file.
-     *
-     * @return string
-     *   The content of the file, if readable.
-     */
-    public function getFileContents($path)
-    {
-        $result = '';
-        // Is it readable and does it have any content?
-        if (is_readable($path)) {
-            $size = filesize($path);
-            if ($size > 0) {
-                $file = fopen($path, "r");
-                $result = fread($file, $size);
-                fclose($file);
-            }
-        }
-
-        return $result;
+        $classname = '\\Brainworxx\\Krexx\\View\\' . ucfirst($skin) . '\\Render';
+        include_once $this->krexxDir . 'resources/skins/' . $skin . '/Render.php';
+        $this->render =  $this->createClass($classname);
     }
 
     /**

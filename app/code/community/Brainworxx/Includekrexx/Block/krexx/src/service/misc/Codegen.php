@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -35,7 +35,7 @@
 namespace Brainworxx\Krexx\Service\Misc;
 
 use Brainworxx\Krexx\Analyse\Model;
-use Brainworxx\Krexx\Service\Storage;
+use Brainworxx\Krexx\Service\Factory\Pool;
 
 /**
  * Code generation methods.
@@ -48,9 +48,9 @@ class Codegen
     /**
      * Here we store all relevant data.
      *
-     * @var Storage
+     * @var Pool
      */
-    protected $storage;
+    protected $pool;
 
     /**
      * Is the code generation allowed? We only allow it during a normal analysis.
@@ -58,15 +58,6 @@ class Codegen
      * @var bool
      */
     protected $allowCodegen = false;
-
-     /**
-     * The "scope" we are starting with. When it is $this in combination with a
-     * nesting level of 1, we treat protected and private variables and functions
-     * as public, because they are reachable from the current scope.
-     *
-     * @var string
-     */
-    protected $scope = '';
 
     /**
      * We are counting the level of the object.
@@ -78,25 +69,12 @@ class Codegen
     /**
      * Initializes the code generation.
      *
-     * @param Storage $storage
-     *   The storage, where we store the classes we need.
+     * @param Pool $pool
+     *   The pool, where we store the classes we need.
      */
-    public function __construct(Storage $storage)
+    public function __construct(Pool $pool)
     {
-        $this->storage = $storage;
-    }
-
-    /**
-     * Sets the scope in which we are moving ('$this' or something else).
-     *
-     * @param string $scope
-     *   The scope ('$this' or something else) .
-     */
-    public function setScope($scope)
-    {
-        if ($scope != '. . .') {
-            $this->scope = $scope;
-        }
+        $this->pool = $pool;
     }
 
     /**
@@ -129,7 +107,7 @@ class Codegen
         } else {
             // Simply fuse the connectors.
             // The connectors are a representation of the current used "language".
-            switch (self::analyseType($model)) {
+            switch ($this->analyseType($model)) {
                 case 'concatenation':
                     $result = $this->concatenation($model);
                     break;
@@ -274,10 +252,8 @@ class Codegen
             return $concatenation;
         }
 
-
-
         // Test if we are inside the scope.
-        if (self::isInScope($type)) {
+        if ($this->pool->scope->testModelForCodegen($model)) {
             // We are inside the scope, this value, function or class is reachable.
             return $concatenation;
         }
@@ -292,32 +268,12 @@ class Codegen
     }
 
     /**
-     * We decide if a function is currently within a reachable scope.
+     * Gets set, as soon as we have a scope to come from.
      *
-     * @param string $type
-     *   The type we are looking at, either class or array.
-     *
-     * @return bool
-     *   Whether it is within the scope or not.
+     * @param boolean $bool
      */
-    public function isInScope($type = '')
+    public function setAllowCodegen($bool)
     {
-        // When analysing a class or array, we have + 1 on our nesting level, when
-        // coming from the code generation. That is, because that class is currently
-        // being analysed.
-        if (strpos($type, 'class') === false && strpos($type, 'array') === false) {
-            $nestingLevel = $this->storage->emergencyHandler->getNestingLevel();
-        } else {
-            $nestingLevel = $this->storage->emergencyHandler->getNestingLevel() - 1;
-        }
-
-        return $nestingLevel <= 1 && $this->scope === '$this';
-    }
-
-    public function checkAllowCodegen()
-    {
-        if (!empty($this->scope)) {
-            $this->allowCodegen = true;
-        }
+        $this->allowCodegen = $bool;
     }
 }
