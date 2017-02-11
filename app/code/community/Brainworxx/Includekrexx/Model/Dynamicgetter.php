@@ -54,7 +54,7 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
 
         foreach ($dataArray as $key => $value) {
             // Transform the $key to getCamelCase.
-            $key = 'get' . strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", $key));
+            $key = 'get' . preg_replace('/(?:^|_)(.?)/e', "strtoupper('$1')", $key);
 
             // Prepare the model.
             /** @var \Brainworxx\Krexx\Analyse\Model $model */
@@ -65,7 +65,26 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
                 ->setData($value)
                 ->addToJson('hint', 'Magic varien getter method.');
 
-            // ans send the result on it's way.
+            // Check if there is a getter method in there. We should add the
+            // comment to the model.
+            foreach ($this->parameters['methodList'] as $id => $reflectionMethod) {
+                $name = $reflectionMethod->getName();
+                if ($name === $key) {
+                    $model->addToJson('method comment', nl2br($this->pool
+                    ->createClass('Brainworxx\\Krexx\\Analyse\\Methods')
+                    ->getComment(
+                        $reflectionMethod,
+                        $this->parameters['ref']
+                    )));
+                    // Remove the reflection from the list. We still need to
+                    // process the parent, and don't want to have double entries in
+                    // there.
+                    unset($this->parameters['methodList'][$id]);
+                    break;
+                }
+            }
+
+            // And send the result on it's way.
             $output .= $this->pool
                     ->createClass('Brainworxx\\Krexx\\Analyse\\Routing\\Routing')
                     ->analysisHub($model);
