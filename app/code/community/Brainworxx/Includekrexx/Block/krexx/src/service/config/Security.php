@@ -190,8 +190,8 @@ class Security extends Fallback
                 break;
 
             case 'destination':
-                // We expect 'frontend' or 'file'
-                if ($value === 'frontend' || $value === 'file') {
+                // We expect 'frontend', 'file' or 'direct.
+                if ($value === 'browser' || $value === 'file') {
                     $result = true;
                 }
                 if (!$result) {
@@ -502,7 +502,11 @@ class Security extends Fallback
      */
     public function isAllowedIp($whitelist)
     {
-        $remote = $_SERVER['REMOTE_ADDR'];
+        if (empty($_SERVER['REMOTE_ADDR'])) {
+            $remote = '';
+        } else {
+            $remote = $_SERVER['REMOTE_ADDR'];
+        }
 
         // Fallback to the Chin Leung implementation.
         // @author Chin Leung
@@ -517,7 +521,7 @@ class Security extends Fallback
                 $ip = trim($ip);
                 $wildcardPos = strpos($ip, "*");
                 # Check if the ip has a wildcard
-                if ($wildcardPos !== false && substr($remote, 0, $wildcardPos) . "*" == $ip) {
+                if ($wildcardPos !== false && substr($remote, 0, $wildcardPos) . "*" === $ip) {
                     return true;
                 }
             }

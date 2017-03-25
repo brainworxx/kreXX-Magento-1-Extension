@@ -71,7 +71,7 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
                 $name = $reflectionMethod->getName();
                 if ($name === $key) {
                     $model->addToJson('method comment', nl2br($this->pool
-                    ->createClass('Brainworxx\\Krexx\\Analyse\\Methods')
+                    ->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Methods')
                     ->getComment(
                         $reflectionMethod,
                         $this->parameters['ref']

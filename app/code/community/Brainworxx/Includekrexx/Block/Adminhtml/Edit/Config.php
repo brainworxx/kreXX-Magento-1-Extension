@@ -81,7 +81,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
 
         // Initializing the select data for the template.
         $this->setSelectDestination(array(
-            'frontend' => 'frontend',
+            'browser' => 'browser',
             'file' => 'file'
         ));
         $this->setSelectBool(array('true' => 'true', 'false' => 'false'));
@@ -90,6 +90,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
             'deep' => 'deep'
         ));
         $skins = array();
+
 
         foreach ($pool->render->getSkinList() as $skin) {
             $skins[$skin] = $skin;

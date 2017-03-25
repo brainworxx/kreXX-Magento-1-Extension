@@ -35,16 +35,16 @@
 namespace Brainworxx\Krexx\Service\Factory;
 
 use Brainworxx\Krexx\Analyse\Caller\AbstractCaller;
-use Brainworxx\Krexx\Analyse\Routing\Routing;
 use Brainworxx\Krexx\Analyse\Scope;
-use Brainworxx\Krexx\Controller\OutputActions;
 use Brainworxx\Krexx\Service\Config\Config;
 use Brainworxx\Krexx\Service\Flow\Emergency;
 use Brainworxx\Krexx\Service\Flow\Recursion;
-use Brainworxx\Krexx\Service\Misc\Chunks;
-use Brainworxx\Krexx\Service\Misc\Codegen;
-use Brainworxx\Krexx\Service\View\Messages;
-use Brainworxx\Krexx\Service\View\Render;
+use Brainworxx\Krexx\Service\Misc\Registry;
+use Brainworxx\Krexx\View\Output\Chunks;
+use Brainworxx\Krexx\Analyse\Code\Codegen;
+use Brainworxx\Krexx\View\Messages;
+use Brainworxx\Krexx\View\Render;
+use Brainworxx\Krexx\Analyse\Routing\Routing;
 
 /**
  * Here we store all classes that we need.
@@ -108,13 +108,6 @@ class Pool extends Factory
     public $chunks;
 
     /**
-     * Our output controller.
-     *
-     * @var OutputActions
-     */
-    public $controller;
-
-    /**
      * Finds the script caller.
      *
      * @var AbstractCaller
@@ -127,6 +120,20 @@ class Pool extends Factory
      * @var Scope
      */
     public $scope;
+
+    /**
+     * Our registry. It will not be reset by the init().
+     *
+     * @var Registry
+     */
+    public $registry;
+
+    /**
+     * The routing of opur analysis.
+     *
+     * @var Routing
+     */
+    public $routing;
 
     /**
      * The directory where kreXX is installed.
@@ -143,6 +150,7 @@ class Pool extends Factory
      */
     public function __construct($krexxDir)
     {
+        $this->registry = $this->createClass('Brainworxx\\Krexx\\Service\\Misc\\Registry');
         $this->init($krexxDir);
     }
 
@@ -156,13 +164,11 @@ class Pool extends Factory
     public function init($krexxDir)
     {
         // Get the rewrites from the $GLOBALS.
-        if (!empty($GLOBALS['kreXXoverwrites'])) {
-            $this->rewrite = $GLOBALS['kreXXoverwrites'];
-        }
+        $this->flushRewrite();
         // Set the directory.
         $this->krexxDir = $krexxDir;
         // Initializes the messages.
-        $this->messages = $this->createClass('Brainworxx\\Krexx\\Service\\View\\Messages');
+        $this->messages = $this->createClass('Brainworxx\\Krexx\\View\\Messages');
         // Initializes the configuration
         $this->config = $this->createClass('Brainworxx\\Krexx\\Service\\Config\\Config');
         // Initialize the emergency handler.
@@ -170,16 +176,48 @@ class Pool extends Factory
         // Initialize the recursionHandler.
         $this->recursionHandler = $this->createClass('Brainworxx\\Krexx\\Service\\Flow\\Recursion');
         // Initialize the code generation.
-        $this->codegenHandler = $this->createClass('Brainworxx\\Krexx\\Service\\Misc\\Codegen');
+        $this->codegenHandler = $this->createClass('Brainworxx\\Krexx\\Analyse\\Code\\Codegen');
         // Initializes the chunks handler.
-        $this->chunks = $this->createClass('Brainworxx\\Krexx\\Service\\Misc\\Chunks');
-        // Initializes the controller.
-        $this->controller = $this->createClass('Brainworxx\\Krexx\\Controller\\OutputActions');
+        $this->chunks = $this->createClass('Brainworxx\\Krexx\\View\\Output\\Chunks');
         // Initializes the scope analysis
         $this->scope = $this->createClass('Brainworxx\\Krexx\\Analyse\\Scope');
-
+        // Initializes the routing
+        $this->routing = $this->createClass('Brainworxx\\Krexx\\Analyse\Routing\\Routing');
         // Initializes the render class.
         $this->initRenderer();
+        // Check the environment and prepare the feedback, if necessary.
+        $this->checkEnvironment();
+    }
+
+    /**
+     * Check if the environment is as it should be.
+     */
+    protected function checkEnvironment()
+    {
+        // Check chunk folder is writable.
+        // If not, give feedback!
+        $chunkFolder = $this->config->getChunkDir();
+        if (!is_writeable($chunkFolder)) {
+            $this->messages->addMessage(
+                'Chunksfolder ' . $chunkFolder . ' is not writable!' .
+                'This will increase the memory usage of kreXX significantly!',
+                'critical'
+            );
+            $this->messages->addKey('protected.folder.chunk', array($chunkFolder));
+            // We can work without chunks, but this will require much more memory!
+            $this->chunks->setUseChunks(false);
+        }
+
+        // Check if the log folder is writable.
+        // If not, give feedback!
+        $logFolder = $this->config->getLogDir();
+        if (!is_writeable($logFolder)) {
+            $this->messages->addMessage('Logfolder ' . $logFolder . ' is not writable !', 'critical');
+            $this->messages->addKey('protected.folder.log', array($logFolder));
+        }
+        // At this point, we won't inform the dev right away. The error message
+        // will pop up, when kreXX is actually displayed, no need to bother the
+        // dev just now.
     }
 
     /**
@@ -191,7 +229,7 @@ class Pool extends Factory
         // the content of classes might change with another run.
         $this->recursionHandler = $this->createClass('Brainworxx\\Krexx\\Service\\Flow\\Recursion');
         // Initialize the code generation.
-        $this->codegenHandler = $this->createClass('Brainworxx\\Krexx\\Service\\Misc\\Codegen');
+        $this->codegenHandler = $this->createClass('Brainworxx\\Krexx\\Analyse\\Code\\Codegen');
         $this->scope = $this->createClass('Brainworxx\\Krexx\\Analyse\\Scope');
         // We also reset our emergency handler timer.
         $this->emergencyHandler->resetTimer();
@@ -235,19 +273,20 @@ class Pool extends Factory
         set_error_handler(function () {
             /* do nothing. */
         });
-        $result = @htmlentities($data);
+
+        $result = htmlentities($data);
+
         // We are also encoding @, because we need them for our chunks.
         $result = str_replace('@', '&#64;', $result);
         // We are also encoding the {, because we use it as markers for the skins.
         $result = str_replace('{', '&#123;', $result);
-        restore_error_handler();
 
         // Check if encoding was successful.
         // 99.99% of the time, the encoding works.
         if (empty($result)) {
             // Something went wrong with the encoding, we need to
             // completely encode this one to be able to display it at all!
-            $data = @mb_convert_encoding($data, 'UTF-32', mb_detect_encoding($data));
+            $data = mb_convert_encoding($data, 'UTF-32', mb_detect_encoding($data));
 
             if ($code) {
                 // We are displaying sourcecode, so we need
@@ -286,6 +325,9 @@ class Pool extends Factory
                 $result = str_replace(chr(9), '&nbsp;&nbsp;', $result);
             }
         }
+
+        // Reactivate whatever error handling we had previously.
+        restore_error_handler();
 
         return $result;
     }

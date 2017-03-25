@@ -68,13 +68,7 @@ class Factory
         if (!empty($this->rewrite[$classname])) {
             $classname = $this->rewrite[$classname];
         }
-        // The model has no need for the pool.
-        // Meh, that does not sound right   ;-)
-        if ($classname === 'Brainworxx\\Krexx\\Analyse\\Model') {
-            $object = new $classname();
-        } else {
-            $object = new $classname($this);
-        }
+        $object = new $classname($this);
 
         return $object;
     }
@@ -86,17 +80,25 @@ class Factory
      *   The original class name, we want to overwrite this one.
      * @param $newClassName
      *   The new class name, the factory will then return this class via get();
+     *
+     * @return $this
+     *   Return $this, for chaining.
      */
     public function addRewrite($originalClassName, $newClassName)
     {
         $this->rewrite[$originalClassName] = $newClassName;
+        return $this;
     }
 
     /**
-     * Resets the rewrite info.
+     * Resets the rewrite info and reloads it from the globals.
      */
     public function flushRewrite()
     {
-        $this->rewrite = array();
+        if (!empty($GLOBALS['kreXXoverwrites']) && is_array($GLOBALS['kreXXoverwrites']['classes'])) {
+            $this->rewrite = $GLOBALS['kreXXoverwrites']['classes'];
+        } else {
+            $this->rewrite = array();
+        }
     }
 }

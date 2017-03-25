@@ -148,7 +148,7 @@ class Config extends Fallback
      * Wrapper around the stored settings array, to intercept settings calls.
      *
      * @param string $name
-     *   The nbame of the setting.
+     *   The name of the setting.
      *
      * @return string|null
      *   The setting.
@@ -358,7 +358,7 @@ class Config extends Fallback
         // Not loaded?
         if (empty($config)) {
             $config = (array)parse_ini_string(
-                $this->fileService->getFileContents($this->pool->krexxDir . 'config/Krexx.ini'),
+                $this->fileService->getFileContents($this->getPathToIniFile()),
                 true
             );
             if (empty($config)) {
@@ -428,7 +428,7 @@ class Config extends Fallback
      */
     protected function isRequestAjaxOrCli()
     {
-        if ($this->getConfigValue('output', 'destination') != 'file') {
+        if ($this->getConfigValue('output', 'destination') !== 'file') {
             // When we are not going to create a logfile, we send it to the browser.
             // Check for ajax.
             if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
@@ -449,5 +449,54 @@ class Config extends Fallback
         }
         // Still here? This means it's neither.
         return false;
+    }
+
+    /**
+     * Get the path to the chunks directory.
+     *
+     * @return string
+     *   The absolute path, trailed by the '/'
+     */
+    public function getChunkDir()
+    {
+        if (!empty($GLOBALS['kreXXoverwrites']['directories']['chunks'])) {
+            // Return the Overwrites
+            return $GLOBALS['kreXXoverwrites']['directories']['chunks'] . DIRECTORY_SEPARATOR;
+        } else {
+            // Return the standard settings.
+            return $this->pool->krexxDir . 'chunks' . DIRECTORY_SEPARATOR;
+        }
+    }
+
+    /**
+     * Get the path to the logging directory.
+     *
+     * @return string
+     *   The absolute path, trailed by the '/'
+     */
+    public function getLogDir()
+    {
+        if (!empty($GLOBALS['kreXXoverwrites']['directories']['log'])) {
+            // Return the Overwrites
+            return $GLOBALS['kreXXoverwrites']['directories']['log'] . DIRECTORY_SEPARATOR;
+        } else {
+            return $this->pool->krexxDir . 'log' . DIRECTORY_SEPARATOR;
+        }
+    }
+
+    /**
+     * Get the path to the configuration file.
+     *
+     * @return string
+     *   The absolute path to the Krexx.ini.
+     */
+    public function getPathToIniFile()
+    {
+        if (!empty($GLOBALS['kreXXoverwrites']['directories']['config'])) {
+            // Return the Overwrites
+            return $GLOBALS['kreXXoverwrites']['directories']['config'] . DIRECTORY_SEPARATOR . 'Krexx.ini';
+        } else {
+            return $this->pool->krexxDir . 'config' . DIRECTORY_SEPARATOR . 'Krexx.ini';
+        }
     }
 }
