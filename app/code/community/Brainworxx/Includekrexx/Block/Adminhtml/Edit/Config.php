@@ -56,7 +56,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
 
         // Initialzing help data for the template.
         $help['skin'] = htmlspecialchars(strip_tags($pool->messages->getHelp('skin')));
-        $help['iprange'] = htmlspecialchars(strip_tags($pool->messages->getHelp('iprange')));
+        $help['iprange'] = 'List of IPs that can trigger kreXX. Wildcards can be used.';
         $help['maxfiles'] = htmlspecialchars(strip_tags($pool->messages->getHelp('maxfiles')));
         $help['destination'] = htmlspecialchars(strip_tags($pool->messages->getHelp('destination')));
         $help['maxCall'] = htmlspecialchars(strip_tags($pool->messages->getHelp('maxCall')));
