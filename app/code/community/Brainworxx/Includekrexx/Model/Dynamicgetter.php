@@ -32,6 +32,8 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+use Brainworxx\Krexx\Analyse\Code\Codegen;
+
 /**
  * Analyses all the dynamic getter methods of a varien object.
  *
@@ -60,8 +62,7 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
             /** @var \Brainworxx\Krexx\Analyse\Model $model */
             $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setName($key)
-                ->setConnector2('()')
-                ->setConnector1('->')
+                ->setConnectorType(Codegen::METHOD)
                 ->setData($value)
                 ->addToJson('hint', 'Magic varien getter method.');
 

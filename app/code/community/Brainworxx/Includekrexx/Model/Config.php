@@ -33,40 +33,48 @@
  */
 
 /**
- * Event observer for kreXX, includes the mainlibrary at an early level.
+ * 'Custom' debug methods for magento.
  */
-class Brainworxx_Includekrexx_Model_Observer
+class Brainworxx_Includekrexx_Model_Config extends Brainworxx\Krexx\Service\Config\Config
 {
-
     /**
-     * Includes the kreXX mainfile
+     * {@inheritdoc}
      *
-     * @param Varien_Event_Observer $observer
-     *   The event observer of the event we are listening to.
+     * We are using fewer debuMethods for magento, to prevent an
+     * overkill-output.
+     *
+     * @var array
      */
-    public function includeKreXX(Varien_Event_Observer $observer)
-    {
-        // We need to do this only once
-        // the static should save some time.
-        static $beenHere = false;
-
-
-        if (!$beenHere) {
-            $blockPath = Mage::getModuleDir('Block', 'Brainworxx_Includekrexx');
-            $filename = $blockPath . '/Block/krexx/Krexx.php';
-            // Tell kreXX that we want to use some special classes for the getter analysis.
-            if (!is_array($GLOBALS['kreXXoverwrites']['classes'])) {
-                $GLOBALS['kreXXoverwrites']['classes'] = array();
-            }
-            $GLOBALS['kreXXoverwrites']['classes'] = array(
-                'Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter' => 'Brainworxx_Includekrexx_Model_Dynamicgetter',
-                'Brainworxx\\Krexx\\Service\\Config\\Config' => 'Brainworxx_Includekrexx_Model_Config',
-            );
-
-            if (file_exists($filename) && !class_exists('Krexx', false)) {
-                include_once $filename;
-            }
-            $beenHere = true;
-        }
-    }
+    public $configFallback = array(
+        'output' => array(
+            'disabled' => 'false',
+            'iprange' => '*',
+            'skin' => 'smokygrey',
+            'destination' => 'browser',
+            'maxfiles' => '10',
+        ),
+        'runtime' => array(
+            'detectAjax' => 'true',
+            'level' => '10',
+            'maxCall' => '20',
+            'maxRuntime' => '60',
+            'memoryLeft' => '64',
+            'useScopeAnalysis' => 'true',
+        ),
+        'properties' => array(
+            'analyseProtected' => 'false',
+            'analysePrivate' => 'false',
+            'analyseConstants' => 'true',
+            'analyseTraversable' => 'true',
+        ),
+        'methods' => array(
+            'analyseProtectedMethods' => 'false',
+            'analysePrivateMethods' => 'false',
+            'analyseGetter' => 'true',
+            'debugMethods' => '__toArray,toString',
+        ),
+        'backtraceAndError' => array(
+            'registerAutomatically' => 'false',
+        ),
+    );
 }
