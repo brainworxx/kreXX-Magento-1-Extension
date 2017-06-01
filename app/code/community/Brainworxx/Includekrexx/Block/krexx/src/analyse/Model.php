@@ -151,6 +151,14 @@ class Model
     protected $connectorService;
 
     /**
+     * We need to know, if we are rendering the expandable child for the
+     * constants. The code generation does special stuff there.
+     *
+     * @var bool
+     */
+    protected $isMetaConstants = false;
+
+    /**
      * Inject the pool and create the connector service.
      *
      * @param \Brainworxx\Krexx\Service\Factory\Pool $pool
@@ -184,12 +192,11 @@ class Model
      */
     public function renderMe()
     {
-        if (is_object($this->callback)) {
+        if (isset($this->callback)) {
             $this->callback->setParams($this->parameters);
             return $this->callback->callMe();
-        } else {
-            return '';
         }
+        return '';
     }
 
     /**
@@ -363,20 +370,25 @@ class Model
     /**
      * Getter for connector2.
      *
+     * @param integer $cap
+     *   Maximum length of all parameters. 0 means no cap.
+     *
      * @return string
      *   The second connector.
      */
-    public function getConnector2()
+    public function getConnector2($cap = 0)
     {
-        return $this->connectorService->getConnector2();
+        return $this->connectorService->getConnector2($cap);
     }
 
     /**
      * We simply add more info to our info json.
+     * Leftover linebreaks will be removed.
+     * If the value is emptyx, we will remove a possible previous entry to this key.
      *
-     * @param $key
+     * @param string $key
      *   The array key.
-     * @param $value
+     * @param string $value
      *   The value we want to set.
      *
      * @return $this
@@ -385,7 +397,13 @@ class Model
     public function addToJson($key, $value)
     {
         // Remove leftover linebreaks.
-        $this->json[$key] = preg_replace("/\r|\n/", "", $value);
+        $value = trim(preg_replace("/\r|\n/", "", $value));
+        if ($value === '') {
+            unset($this->json[$key]);
+        } else {
+            $this->json[$key] = $value;
+        }
+
         return $this;
     }
 
@@ -586,5 +604,31 @@ class Model
     public function getParameters()
     {
         return $this->parameters;
+    }
+
+    /**
+     * Getter for the isMetaConstants.
+     *
+     * @return bool
+     *   True means that we are currently rendering the expandable child for
+     *   the constants.
+     */
+    public function getIsMetaConstants()
+    {
+        return $this->isMetaConstants;
+    }
+
+    /**
+     * Setter for the isMetaConstants.
+     *
+     * @param bool $bool
+     *   The value we want to set.
+     * @return $this
+     *   Return $this for chaining.
+     */
+    public function setIsMetaConstants($bool)
+    {
+        $this->isMetaConstants = $bool;
+        return $this;
     }
 }

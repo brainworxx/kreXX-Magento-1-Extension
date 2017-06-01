@@ -34,6 +34,8 @@
 
 namespace Brainworxx\Krexx\View\Output;
 
+use Brainworxx\Krexx\Service\Factory\Pool;
+
 /**
  * File output, directly after the analysis.
  *
@@ -43,21 +45,65 @@ class File extends AbstractOutput
 {
 
     /**
-     * Adding a chunk string here will result in writing to a logfile.
+     * [0] -> The chunkedup string, that we intend to send to
+     *        the browser.
+     * [1] -> Are we ignoring local settings?
      *
-     * {@inheritdoc}
+     * @var array
+     *   An array of all chunk strings.
+     *   A chunk string are be:
+     *   - header
+     *   - messages
+     *   - data part
+     *   - footer
+     *   This means, that every output is split in 4 parts
+     */
+    protected $chunkStrings = array();
+
+    /**
+     * Inject the pool and register the shutdown function.
+     *
+     * @param \Brainworxx\Krexx\Service\Factory\Pool $pool
+     */
+    public function __construct(Pool $pool)
+    {
+        parent::__construct($pool);
+        register_shutdown_function(array($this, 'shutdownCallback'));
+    }
+
+
+    /**
+     * Adds output to our shutdown handler.
+     *
+     * @param string $chunkString
+     *   The chunked output string.
      */
     public function addChunkString($chunkString)
     {
+        $this->chunkStrings[] = $chunkString;
+    }
+
+
+
+    /**
+     * Creating the logfile after everything is done fro mthe chunk files.
+     */
+    public function shutdownCallback()
+    {
         // Check for CLI and messages.
-        if (php_sapi_name() === "cli") {
-            $messages = $this->pool->messages->outputMessages();
+        if (php_sapi_name() === 'cli') {
             // Since we are in CLI mode, these messages are not in HTML.
             // We can output them right away.
-            echo $messages;
+            echo $this->pool->messages->outputMessages();
         }
 
-        // We save them directly after the analysis.
-        $this->pool->chunks->saveDechunkedToFile($chunkString);
+        // Output our chunks.
+        // Every output is split into 4 chunk strings (header, messages,
+        // data, footer).
+        foreach ($this->chunkStrings as $chunkString) {
+            // Save everything to the file after we are done.
+            $this->pool->chunks->saveDechunkedToFile($chunkString);
+        }
+
     }
 }

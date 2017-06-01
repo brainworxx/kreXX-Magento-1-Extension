@@ -76,6 +76,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
         $help['useScopeAnalysis'] = htmlspecialchars(strip_tags($pool->messages->getHelp('useScopeAnalysis')));
         $help['memoryLeft'] = htmlspecialchars(strip_tags($pool->messages->getHelp('memoryLeft')));
         $help['maxRuntime'] = htmlspecialchars(strip_tags($pool->messages->getHelp('maxRuntime')));
+        $help['maxStepNumber'] = htmlspecialchars(strip_tags($pool->messages->getHelp('maxStepNumber')));
 
         $this->assign('help', $help);
 
@@ -160,6 +161,10 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
         $settings['backtraceAndError']['registerAutomatically'] = $pool->config->getConfigFromFile(
             'backtraceAndError',
             'registerAutomatically'
+        );
+        $settings['backtraceAndError']['maxStepNumber'] = $pool->config->getConfigFromFile(
+            'backtraceAndError',
+            'maxStepNumber'
         );
         $settings['methods']['analyseGetter'] = $pool->config->getConfigFromFile(
             'methods',

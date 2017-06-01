@@ -113,6 +113,9 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
         $settings['backtraceAndError']['registerAutomatically'] = $this->convertKrexxFeSetting(
             $pool->config->getFeConfigFromFile('registerAutomatically')
         );
+        $settings['backtraceAndError']['maxStepNumber'] = $this->convertKrexxFeSetting(
+            $pool->config->getFeConfigFromFile('maxStepNumber')
+        );
         $settings['runtime']['memoryLeft'] = $this->convertKrexxFeSetting(
             $pool->config->getFeConfigFromFile('memoryLeft')
         );

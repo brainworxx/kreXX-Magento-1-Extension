@@ -16,7 +16,7 @@
  * @license http://opensource.org/licenses/LGPL-2.1
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -450,6 +450,21 @@
                 <label for="factory.registerAutomatically">Use factory settings</label>
             </td>
         </tr>
+        <tr>
+            <td><label for="maxStepNumber">Maximum count of steps in the backtrace:</label></td>
+            <td>
+                <div class="link-store-scope" title="<?php echo $help['maxStepNumber']; ?>"></div>
+            </td>
+            <td>
+                <input type="text" value="<?php echo $settings['backtraceAndError']['maxStepNumber']; ?>" name="backtraceAndError[maxStepNumber]" id="maxStepNumber">
+            </td>
+            <td>
+                <input id="factory.maxStepNumber" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['maxStepNumber']; ?>/>
+                <label for="factory.maxStepNumber">Use factory settings</label>
+            </td>
+        </tr>
+
+
         <tr>
             <td colspan="4">&nbsp;</td>
         </tr>

@@ -37,7 +37,6 @@ namespace Brainworxx\Krexx\Analyse\Callback\Iterate;
 use Brainworxx\Krexx\Analyse\Callback\AbstractCallback;
 use Brainworxx\Krexx\Analyse\Code\Connectors;
 use Brainworxx\Krexx\Service\Misc\File;
-use Brainworxx\Krexx\Analyse\Model;
 
 /**
  * Class properties analysis methods.
@@ -77,38 +76,32 @@ class ThroughProperties extends AbstractCallback
         $default = $ref->getDefaultProperties();
 
         foreach ($this->parameters['data'] as $refProperty) {
+            // Check memory and runtime.
+            if ($this->pool->emergencyHandler->checkEmergencyBreak()) {
+                return '';
+            }
+
             /* @var \ReflectionProperty $refProperty */
             $refProperty->setAccessible(true);
 
             // Getting our values from the reflection.
             $value = $refProperty->getValue($this->parameters['orgObject']);
             $propName = $refProperty->name;
-            if (is_null($value) && $refProperty->isDefault()) {
+            if (is_null($value) && $refProperty->isDefault() && isset($default[$propName])) {
                 // We might want to look at the default value.
                 $value = $default[$propName];
             }
 
-            // Check memory and runtime.
-            if (!$this->pool->emergencyHandler->checkEmergencyBreak()) {
-                return '';
-            }
-
-            // Recursion tests are done in the analyseObject and
-            // iterateThrough (for arrays).
-            // We will not check them here.
             // Now that we have the key and the value, we can analyse it.
             // Stitch together our additional info about the data:
             // public, protected, private, static.
             $additional = '';
-            $connectorType = Connectors::NORMAL_PROPERTY;
-            if ($refProperty->isPublic()) {
-                $additional .= 'public ';
-            }
-            if ($refProperty->isPrivate()) {
-                $additional .= 'private ';
-            }
             if ($refProperty->isProtected()) {
                 $additional .= 'protected ';
+            } elseif ($refProperty->isPublic()) {
+                $additional .= 'public ';
+            } elseif ($refProperty->isPrivate()) {
+                $additional .= 'private ';
             }
 
             // Test if the property is inherited or not by testing the
@@ -118,10 +111,7 @@ class ThroughProperties extends AbstractCallback
                 $additional .= 'inherited ';
             }
 
-            if (is_a($refProperty, '\\Brainworxx\\Krexx\\Analysis\\Flection')) {
-                /* @var \Brainworxx\Krexx\Analyse\Flection $refProperty */
-                $additional .= $refProperty->getWhatAmI() . ' ';
-            }
+            $connectorType = Connectors::NORMAL_PROPERTY;
             if ($refProperty->isStatic()) {
                 $additional .= 'static ';
                 $connectorType = Connectors::STATIC_PROPERTY;
@@ -129,11 +119,31 @@ class ThroughProperties extends AbstractCallback
                 $propName = '$' . $propName;
             }
 
+            // The property 'isUndeclared' is not a part of the reflectionProperty.
+            // @see \Brainworxx\Krexx\Analyse\Callback\Analyse\Objects
+            // With isset, we prevent a notice btw.
+            if (isset($refProperty->isUndeclared)) {
+                $additional .= 'dynamic property ';
+                $comment = '';
+                $declarationPlace = '';
+            } else {
+                // Since we are dealing with a declared Property here, we can
+                // get the comment and the declaration place.
+                $comment = $this->pool
+                    ->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Properties')
+                    ->getComment($refProperty);
+                $declarationPlace = $this->pool->fileService->filterFilePath(
+                    $refProperty->getDeclaringClass()->getFileName()
+                );
+            }
+
             // Stitch together our model
             $output .= $this->pool->routing->analysisHub(
                 $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                     ->setData($value)
                     ->setName($propName)
+                    ->addToJson('Comment', $comment)
+                    ->addToJson('Declared in', $declarationPlace)
                     ->setAdditional($additional)
                     ->setConnectorType($connectorType)
             );

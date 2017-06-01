@@ -65,6 +65,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         'maxRuntime',
         'useScopeAnalysis',
         'analyseGetter',
+        'maxStepNumber',
     );
 
     /**

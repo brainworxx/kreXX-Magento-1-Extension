@@ -75,6 +75,7 @@ class Brainworxx_Includekrexx_Model_Config extends Brainworxx\Krexx\Service\Conf
         ),
         'backtraceAndError' => array(
             'registerAutomatically' => 'false',
+            'maxStepNumber' => 10,
         ),
     );
 }

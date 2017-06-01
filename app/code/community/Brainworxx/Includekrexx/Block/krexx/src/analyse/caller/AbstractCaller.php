@@ -36,6 +36,11 @@ namespace Brainworxx\Krexx\Analyse\Caller;
 
 use Brainworxx\Krexx\Service\Factory\Pool;
 
+/**
+ * Abstract defining what a CallerFinder clkass must implement.
+ *
+ * @package Brainworxx\Krexx\Analyse\Caller
+ */
 abstract class AbstractCaller
 {
     /**
@@ -70,7 +75,7 @@ abstract class AbstractCaller
     /**
      * Setter for the identifier pattern.
      *
-     * @param $pattern
+     * @param string $pattern
      *   The pattern, duh!
      *
      * @return $this
@@ -90,32 +95,6 @@ abstract class AbstractCaller
     public function getPattern()
     {
         return $this->pattern;
-    }
-
-    /**
-     * We will remove the $_SERVER['DOCUMENT_ROOT'] from the absolute
-     * path of the calling file.
-     * Return the original path, in case we can not determine the
-     * $_SERVER['DOCUMENT_ROOT']
-     *
-     * @param $path
-     *   The path we want to filter
-     *
-     * @return string
-     *   The filtered path to the calling file.
-     */
-    protected function filterFilePath($path)
-    {
-        // There may or may not be a trailing '/'.
-        // We remove it, just in case, to make sure that we remove the doc root
-        // completely from the $path variable.
-        $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/');
-        if (isset($docRoot) && strpos($path, $docRoot) === 0) {
-            // Found it on position 0.
-            $path = '. . ./' . substr($path, strlen($docRoot) + 1);
-        }
-
-        return $path;
     }
 
     /**

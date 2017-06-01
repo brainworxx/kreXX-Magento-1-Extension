@@ -46,7 +46,18 @@ class Krexx
 {
 
     /**
+     * Here we remember, if we are currently running a analysis.
+     * The debug methods may trigger another run, and we may get into
+     * trouble, memory or runtime wise.
+     *
+     * @var bool
+     */
+    protected static $analysisInProgress = false;
+
+    /**
      * Our pool where we keep all relevant classes.
+     *
+     * @internal
      *
      * @var Pool
      */
@@ -54,11 +65,12 @@ class Krexx
 
     /**
      * Includes all needed files and sets some internal values.
+     *
+     * @internal
      */
     public static function bootstrapKrexx()
     {
         $krexxDir = dirname(__FILE__) . DIRECTORY_SEPARATOR;
-        include_once $krexxDir . 'src/view/Help.php';
         include_once $krexxDir . 'src/view/AbstractRender.php';
         include_once $krexxDir . 'src/view/Render.php';
         include_once $krexxDir . 'src/view/Messages.php';
@@ -76,7 +88,6 @@ class Krexx
         include_once $krexxDir . 'src/service/factory/Pool.php';
         include_once $krexxDir . 'src/service/flow/Recursion.php';
         include_once $krexxDir . 'src/service/flow/Emergency.php';
-        include_once $krexxDir . 'src/analyse/Flection.php';
         include_once $krexxDir . 'src/analyse/routing/AbstractRouting.php';
         include_once $krexxDir . 'src/analyse/routing/Routing.php';
         include_once $krexxDir . 'src/analyse/routing/process/AbstractProcess.php';
@@ -91,13 +102,14 @@ class Krexx
         include_once $krexxDir . 'src/analyse/routing/process/ProcessResource.php';
         include_once $krexxDir . 'src/analyse/routing/process/ProcessString.php';
         include_once $krexxDir . 'src/analyse/Model.php';
-        include_once $krexxDir . 'src/analyse/Scope.php';
+        include_once $krexxDir . 'src/analyse/code/Scope.php';
         include_once $krexxDir . 'src/analyse/callback/AbstractCallback.php';
         include_once $krexxDir . 'src/analyse/callback/analyse/BacktraceStep.php';
         include_once $krexxDir . 'src/analyse/callback/analyse/ConfigSection.php';
         include_once $krexxDir . 'src/analyse/callback/analyse/Debug.php';
         include_once $krexxDir . 'src/analyse/callback/analyse/Objects.php';
         include_once $krexxDir . 'src/analyse/callback/iterate/ThroughArray.php';
+        include_once $krexxDir . 'src/analyse/callback/iterate/ThroughLargeArray.php';
         include_once $krexxDir . 'src/analyse/callback/iterate/ThroughConfig.php';
         include_once $krexxDir . 'src/analyse/callback/iterate/ThroughConstants.php';
         include_once $krexxDir . 'src/analyse/callback/iterate/ThroughMethodAnalysis.php';
@@ -109,6 +121,7 @@ class Krexx
         include_once $krexxDir . 'src/analyse/comment/AbstractComment.php';
         include_once $krexxDir . 'src/analyse/comment/Methods.php';
         include_once $krexxDir . 'src/analyse/comment/Functions.php';
+        include_once $krexxDir . 'src/analyse/comment/Properties.php';
         include_once $krexxDir . 'src/analyse/code/Codegen.php';
         include_once $krexxDir . 'src/analyse/code/Connectors.php';
         include_once $krexxDir . 'src/analyse/code/ReflectionParameterWrapper.php';
@@ -144,7 +157,17 @@ class Krexx
         }
 
         // Create a new pool where we store all our classes.
-        self::$pool = new Pool($krexxDir);
+        // We also need to check if we have an overwrite for the pool.
+        if (!empty($GLOBALS['kreXXoverwrites']) &&
+            is_array($GLOBALS['kreXXoverwrites']['classes']) &&
+            isset($GLOBALS['kreXXoverwrites']['classes']['Brainworxx\\Krexx\\Service\\Factory\\Pool'])
+        ) {
+            $classname = $GLOBALS['kreXXoverwrites']['classes']['Brainworxx\\Krexx\\Service\\Factory\\Pool'];
+            self::$pool = new $classname($krexxDir);
+        } else {
+            self::$pool = new Pool($krexxDir);
+        }
+
 
         // We might need to register our fatal error handler.
         if (self::$pool->config->getSetting('registerAutomatically') &&
@@ -158,6 +181,8 @@ class Krexx
     /**
      * Handles the developer handle.
      *
+     * @api
+     *
      * @param string $name
      *   The name of the static function which was called.
      * @param array $arguments
@@ -166,8 +191,7 @@ class Krexx
     public static function __callStatic($name, array $arguments)
     {
         // Do we gave a handle?
-        $handle = self::$pool->config->getDevHandler();
-        if ($name === $handle) {
+        if ($name === self::$pool->config->getDevHandler()) {
             // We do a standard-open.
             if (isset($arguments[0])) {
                 self::open($arguments[0]);
@@ -180,59 +204,74 @@ class Krexx
     /**
      * Takes a "moment".
      *
+     * @api
+     *
      * @param string $string
      *   Defines a "moment" during a benchmark test.
      *   The string should be something meaningful, like "Model invoice db call".
      */
     public static function timerMoment($string)
     {
-        /** @var \Brainworxx\Krexx\Controller\DumpController $controller */
-        $controller = self::$pool
-            ->createClass('Brainworxx\\Krexx\\Controller\\DumpController')
-            ->noFatalForKrexx();
-
         // Disabled?
-        if (self::$pool->config->getSetting('disabled')) {
+        if (self::$pool->config->getSetting('disabled') || self::$analysisInProgress) {
             return;
         }
-        $controller->timerAction($string)->reFatalAfterKrexx();
+
+        self::$analysisInProgress = true;
+
+        self::$pool->createClass('Brainworxx\\Krexx\\Controller\\DumpController')
+            ->noFatalForKrexx()
+            ->timerAction($string)
+            ->reFatalAfterKrexx();
+
+        self::$analysisInProgress = false;
     }
 
     /**
      * Takes a "moment" and outputs the timer.
+     *
+     * @api
      */
     public static function timerEnd()
     {
-        /** @var \Brainworxx\Krexx\Controller\DumpController $controller */
-        $controller = self::$pool
-            ->createClass('Brainworxx\\Krexx\\Controller\\DumpController')
-            ->noFatalForKrexx();
-
         // Disabled ?
-        if (self::$pool->config->getSetting('disabled')) {
+        if (self::$pool->config->getSetting('disabled') || self::$analysisInProgress) {
             return;
         }
-        $controller->timerEndAction()->reFatalAfterKrexx();
+
+        self::$analysisInProgress = true;
+
+        self::$pool->createClass('Brainworxx\\Krexx\\Controller\\DumpController')
+            ->noFatalForKrexx()
+            ->timerEndAction()
+            ->reFatalAfterKrexx();
+
+        self::$analysisInProgress = false;
     }
 
     /**
      * Starts the analysis of a variable.
+     *
+     * @api
      *
      * @param mixed $data
      *   The variable we want to analyse.
      */
     public static function open($data = null)
     {
-        /** @var \Brainworxx\Krexx\Controller\DumpController $controller */
-        $controller = self::$pool
-            ->createClass('Brainworxx\\Krexx\\Controller\\DumpController')
-            ->noFatalForKrexx();
-
         // Disabled?
-        if (self::$pool->config->getSetting('disabled')) {
+        if (self::$pool->config->getSetting('disabled') || self::$analysisInProgress) {
             return;
         }
-        $controller->dumpAction($data)->reFatalAfterKrexx();
+
+        self::$analysisInProgress = true;
+
+        self::$pool->createClass('Brainworxx\\Krexx\\Controller\\DumpController')
+            ->noFatalForKrexx()
+            ->dumpAction($data)
+            ->reFatalAfterKrexx();
+
+        self::$analysisInProgress = false;
     }
 
     /**
@@ -240,30 +279,36 @@ class Krexx
      *
      * When there are classes found inside the backtrace,
      * they will be analysed.
+     *
+     * @api
+     *
      */
     public static function backtrace()
     {
-        /** @var \Brainworxx\Krexx\Controller\BacktraceController $controller */
-        $controller = self::$pool
-            ->createClass('Brainworxx\\Krexx\\Controller\\BacktraceController')
-            ->noFatalForKrexx();
-
         // Disabled?
-        if (self::$pool->config->getSetting('disabled')) {
+        if (self::$pool->config->getSetting('disabled') || self::$analysisInProgress) {
             return;
         }
-        // Render it.
-        $controller->backtraceAction()->reFatalAfterKrexx();
+
+        self::$analysisInProgress = true;
+
+        self::$pool->createClass('Brainworxx\\Krexx\\Controller\\BacktraceController')
+            ->noFatalForKrexx()
+            ->backtraceAction()
+            ->reFatalAfterKrexx();
+
+        self::$analysisInProgress = false;
     }
 
     /**
      * Disable kreXX.
+     *
+     * @api
      */
     public static function disable()
     {
         self::$pool->createClass('Brainworxx\\Krexx\\Controller\\DumpController')
             ->noFatalForKrexx();
-        self::$pool->config->setDisabled(true);
         // We will not re-enable it afterwards, because kreXX
         // is disabled and the handler would not show up anyway.
     }
@@ -272,26 +317,29 @@ class Krexx
      * Displays the edit settings part, no analysis.
      *
      * Ignores the 'disabled' settings in the cookie.
+     *
+     * @api
      */
     public static function editSettings()
     {
-         /** @var \Brainworxx\Krexx\Controller\EditSettingsController $controller */
-        $controller = self::$pool
-            ->createClass('Brainworxx\\Krexx\\Controller\\EditSettingsController')
-            ->noFatalForKrexx();
-
         // Disabled?
         // We are ignoring local settings here.
         if (self::$pool->config->getSetting('disabled')) {
             return;
         }
-        $controller->editSettingsAction()->reFatalAfterKrexx();
+
+         self::$pool->createClass('Brainworxx\\Krexx\\Controller\\EditSettingsController')
+            ->noFatalForKrexx()
+            ->editSettingsAction()
+            ->reFatalAfterKrexx();
     }
 
     /**
      * Registers a shutdown function.
      *
      * Our fatal errorhandler is located there.
+     *
+     * @api
      */
     public static function registerFatal()
     {
@@ -309,6 +357,8 @@ class Krexx
      * We can not unregister a once declared shutdown function,
      * so we need to tell our errorhandler to do nothing, in case
      * there is a fatal.
+     *
+     * @api
      */
     public static function unregisterFatal()
     {

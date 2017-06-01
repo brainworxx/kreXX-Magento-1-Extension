@@ -16,7 +16,7 @@
  * @license http://opensource.org/licenses/LGPL-2.1
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2016 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -345,8 +345,6 @@
                 <label for="factory.analyseGetter">Use factory settings</label>
             </td>
         </tr>
-
-
         <tr>
             <td>List of debug methods to poll for data:</td>
             <td colspan="2">This setting is not editable on the frontend.</td>
@@ -358,9 +356,6 @@
         <tr>
             <th colspan="3"><b>Error Handling and Backtrace</b></th>
         </tr>
-
-
-
         <tr>
             <td><label for="registerAutomatically">Register fatal error handler automatically:</label></td>
             <td>
@@ -381,6 +376,29 @@
                 <label for="factory.registerAutomatically">Use factory settings</label>
             </td>
         </tr>
+
+        <tr>
+            <td><label for="maxStepNumber">Maximum count of steps in the backtrace:</label></td>
+            <td>
+                <select name="backtraceAndError[maxStepNumber]" id="maxStepNumber">
+                    <?php foreach ($data['settings'] as $key => $value) {
+                        if ($key == $settings['backtraceAndError']['maxStepNumber']) {
+                            $selected = 'selected="selected"';
+                        } else {
+                            $selected = '';
+                        } ?>
+                        <option
+                            value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                    <?php } ?>
+                </select>
+            </td>
+            <td>
+                <input id="factory.maxStepNumber" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['maxStepNumber']; ?>/>
+                <label for="factory.maxStepNumber">Use factory settings</label>
+            </td>
+        </tr>
+
+
     </table>
     <br/>
     <?php echo $this->getBlockHtml('formkey') ?>
