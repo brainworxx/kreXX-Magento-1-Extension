@@ -84,6 +84,7 @@ class Krexx
         include_once $krexxDir . 'src/service/config/Config.php';
         include_once $krexxDir . 'src/service/misc/File.php';
         include_once $krexxDir . 'src/service/misc/Registry.php';
+        include_once $krexxDir . 'src/service/misc/Encoding.php';
         include_once $krexxDir . 'src/service/factory/Factory.php';
         include_once $krexxDir . 'src/service/factory/Pool.php';
         include_once $krexxDir . 'src/service/flow/Recursion.php';
@@ -124,7 +125,6 @@ class Krexx
         include_once $krexxDir . 'src/analyse/comment/Properties.php';
         include_once $krexxDir . 'src/analyse/code/Codegen.php';
         include_once $krexxDir . 'src/analyse/code/Connectors.php';
-        include_once $krexxDir . 'src/analyse/code/ReflectionParameterWrapper.php';
         include_once $krexxDir . 'src/errorhandler/AbstractError.php';
         include_once $krexxDir . 'src/errorhandler/Fatal.php';
         include_once $krexxDir . 'src/controller/AbstractController.php';

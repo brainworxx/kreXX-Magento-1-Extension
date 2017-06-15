@@ -191,7 +191,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
                         // We escape the value, just in case, since we can not whitelist it.
                         $value = htmlspecialchars(preg_replace('/\s+/', '', $value));
                         // Evaluate the setting!
-                        if ($pool->config->security->evaluateSetting($section, $setting_name, $value)) {
+                        if ($pool->config->evaluateSetting($section, $setting_name, $value)) {
                             $old_values[$section][$setting_name] = $value;
                         } else {
                             // Validation failed! kreXX will generate a message, which we will

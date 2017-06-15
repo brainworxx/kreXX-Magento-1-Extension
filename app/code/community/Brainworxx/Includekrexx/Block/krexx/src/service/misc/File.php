@@ -43,19 +43,13 @@ use Brainworxx\Krexx\Service\Factory\Pool;
  */
 class File
 {
-    /**
-     * The cache for the reading of files.
-     *
-     * @var array
-     */
-    protected $fileCache = array();
 
     /**
      * Here we cache, if a file exists and is readable.
      *
      * @var array
      */
-    protected $isReadableCache = array();
+    protected static $isReadableCache = array();
 
     /**
      * @var Pool
@@ -107,23 +101,17 @@ class File
                 // Add it to the result.
                 $realLineNo = $currentLineNo + 1;
 
-                // Escape it.
-                $content[$currentLineNo] = $this->pool->encodeString(
-                    $content[$currentLineNo],
-                    true
-                );
-
                 if ($currentLineNo === $highlight) {
                     $result .= $this->pool->render->renderBacktraceSourceLine(
                         'highlight',
                         $realLineNo,
-                        $content[$currentLineNo]
+                        $this->pool->encodingService->encodeString($content[$currentLineNo], true)
                     );
                 } else {
                     $result .= $this->pool->render->renderBacktraceSourceLine(
                         'source',
                         $realLineNo,
-                        $content[$currentLineNo]
+                        $this->pool->encodingService->encodeString($content[$currentLineNo], true)
                     );
                 }
             } else {
@@ -174,20 +162,24 @@ class File
      * @param string $filename
      *   The path to the file we want to read.
      *
-     * @return array
-     *   The file array.
+     * @return \SplFixedArray
+     *   The file in a \SplFixedArray.
      */
     protected function getFileContentsArray($filename)
     {
-        if (isset($this->fileCache[$filename])) {
-            return $this->fileCache[$filename];
+        static $filecache = array();
+
+        if (isset($filecache[$filename])) {
+            return $filecache[$filename];
         }
 
+        // Using \SplFixedArray to save some memory, as it can get
+        // quire huge, depending on your system. 4mb is nothing here.
         if ($this->fileIsReadable($filename)) {
-            return $this->fileCache[$filename] = file($filename);
+            return $filecache[$filename] = \SplFixedArray::fromArray(file($filename));
         } else {
             // Not readable!
-            return $this->fileCache[$filename] = array();
+            return $filecache[$filename] = new \SplFixedArray(0);
         }
     }
 
@@ -211,11 +203,12 @@ class File
                 fclose($file);
                 return $result;
             }
+        } else {
+            // This file was not readable! We need to tell the user!
+            $this->pool->messages->addMessage('fileserviceAccess', array($this->filterFilePath($path)));
         }
 
-        // This file was not readable! We need to tell the user!
-        // Huh, we can not fully access this one.
-        $this->pool->messages->addMessage('fileserviceAccess', array($this->filterFilePath($path)));
+        // Empty file returns an empty string.
         return '';
     }
 
@@ -239,7 +232,7 @@ class File
         }
         // New file. We tell the caching, that we have read access here.
         file_put_contents($path, $string, FILE_APPEND);
-        $this->isReadableCache[$path] = true;
+        self::$isReadableCache[$path] = true;
 
     }
 
@@ -285,7 +278,7 @@ class File
         // We remove it, just in case, to make sure that we remove the doc root
         // completely from the $path variable.
         $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/');
-        if (isset($docRoot) && strpos($path, $docRoot) === 0) {
+        if (!empty($docRoot) && strpos($path, $docRoot) === 0) {
             // Found it on position 0.
             $path = '. . ./' . substr($path, strlen($docRoot) + 1);
         }
@@ -305,11 +298,11 @@ class File
     protected function fileIsReadable($filePath)
     {
         // Return the cache, if we have any.
-        if (isset($this->isReadableCache[$filePath])) {
-            return $this->isReadableCache[$filePath];
+        if (isset(self::$isReadableCache[$filePath])) {
+            return self::$isReadableCache[$filePath];
         }
 
         // Set the cache and return it.
-        return $this->isReadableCache[$filePath] = is_readable($filePath) && is_file($filePath);
+        return self::$isReadableCache[$filePath] = is_readable($filePath) && is_file($filePath);
     }
 }
