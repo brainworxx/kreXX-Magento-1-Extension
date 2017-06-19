@@ -45,13 +45,9 @@ use Brainworxx\Krexx\Service\Factory\Pool;
 class Codegen
 {
     /**
-     * Some constants for internal use.
+     * Constant identifier for the array multiline code generation.
      */
-    const ITERATOR_TO_ARRAY = 'iterator_to_array';
-    const STOP = 'stop';
-    const PROPERTY = 'property';
-    const METHOD = 'method';
-    const CONCATENATION = 'concatenation';
+    const ITERATOR_TO_ARRAY = 1;
 
 
     /**
@@ -131,13 +127,12 @@ class Codegen
                 return $this->concatenation($model);
             }
 
-            // Multiline code generation starts here.
+            // Multi line code generation starts here.
             if ($model->getMultiLineCodeGen() === self::ITERATOR_TO_ARRAY) {
                 return 'iterator_to_array(;firstMarker;)' . $this->concatenation($model);
             }
 
             // Test for private or protected.
-
             if (strpos($type, 'protected') === false && strpos($type, 'private') === false) {
                 // Is not protected.
                 return $this->concatenation($model);
@@ -250,7 +245,7 @@ class Codegen
     }
 
     /**
-     * Convert the default value into a human readabla form.
+     * Convert the default value into a human readable form.
      *
      * @param mixed $default
      * The default value we need to bring into a human readable form.

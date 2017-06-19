@@ -151,7 +151,7 @@ class Security extends Fallback
 
     /**
      * Evaluation the registering of the fatal error handler.
-     * Works only in PHP5 and we are expection a boolean.
+     * Works only in PHP5 and we are expecting a boolean.
      *
      * @param string $value
      *   The value we want to evaluate
@@ -166,7 +166,7 @@ class Security extends Fallback
      */
     protected function evalFatal($value, $name, $group)
     {
-        // The feedback happens in the methodsbelow.
+        // The feedback happens in the methods below.
         return $this->evalBool($value, $name, $group) && $this->evalPhp();
     }
 
@@ -194,7 +194,7 @@ class Security extends Fallback
 
         $maxTime = (int)ini_get('max_execution_time');
         // We need a maximum runtime in the first place
-        // and then check, if we have avalue smaller than it.
+        // and then check, if we have a value smaller than it.
         if ($maxTime <= 0) {
             // We were unable to get the maximum runtime from the server.
             // No need to check any further.
@@ -284,38 +284,6 @@ class Security extends Fallback
      */
     protected function doNotEval()
     {
-        return true;
-    }
-
-    /**
-     * Determines if a debug function is blacklisted in s specific class.
-     *
-     * @param object $data
-     *   The class we are analysing.
-     * @param string $call
-     *   The function name we want to call.
-     *
-     * @return bool
-     *   Whether the function is allowed to be called.
-     */
-    public function isAllowedDebugCall($data, $call)
-    {
-        // Check if the class itself is blacklisted.
-        foreach ($this->debugClassBlacklist as $classname) {
-            if (is_a($data, $classname)) {
-                // No debug methods for you.
-                return false;
-            }
-        }
-
-        // Check for a class / method combination.
-        foreach ($this->debugMethodsBlacklist as $classname => $methodLlist) {
-            if (is_a($data, $classname) && in_array($call, $methodLlist)) {
-                // We have a winner, this one is blacklisted!
-                return false;
-            }
-        }
-        // Nothing found?
         return true;
     }
 }

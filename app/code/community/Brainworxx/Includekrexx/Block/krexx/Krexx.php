@@ -33,6 +33,7 @@
  */
 
 use Brainworxx\Krexx\Service\Factory\Pool;
+use Brainworxx\Krexx\Controller\AbstractController;
 
 // Include some files and set some internal values.
 \Krexx::bootstrapKrexx();
@@ -45,14 +46,7 @@ use Brainworxx\Krexx\Service\Factory\Pool;
 class Krexx
 {
 
-    /**
-     * Here we remember, if we are currently running a analysis.
-     * The debug methods may trigger another run, and we may get into
-     * trouble, memory or runtime wise.
-     *
-     * @var bool
-     */
-    protected static $analysisInProgress = false;
+
 
     /**
      * Our pool where we keep all relevant classes.
@@ -71,6 +65,7 @@ class Krexx
     public static function bootstrapKrexx()
     {
         $krexxDir = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+        include_once $krexxDir . 'src/view/RenderInterface.php';
         include_once $krexxDir . 'src/view/AbstractRender.php';
         include_once $krexxDir . 'src/view/Render.php';
         include_once $krexxDir . 'src/view/Messages.php';
@@ -82,6 +77,8 @@ class Krexx
         include_once $krexxDir . 'src/service/config/Fallback.php';
         include_once $krexxDir . 'src/service/config/Security.php';
         include_once $krexxDir . 'src/service/config/Config.php';
+        include_once $krexxDir . 'src/service/config/from/Cookie.php';
+        include_once $krexxDir . 'src/service/config/from/Ini.php';
         include_once $krexxDir . 'src/service/misc/File.php';
         include_once $krexxDir . 'src/service/misc/Registry.php';
         include_once $krexxDir . 'src/service/misc/Encoding.php';
@@ -213,18 +210,18 @@ class Krexx
     public static function timerMoment($string)
     {
         // Disabled?
-        if (self::$pool->config->getSetting('disabled') || self::$analysisInProgress) {
+        if (self::$pool->config->getSetting('disabled') || AbstractController::$analysisInProgress) {
             return;
         }
 
-        self::$analysisInProgress = true;
+        AbstractController::$analysisInProgress = true;
 
         self::$pool->createClass('Brainworxx\\Krexx\\Controller\\DumpController')
             ->noFatalForKrexx()
             ->timerAction($string)
             ->reFatalAfterKrexx();
 
-        self::$analysisInProgress = false;
+        AbstractController::$analysisInProgress = false;
     }
 
     /**
@@ -235,18 +232,18 @@ class Krexx
     public static function timerEnd()
     {
         // Disabled ?
-        if (self::$pool->config->getSetting('disabled') || self::$analysisInProgress) {
+        if (self::$pool->config->getSetting('disabled') || AbstractController::$analysisInProgress) {
             return;
         }
 
-        self::$analysisInProgress = true;
+        AbstractController::$analysisInProgress = true;
 
         self::$pool->createClass('Brainworxx\\Krexx\\Controller\\DumpController')
             ->noFatalForKrexx()
             ->timerEndAction()
             ->reFatalAfterKrexx();
 
-        self::$analysisInProgress = false;
+        AbstractController::$analysisInProgress = false;
     }
 
     /**
@@ -260,18 +257,18 @@ class Krexx
     public static function open($data = null)
     {
         // Disabled?
-        if (self::$pool->config->getSetting('disabled') || self::$analysisInProgress) {
+        if (self::$pool->config->getSetting('disabled') || AbstractController::$analysisInProgress) {
             return;
         }
 
-        self::$analysisInProgress = true;
+        AbstractController::$analysisInProgress = true;
 
         self::$pool->createClass('Brainworxx\\Krexx\\Controller\\DumpController')
             ->noFatalForKrexx()
             ->dumpAction($data)
             ->reFatalAfterKrexx();
 
-        self::$analysisInProgress = false;
+        AbstractController::$analysisInProgress = false;
     }
 
     /**
@@ -286,18 +283,18 @@ class Krexx
     public static function backtrace()
     {
         // Disabled?
-        if (self::$pool->config->getSetting('disabled') || self::$analysisInProgress) {
+        if (self::$pool->config->getSetting('disabled') || AbstractController::$analysisInProgress) {
             return;
         }
 
-        self::$analysisInProgress = true;
+        AbstractController::$analysisInProgress = true;
 
         self::$pool->createClass('Brainworxx\\Krexx\\Controller\\BacktraceController')
             ->noFatalForKrexx()
             ->backtraceAction()
             ->reFatalAfterKrexx();
 
-        self::$analysisInProgress = false;
+        AbstractController::$analysisInProgress = false;
     }
 
     /**

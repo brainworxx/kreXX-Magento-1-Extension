@@ -153,12 +153,12 @@ class ThroughMethods extends AbstractCallback
      * @param \ReflectionMethod $reflectionMethod
      *   The reflection of the method that we are analysing.
      * @param \ReflectionClass $declaringClass
-     *   The class in wigh this method was declared.
+     *   The class in witch this method was declared.
      * @param \ReflectionClass $reflectionClass
      *   The class that we are currently analysing.
      *
      * @return string
-     *   All declaring keywards + the info if this method was inherited.
+     *   All declaring keywords + the info if this method was inherited.
      */
     protected function getDeclarationKeywords(
         \ReflectionMethod $reflectionMethod,
@@ -167,26 +167,16 @@ class ThroughMethods extends AbstractCallback
     ) {
         $result = '';
 
-        if ($declaringClass->getName() !== $reflectionClass->getName()) {
-            $result .= ' inherited';
-            // We need to recheck our scope.
-            // Private inherited methods are never within the scope.
-            if ($reflectionMethod->isPrivate() && $this->pool->config->getSetting('analysePrivate') === false) {
-                // Do nothing. We ignore this one.
-                return '';
-            }
-        }
-
         if ($reflectionMethod->isPrivate()) {
             $result .= ' private';
-        }
-
-        if ($reflectionMethod->isProtected()) {
+        } elseif ($reflectionMethod->isProtected()) {
             $result .= ' protected';
+        } elseif ($reflectionMethod->isPublic()) {
+            $result .= ' public';
         }
 
-        if ($reflectionMethod->isPublic()) {
-            $result .= ' public';
+        if ($declaringClass->getName() !== $reflectionClass->getName()) {
+            $result .= ' inherited';
         }
 
         if ($reflectionMethod->isStatic()) {

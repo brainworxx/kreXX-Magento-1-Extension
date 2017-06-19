@@ -46,6 +46,15 @@ use Brainworxx\Krexx\View\Output\AbstractOutput;
 abstract class AbstractController
 {
     /**
+     * Here we remember, if we are currently running a analysis.
+     * The debug methods may trigger another run, and we may get into
+     * trouble, memory or runtime wise.
+     *
+     * @var bool
+     */
+    public static $analysisInProgress = false;
+
+    /**
      * Config for the 'deep' backtrace analysis.
      *
      * @var array
@@ -223,7 +232,7 @@ abstract class AbstractController
         } else {
             $jsFile = $krexxDir . 'resources/jsLibs/kdt.js';
         }
-        $js = $this->pool->fileService->getFileContents($jsFile);
+        $jsCode = $this->pool->fileService->getFileContents($jsFile);
 
         // Krexx.js is comes directly form the template.
         $path = $krexxDir . 'resources/skins/' . $this->pool->config->getSetting('skin');
@@ -232,9 +241,9 @@ abstract class AbstractController
         } else {
             $jsFile = $path . '/krexx.js';
         }
-        $js .= $this->pool->fileService->getFileContents($jsFile);
+        $jsCode .= $this->pool->fileService->getFileContents($jsFile);
 
-        return $this->pool->render->renderCssJs($css, $js);
+        return $this->pool->render->renderCssJs($css, $jsCode);
     }
 
     /**
@@ -325,32 +334,33 @@ abstract class AbstractController
     {
         static $result;
 
-        // Check if someone has been messing with the $_SERVER, to prevent
-        // warnings and notices.
-        if (empty($_SERVER) ||
-            empty($_SERVER['SERVER_PROTOCOL']) ||
-            empty($_SERVER['SERVER_PORT']) ||
-            empty($_SERVER['SERVER_NAME'])) {
-            $result = 'n/a';
-        }
-
         if (isset($result)) {
             return $result;
         }
 
-        // SSL or no SSL.
-        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
-            $ssl = true;
-        } else {
-            $ssl = false;
+        $server = $this->pool->getServer();
+
+        // Check if someone has been messing with the $_SERVER, to prevent
+        // warnings and notices.
+        if (empty($server) ||
+            empty($server['SERVER_PROTOCOL']) ||
+            empty($server['SERVER_PORT']) ||
+            empty($server['SERVER_NAME'])) {
+            $result = 'n/a';
+
+            return $result;
         }
-        $sp = strtolower($_SERVER['SERVER_PROTOCOL']);
-        $protocol = substr($sp, 0, strpos($sp, '/'));
+
+        // SSL or no SSL.
+        $ssl = (!empty($server['HTTPS']) && $server['HTTPS'] === 'on');
+
+        $protocol = strtolower($server['SERVER_PROTOCOL']);
+        $protocol = substr($protocol, 0, strpos($protocol, '/'));
         if ($ssl) {
             $protocol .= 's';
         }
 
-        $port = $_SERVER['SERVER_PORT'];
+        $port = $server['SERVER_PORT'];
 
         if ((!$ssl && $port === '80') || ($ssl && $port === '443')) {
             // Normal combo with port and protocol.
@@ -360,13 +370,13 @@ abstract class AbstractController
             $port = ':' . $port;
         }
 
-        if (isset($_SERVER['HTTP_HOST'])) {
-            $host = $_SERVER['HTTP_HOST'];
+        if (isset($server['HTTP_HOST'])) {
+            $host = $server['HTTP_HOST'];
         } else {
-            $host = $_SERVER['SERVER_NAME'] . $port;
+            $host = $server['SERVER_NAME'] . $port;
         }
 
-        $result = htmlspecialchars($protocol . '://' . $host . $_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8');
+        $result = $this->pool->encodingService->encodeString($protocol . '://' . $host . $server['REQUEST_URI']);
         return $result;
 
     }
