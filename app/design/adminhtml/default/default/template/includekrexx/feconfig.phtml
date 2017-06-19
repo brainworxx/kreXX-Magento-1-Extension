@@ -100,10 +100,6 @@
         </tr>
 
 
-
-
-
-
         <tr><th colspan="3"><b>Runtime</b></th></tr>
         <tr>
             <td><label for="detectAjax">Try to detect AJAX requests:</label></td>
@@ -202,6 +198,26 @@
                 <label for="factory.maxRuntime">Use factory settings</label>
             </td>
         </tr>
+        <tr>
+            <td><label for="useScopeAnalysis">Use scope analysis:</label></td>
+            <td>
+                <select name="runtime[useScopeAnalysis]" id="useScopeAnalysis">
+                    <?php foreach ($data['settings'] as $key => $value) {
+                        if ($key == $settings['runtime']['useScopeAnalysis']) {
+                            $selected = 'selected="selected"';
+                        } else {
+                            $selected = '';
+                        } ?>
+                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                    <?php } ?>
+                </select>
+            </td>
+            <td>
+                <input id="factory.useScopeAnalysis" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['useScopeAnalysis']; ?>/>
+                <label for="factory.useScopeAnalysis">Use factory settings</label>
+            </td>
+        </tr>
+
         <tr><td colspan="3">&nbsp;</td></tr>
 
         <tr><th colspan="3"><b>Properties</b></th></tr>
