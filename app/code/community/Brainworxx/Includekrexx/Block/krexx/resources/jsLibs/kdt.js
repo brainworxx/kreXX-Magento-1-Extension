@@ -55,35 +55,78 @@
         /** @type {Node} */
         var parent = el.parentNode;
 
-        while (parent !== null && typeof parent[matches()] === 'function') {
+        while (parent !== null) {
 
             // Check for classname
-            if (parent[matches()](selector)) {
+            if (kdt.matches(parent, selector)) {
                 result.push(parent);
             }
             // Get the next one.
             parent = parent.parentNode;
+            // check if we have reached the top of the rabbit hole.
+            if (parent === kdt.body) {
+                // Exit the while.
+                parent = null;
+            }
         }
         return result;
 
-        // Workaround for several browsers, since matches() is still not really
-        // implemented in IE.
-        function matches() {
-            /** @type {Element} */
-            var el = document.querySelector('body');
-            /** @type {Array.<String>} */
-            var names = [
-                'matches',
-                'msMatchesSelector',
-                'mozMatchesSelector',
-                'oMatchesSelector',
-                'webkitMatchesSelector'
-            ];
-            // We need to iterate them.
-            for (var i = 0; i < names.length; i++) {
-                if (typeof el[names[i]] === 'function') {
-                    return names[i];
-                }
+    };
+
+    /**
+     * X-Browser implementation of the matchesSelector.
+     *
+     * @param {Node} element
+     * @param {string} selector
+     * @return {*}
+     */
+    kdt.matches = function(element, selector) {
+        return false;
+    };
+
+    /**
+     * We are adding a concrete implementation of the matches method,
+     * which may or may not be implemented in one way or the aother.
+     */
+    kdt.testMachtes = function() {
+        // Normal implementation.
+        if (typeof kdt.body.matches === 'function') {
+            kdt.matches = function(element, selector) {
+                return element.matches(selector);
+            };
+            return;
+        }
+        // Whatever.
+        if (typeof kdt.body.matchesSelector === 'function') {
+            kdt.matches = function(element, selector) {
+                return element.matchesSelector(selector);
+            };
+            return;
+        }
+        // IE.
+        if (typeof kdt.body.msMatchesSelector === 'function') {
+            kdt.matches = function(element, selector) {
+                return element.msMatchesSelector(selector);
+            };
+            return;
+        }
+        // Firefox.
+        if (typeof kdt.body.mozMatchesSelector === 'function') {
+            kdt.matches = function(element, selector) {
+                return element.mozMatchesSelector(selector);
+            };
+            return;
+        }
+        // Chrome.
+        if (typeof kdt.body.webkitMatchesSelector === 'function') {
+            kdt.matches = function(element, selector) {
+                return element.webkitMatchesSelector(selector);
+            }
+        }
+         // Opera.
+        if (typeof kdt.body.oMatchesSelector === 'function') {
+            kdt.webkitMatchesSelector = function(element, selector) {
+                return element.oMatchesSelector(selector);
             }
         }
     };
@@ -202,7 +245,6 @@
      * @param {string} className
      */
     kdt.toggleClass = function (el, className) {
-
         if (el.classList) {
             // Just toggle it.
             el.classList.toggle(className);
@@ -231,12 +273,99 @@
      *
      */
     kdt.addEvent = function (selector, eventName, callBack) {
+        // We use the clickHandler instead.
+        if (eventName === 'click') {
+            kdt.clickHandler.add(selector, callBack);
+        } else {
+            /** @type {NodeList} */
+            var elements = document.querySelectorAll(selector);
+
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].addEventListener(eventName, callBack);
+            }
+        }
+    };
+
+    /**
+     * Click handler for kreXX, to get out of the event-hell.
+     */
+    kdt.clickHandler =  {};
+
+    /**
+     * The storage object, with an array of callbacks behind it.
+     *
+     * @type {{}}
+     */
+    kdt.clickHandler.storage = {};
+
+    /**
+     *
+     * @param {string} selector
+     * @param {function} callback
+     */
+    kdt.clickHandler.add = function(selector, callback) {
+        if (!(selector in kdt.clickHandler.storage)) {
+            kdt.clickHandler.storage[selector] = [];
+        }
+        kdt.clickHandler.storage[selector].push(callback);
+    };
+
+    /**
+     * Registers the eventhandler, prefereably on the kreXX instance window.
+     *
+     * @param selector
+     */
+    kdt.clickHandler.register = function(selector) {
         /** @type {NodeList} */
         var elements = document.querySelectorAll(selector);
 
         for (var i = 0; i < elements.length; i++) {
-            elements[i].addEventListener(eventName, callBack);
+            elements[i].addEventListener('click', kdt.clickHandler.handle);
         }
+    };
+
+    /**
+     * Whenever a click is bubbeled on a kreXX instance, we try to find
+     * the according callback, and sinply call it.
+     *
+     * @param {Event} event
+     * @event click
+     */
+    kdt.clickHandler.handle = function(event) {
+        // We stop the event in it's tracks.
+        event.stopPropagation();
+        event.stop = false;
+
+        var element = event.target;
+        var selector;
+        var i;
+        var callbackArray = [];
+
+        do {
+            // We need to test the element on all selectors.
+            for (selector in kdt.clickHandler.storage) {
+
+                if (kdt.matches(element, selector)) {
+                    callbackArray = kdt.clickHandler.storage[selector];
+                    // Got to call them all.
+                    for (i = 0; i < callbackArray.length; i++) {
+                        callbackArray[i](event, element);
+                        if (event.stop) {
+                            // Our "implementation" of stopPropagation().
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Time to test the parent.
+            element = element.parentNode;
+            // Test if we have reached the top of the rabbit hole.
+            if (element === this) {
+                element = null;
+            }
+
+        } while (element !== null);
     };
 
     /**
@@ -357,13 +486,15 @@
             /** @type {number} */
             var offSetX = offset.left + outerWidth(elContent) - event.pageX - outerWidth(elContent);
 
+            var elContentStyle = elContent.style;
+
             // We might need to add a special offset, in case that:
             // - body is position: relative;
             // and there are elements above that have
             // - margin: top or
             // - margin: bottom
             /** @type {CSSStyleDeclaration} */
-            var bodyStyle = getComputedStyle(document.querySelector('body'));
+            var bodyStyle = getComputedStyle(kdt.body);
             if (bodyStyle.position === 'relative') {
 
                 /** @type {number} */
@@ -396,31 +527,28 @@
                 offSetX -= relOffsetX;
             }
 
-            // Prevents the default event behavior (ie: click).
+            document.addEventListener("mousemove", drag);
+            document.addEventListener("mouseup",up);
+
             event.preventDefault();
-            // Prevents the event from propagating (ie: "bubbling").
             event.stopPropagation();
 
-            document.addEventListener("mousemove", drag);
-
             /**
-             * Stops the dragging process
+             * Stops the dragging process.
              *
-             * @event mouseup
+             * @param {Event} event
              */
-            document.addEventListener("mouseup", function () {
-                // Prevents the default event behavior (ie: click).
+            function up(event) {
                 event.preventDefault();
-                // Prevents the event from propagating (ie: "bubbling").
                 event.stopPropagation();
+
                 // Unregister to prevent slowdown.
                 document.removeEventListener("mousemove", drag);
+                document.removeEventListener("mouseup", up);
 
                 // Calling the callback for the mouseup.
-                if (typeof  callbackUp === 'function') {
-                    callbackUp();
-                }
-            });
+                callbackUp();
+            }
 
             /**
              * Drags the DOM element around.
@@ -429,23 +557,14 @@
              * @param {Event} event
              */
             function drag(event) {
-                // Prevents the default event behavior (ie: click).
                 event.preventDefault();
-                // Prevents the event from propagating (ie: "bubbling").
                 event.stopPropagation();
 
-                /** @type {number} */
-                var left = event.pageX + offSetX;
-                /** @type {number} */
-                var top = event.pageY + offSetY;
-
-                elContent.style.left = left + "px";
-                elContent.style.top = top + "px";
+                elContentStyle.left = (event.pageX + offSetX) + "px";
+                elContentStyle.top = (event.pageY + offSetY) + "px";
 
                 // Calling the callback for the dragging.
-                if (typeof  callbackDrag === 'function') {
-                    callbackDrag();
-                }
+                callbackDrag();
             }
         }
 
@@ -562,12 +681,11 @@
      * Resets all values in the local cookie settings.
      *
      * @param {Event} event
+     *   The click event.
+     * @param {Node} element
+     *   The element that was clicked.
      */
-    kdt.resetSetting = function (event) {
-        // Prevents the default event behavior (ie: click).
-        event.preventDefault();
-        // Prevents the event from propagating (ie: "bubbling").
-        event.stopPropagation();
+    kdt.resetSetting = function (event, element) {
 
         // We do not delete the cookie, we simply remove all settings in it.
         /** @type {Object} */
@@ -604,15 +722,6 @@
     };
 
     /**
-     * Prevents the bubbeling of en event, nothing more.
-     *
-     * @param {Event} event
-     */
-    kdt.preventBubble = function (event) {
-        event.stopPropagation();
-    };
-
-    /**
      * Get all elements with the provided selector and
      * move them to the bottom of the dom, right before
      * the </body> end tag.
@@ -623,15 +732,13 @@
         // Get all elements.
         /** @type {NodeList} */
         var elements = document.querySelectorAll(selector);
-        /** @type {Element} */
-        var body = document.querySelector('body');
 
         for (var i = 0; i < elements.length; i++) {
             // Check if their parent is the body tag.
             if (elements[i].parentNode.nodeName.toUpperCase() !== 'BODY') {
                 // Meh, we are handling some broken DOM. We need to move it
                 // to the bottom.
-                body.appendChild(elements[i]);
+                kdt.body.appendChild(elements[i]);
             }
         }
     };
@@ -694,6 +801,29 @@
         }, 500);
     };
 
+    kdt.preventBubble = function (event, element) {
+        event.stop = true;
+    };
+
+    /**
+     * Must be called before usage, only once.
+     *
+     * @event onDocumentReady
+     */
+    kdt.initialize = function () {
+
+        /**
+         * Caching of the body element for late usage.
+         *
+         * @type {Element}
+         */
+        kdt.body = document.querySelector('body');
+
+        // Adding a concrete maches implementation to the lib.
+        kdt.testMachtes();
+    };
+
+    // Copy the lib to the DOM, for later usage.
     window.kreXXdomTools = kdt;
 
 })();
