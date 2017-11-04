@@ -101,6 +101,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxlogController extends Mage_Adminhtm
                 // Get new data.
                 $stream = $ioFile->streamRead();
             }
+
             $ioFile->streamClose();
         } else {
             Mage::getSingleton('core/session')->addError('File: ' . $file . ' is not readable!');

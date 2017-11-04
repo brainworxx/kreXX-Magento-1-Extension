@@ -55,41 +55,154 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
         $pool = \Krexx::$pool;
 
         // Initialzing help data for the template.
-        $help['skin'] = htmlspecialchars(strip_tags($pool->messages->getHelp('skinHelp')));
+        $help['skin'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'skinHelp'
+                )
+            )
+        );
         $help['iprange'] = 'List of IPs that can trigger kreXX. Wildcards can be used.';
-        $help['maxfiles'] = htmlspecialchars(strip_tags($pool->messages->getHelp('maxfilesHelp')));
-        $help['destination'] = htmlspecialchars(strip_tags($pool->messages->getHelp('destinationHelp')));
-        $help['maxCall'] = htmlspecialchars(strip_tags($pool->messages->getHelp('maxCallHelp')));
+        $help['maxfiles'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'maxfilesHelp'
+                )
+            )
+        );
+        $help['destination'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'destinationHelp'
+                )
+            )
+        );
+        $help['maxCall'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'maxCallHelp'
+                )
+            )
+        );
         $help['disabled'] = 'Here you can disable kreXX without uninstalling the whole module.';
-        $help['detectAjax'] = htmlspecialchars(strip_tags($pool->messages->getHelp('detectAjaxHelp')));
-        $help['analyseProtected'] = htmlspecialchars(strip_tags($pool->messages->getHelp('analyseProtectedHelp')));
-        $help['analysePrivate'] = htmlspecialchars(strip_tags($pool->messages->getHelp('analysePrivateHelp')));
-        $help['analyseTraversable'] = htmlspecialchars(strip_tags($pool->messages->getHelp('analyseTraversableHelp')));
+        $help['detectAjax'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'detectAjaxHelp'
+                )
+            )
+        );
+        $help['analyseProtected'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'analyseProtectedHelp'
+                )
+            )
+        );
+        $help['analysePrivate'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'analysePrivateHelp'
+                )
+            )
+        );
+        $help['analyseTraversable'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'analyseTraversableHelp'
+                )
+            )
+        );
         $help['debugMethods'] = 'Comma-separated list of used debug callback functions. kreXX will try to call them,' .
             "if they are available and display their provided data.\nWe Recommend for Magento: '__toArray,toString'";
-        $help['level'] = htmlspecialchars(strip_tags($pool->messages->getHelp('levelHelp')));
-        $help['analyseProtectedMethods'] = htmlspecialchars(strip_tags($pool->messages->getHelp('analyseProtectedMethodsHelp')));
-        $help['analysePrivateMethods'] = htmlspecialchars(strip_tags($pool->messages->getHelp('analysePrivateMethodsHelp')));
-        $help['registerAutomatically'] = htmlspecialchars(strip_tags($pool->messages->getHelp('registerAutomaticallyHelp')));
-        $help['analyseConstants'] = htmlspecialchars(strip_tags($pool->messages->getHelp('analyseConstantsHelp')));
-        $help['analyseGetter'] = htmlspecialchars(strip_tags($pool->messages->getHelp('analyseGetterHelp')));
-        $help['useScopeAnalysis'] = htmlspecialchars(strip_tags($pool->messages->getHelp('useScopeAnalysisHelp')));
-        $help['memoryLeft'] = htmlspecialchars(strip_tags($pool->messages->getHelp('memoryLeftHelp')));
-        $help['maxRuntime'] = htmlspecialchars(strip_tags($pool->messages->getHelp('maxRuntimeHelp')));
-        $help['maxStepNumber'] = htmlspecialchars(strip_tags($pool->messages->getHelp('maxStepNumberHelp')));
+        $help['level'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'levelHelp'
+                )
+            )
+        );
+        $help['analyseProtectedMethods'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'analyseProtectedMethodsHelp'
+                )
+            )
+        );
+        $help['analysePrivateMethods'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'analysePrivateMethodsHelp'
+                )
+            )
+        );
+        $help['registerAutomatically'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'registerAutomaticallyHelp'
+                )
+            )
+        );
+        $help['analyseConstants'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'analyseConstantsHelp'
+                )
+            )
+        );
+        $help['analyseGetter'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'analyseGetterHelp'
+                )
+            )
+        );
+        $help['useScopeAnalysis'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'useScopeAnalysisHelp'
+                )
+            )
+        );
+        $help['memoryLeft'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'memoryLeftHelp'
+                )
+            )
+        );
+        $help['maxRuntime'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'maxRuntimeHelp'
+                )
+            )
+        );
+        $help['maxStepNumber'] = htmlspecialchars(
+            strip_tags(
+                $pool->messages->getHelp(
+                    'maxStepNumberHelp'
+                )
+            )
+        );
 
         $this->assign('help', $help);
 
         // Initializing the select data for the template.
-        $this->setSelectDestination(array(
-            'browser' => 'browser',
-            'file' => 'file'
-        ));
+        $this->setSelectDestination(
+            array(
+                'browser' => 'browser',
+                'file' => 'file'
+            )
+        );
+
         $this->setSelectBool(array('true' => 'true', 'false' => 'false'));
-        $this->setSelectBacktrace(array(
-            'normal' => 'normal',
-            'deep' => 'deep'
-        ));
+        $this->setSelectBacktrace(
+            array(
+                'normal' => 'normal',
+                'deep' => 'deep'
+            )
+        );
         $skins = array();
 
 
@@ -186,7 +299,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
         // Are these actually set?
         foreach ($settings as $mainkey => $setting) {
             foreach ($setting as $attribute => $config) {
-                if (is_null($config)) {
+                if ($config === null) {
                     $factory[$attribute] = ' checked="checked" ';
                     // We need to fill these values with the stuff from the factory settings!
                     $settings[$mainkey][$attribute] = $pool->config->configFallback[$mainkey][$attribute];
@@ -210,9 +323,11 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
      */
     public function getSaveUrl()
     {
-        return $this->getUrl('*/*/saveconfig', array(
-            '_current' => true,
-            'back' => null
-        ));
+        return $this->getUrl(
+            '*/*/saveconfig', array(
+                '_current' => true,
+                'back' => null
+            )
+        );
     }
 }

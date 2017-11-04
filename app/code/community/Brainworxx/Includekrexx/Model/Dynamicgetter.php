@@ -71,12 +71,17 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
             foreach ($this->parameters['methodList'] as $id => $reflectionMethod) {
                 $name = $reflectionMethod->getName();
                 if ($name === $key) {
-                    $model->addToJson('method comment', nl2br($this->pool
-                    ->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Methods')
-                    ->getComment(
-                        $reflectionMethod,
-                        $this->parameters['ref']
-                    )));
+                    $model->addToJson(
+                        'method comment',
+                        nl2br(
+                            $this->pool
+                                ->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Methods')
+                                ->getComment(
+                                    $reflectionMethod,
+                                    $this->parameters['ref']
+                                )
+                        )
+                    );
                     // Remove the reflection from the list. We still need to
                     // process the parent, and don't want to have double entries in
                     // there.
@@ -112,6 +117,7 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
             }
         } catch (ReflectionException $e) {
             // Do nothing.
+            return $data;
         }
 
         return $data;

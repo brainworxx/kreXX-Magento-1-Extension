@@ -47,10 +47,12 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
      */
     public function getSaveUrl()
     {
-        return $this->getUrl('*/*/savefeconfig', array(
+        return $this->getUrl(
+            '*/*/savefeconfig', array(
             '_current' => true,
             'back' => null
-        ));
+            )
+        );
     }
 
     /**
@@ -132,7 +134,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
         // Are these actually set?
         foreach ($settings as $mainkey => $setting) {
             foreach ($setting as $attribute => $config) {
-                if (is_null($config)) {
+                if ($config === null) {
                     $factory[$attribute] = ' checked="checked" ';
                     // We need to fill these values with the stuff from the
                     // factory settings!
@@ -172,14 +174,17 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
                 // It's not visible, thus we do not accept any values from it.
                 $result = 'none';
             }
+
             if ($values['editable'] == 'true' && $values['type'] != 'None') {
                 // It's editable and visible.
                 $result = 'full';
             }
+
             if ($values['editable'] == 'false' && $values['type'] != 'None') {
                 // It's only visible.
                 $result = 'display';
             }
+
             return $result;
         }
     }

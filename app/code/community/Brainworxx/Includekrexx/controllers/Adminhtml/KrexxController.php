@@ -43,7 +43,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      *
      * @var array
      */
-    protected $allowedSettingsNames = array(
+    protected $_allowedSettingsNames = array(
         'skin',
         'maxfiles',
         'destination',
@@ -73,7 +73,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      *
      * @var array
      */
-    protected $allowedSections = array(
+    protected $_allowedSections = array(
         'runtime',
         'output',
         'properties',
@@ -93,12 +93,15 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         if ($actionName == 'adminhtml_krexx_config') {
             return Mage::getSingleton('admin/session')->isAllowed('system/krexx/edit');
         }
+
         if ($actionName == 'adminhtml_krexx_feconfig') {
             return Mage::getSingleton('admin/session')->isAllowed('system/krexx/editfe');
         }
+
         if ($actionName == 'adminhtml_krexx_editlocalconfig') {
             return Mage::getSingleton('admin/session')->isAllowed('system/krexx/editlocalconfig');
         }
+
         if ($actionName == 'adminhtml_krexx_docu') {
             return Mage::getSingleton('admin/session')->isAllowed('system/krexx/docu');
         }
@@ -173,30 +176,30 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
     public function saveconfigAction()
     {
         $arguments = $this->getRequest()->getPost();
-        $all_ok = true;
+        $allOk = true;
         $pool = \Krexx::$pool;
 
         $filepath = $pool->krexxDir . 'config/Krexx.ini';
         // We must preserve the section 'feEditing'.
         // Everything else will be overwritten.
-        $old_values = parse_ini_file($filepath, true);
-        $old_values = array('feEditing' => $old_values['feEditing']);
+        $oldValues = parse_ini_file($filepath, true);
+        $oldValues = array('feEditing' => $oldValues['feEditing']);
 
         // Iterating through the form.
         foreach ($arguments as $section => $data) {
-            if (is_array($data) && in_array($section, $this->allowedSections)) {
+            if (is_array($data) && in_array($section, $this->_allowedSections)) {
                 // We've got a section key.
-                foreach ($data as $setting_name => $value) {
-                    if (in_array($setting_name, $this->allowedSettingsNames)) {
+                foreach ($data as $settingName => $value) {
+                    if (in_array($settingName, $this->_allowedSettingsNames)) {
                         // We escape the value, just in case, since we can not whitelist it.
                         $value = htmlspecialchars(preg_replace('/\s+/', '', $value));
                         // Evaluate the setting!
-                        if ($pool->config->security->evaluateSetting($section, $setting_name, $value)) {
-                            $old_values[$section][$setting_name] = $value;
+                        if ($pool->config->security->evaluateSetting($section, $settingName, $value)) {
+                            $oldValues[$section][$settingName] = $value;
                         } else {
                             // Validation failed! kreXX will generate a message, which we will
                             // display at the buttom.
-                            $all_ok = false;
+                            $allOk = false;
                         }
                     }
                 }
@@ -205,24 +208,24 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
 
         // Now we must create the ini file.
         $ini = '';
-        foreach ($old_values as $key => $setting) {
+        foreach ($oldValues as $key => $setting) {
             $ini .= '[' . $key . ']' . PHP_EOL;
-            foreach ($setting as $setting_name => $value) {
-                $ini .= $setting_name . ' = "' . $value . '"' . PHP_EOL;
+            foreach ($setting as $settingName => $value) {
+                $ini .= $settingName . ' = "' . $value . '"' . PHP_EOL;
             }
         }
 
         // Now we should write the file!
-        if ($all_ok) {
+        if ($allOk) {
             $file = new Varien_Io_File();
             if ($file->write($filepath, $ini) === false) {
-                $all_ok = false;
+                $allOk = false;
                 $pool->messages->addMessage('Configuration file ' . $filepath . ' is not writeable!');
             }
         }
 
         // Something went wrong, we need to tell the user.
-        if (!$all_ok) {
+        if (!$allOk) {
             Mage::getSingleton('core/session')->addError(
                 strip_tags($pool->messages->outputMessages()),
                 "The settings were NOT saved."
@@ -244,33 +247,33 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
     public function savefeconfigAction()
     {
         $arguments = $this->getRequest()->getPost();
-        $all_ok = true;
+        $allOk = true;
         $pool = \Krexx::$pool;
         $filepath = $pool->krexxDir . 'config/Krexx.ini';
 
         // Whitelist of the vales we are accepting.
-        $allowed_values = array('full', 'display', 'none');
+        $allowedValues = array('full', 'display', 'none');
 
         // Get the old values . . .
-        $old_values = parse_ini_file($filepath, true);
+        $oldValues = parse_ini_file($filepath, true);
         // . . . and remove our part.
-        unset($old_values['feEditing']);
+        unset($oldValues['feEditing']);
 
         // We need to correct the allowed settings, since we do not allow anything.
-        unset($this->allowedSettingsNames['destination']);
-        unset($this->allowedSettingsNames['maxfiles']);
-        unset($this->allowedSettingsNames['debugMethods']);
+        unset($this->_allowedSettingsNames['destination']);
+        unset($this->_allowedSettingsNames['maxfiles']);
+        unset($this->_allowedSettingsNames['debugMethods']);
 
         // Iterating through the form.
         foreach ($arguments as $key => $data) {
             if (is_array($data)) {
-                foreach ($data as $setting_name => $value) {
-                    if (in_array($value, $allowed_values) && in_array($setting_name, $this->allowedSettingsNames)) {
+                foreach ($data as $settingName => $value) {
+                    if (in_array($value, $allowedValues) && in_array($settingName, $this->_allowedSettingsNames)) {
                         // Whitelisted values are ok.
-                        $old_values['feEditing'][$setting_name] = $value;
+                        $oldValues['feEditing'][$settingName] = $value;
                     } else {
                         // Validation failed!
-                        $all_ok = false;
+                        $allOk = false;
                         $pool->messages->addMessage(htmlentities($value) . ' is not an allowed value!');
                     }
                 }
@@ -279,24 +282,24 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
 
         // Now we must create the ini file.
         $ini = '';
-        foreach ($old_values as $key => $setting) {
+        foreach ($oldValues as $key => $setting) {
             $ini .= '[' . $key . ']' . PHP_EOL;
-            foreach ($setting as $setting_name => $value) {
-                $ini .= $setting_name . ' = "' . $value . '"' . PHP_EOL;
+            foreach ($setting as $settingName => $value) {
+                $ini .= $settingName . ' = "' . $value . '"' . PHP_EOL;
             }
         }
 
         // Now we should write the file!
-        if ($all_ok) {
+        if ($allOk) {
             $file = new Varien_Io_File();
             if ($file->write($filepath, $ini) === false) {
-                $all_ok = false;
+                $allOk = false;
                 $pool->messages->addMessage('Configuration file ' . $filepath . ' is not writeable!');
             }
         }
 
         // Something went wrong, we need to tell the user.
-        if (!$all_ok) {
+        if (!$allOk) {
             Mage::getSingleton('core/session')->addError(
                 strip_tags($pool->messages->outputMessages()),
                 "The settings were NOT saved."

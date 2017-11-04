@@ -61,9 +61,12 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
         }
 
         // The function filemtime gets cached by php btw.
-        usort($files, function ($a, $b) {
-            return filemtime($b) - filemtime($a);
-        });
+        usort(
+            $files,
+            function ($a, $b) {
+                return filemtime($b) - filemtime($a);
+            }
+        );
 
         // 3. Get the file info.
         $fileList = array();
@@ -136,10 +139,11 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
         foreach ($arBytes as $aritem) {
             if ($bytes >= $aritem["VALUE"]) {
                 $result = $bytes / $aritem["VALUE"];
-                $result = str_replace(".", ",", strval(round($result, 2))) . " " . $aritem["UNIT"];
+                $result = str_replace(".", ",", (string)(round($result, 2))) . " " . $aritem["UNIT"];
                 break;
             }
         }
+
         return $result;
     }
 }

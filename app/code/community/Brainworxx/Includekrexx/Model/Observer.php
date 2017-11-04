@@ -58,14 +58,17 @@ class Brainworxx_Includekrexx_Model_Observer
             if (!is_array($GLOBALS['kreXXoverwrites']['classes'])) {
                 $GLOBALS['kreXXoverwrites']['classes'] = array();
             }
+            
             $GLOBALS['kreXXoverwrites']['classes'] = array(
-                'Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter' => 'Brainworxx_Includekrexx_Model_Dynamicgetter',
+                'Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter' =>
+                    'Brainworxx_Includekrexx_Model_Dynamicgetter',
                 'Brainworxx\\Krexx\\Service\\Config\\Config' => 'Brainworxx_Includekrexx_Model_Config',
             );
 
             if (file_exists($filename) && !class_exists('Krexx', false)) {
                 include_once $filename;
             }
+
             $beenHere = true;
         }
     }
