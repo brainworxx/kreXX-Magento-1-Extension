@@ -99,11 +99,13 @@ class ErrorController extends AbstractController
 
         // Add the caller as metadata to the chunks class. It will be saved as
         // additional info, in case we are logging to a file.
-        $this->pool->chunks->addMetadata(array(
-            'file' => $errorData['errfile'],
-            'line' => $errorData['errline'] + 1,
-            'varname' => ' Fatal Error',
-        ));
+        $this->pool->chunks->addMetadata(
+            array(
+                'file' => $errorData['errfile'],
+                'line' => $errorData['errline'] + 1,
+                'varname' => ' Fatal Error',
+            )
+        );
 
         if ($this->pool->config->getSetting('destination') === 'file') {
             // Save it to a file.
@@ -136,16 +138,20 @@ class ErrorController extends AbstractController
             // Just return, there is nothing more to do here.
             return $this;
         }
+
         $this->pool->reset();
         // Do we need another shutdown handler?
         if (!is_object($this->krexxFatal)) {
             $this->krexxFatal = $this->pool->createClass('Brainworxx\\Krexx\\Errorhandler\\Fatal');
             declare(ticks = 1);
-            register_shutdown_function(array(
-              $this->krexxFatal,
-              'shutdownCallback',
-            ));
+            register_shutdown_function(
+                array(
+                    $this->krexxFatal,
+                    'shutdownCallback',
+                )
+            );
         }
+
         $this->krexxFatal->setIsActive(true);
         $this->fatalShouldActive = true;
         register_tick_function(array($this->krexxFatal, 'tickCallback'));
@@ -165,12 +171,13 @@ class ErrorController extends AbstractController
      */
     public function unregisterFatalAction()
     {
-        if (!is_null($this->krexxFatal)) {
+        if ($this->krexxFatal  !== null) {
             // Now we need to tell the shutdown function, that is must
             // not do anything on shutdown.
             $this->krexxFatal->setIsActive(false);
             unregister_tick_function(array($this->krexxFatal, 'tickCallback'));
         }
+
         $this->fatalShouldActive = false;
 
         return $this;

@@ -126,15 +126,17 @@ class ThroughGetter extends AbstractCallback
             // We render this right away, without any routing.
             return $this->pool->render->renderSingleChild($model);
         }
+
         // We've got ourselves a possible result!
         $refProp->setAccessible(true);
         $value = $refProp->getValue($this->parameters['data']);
         $model->setData($value);
-        if (is_null($value)) {
+        if ($value === null) {
             // A NULL value might mean that the values does not
             // exist, until the getter computes it.
             $model->addToJson('hint', $this->pool->messages->getHelp('getterNull'));
         }
+
         return $this->pool->routing->analysisHub($model);
     }
 
@@ -242,6 +244,7 @@ class ThroughGetter extends AbstractCallback
         if (strpos($getterName, 'get') === 0) {
             $getterName = substr($getterName, 3);
         }
+        
         if (strpos($getterName, '_get') === 0) {
             $getterName = substr($getterName, 4);
         }
@@ -281,6 +284,7 @@ class ThroughGetter extends AbstractCallback
             if ($classReflection->hasProperty($propertyName)) {
                 return $classReflection->getProperty($propertyName);
             }
+
             // Check if this is a method and go deeper!
             $methodName = rtrim($propertyName, '()');
             if ($classReflection->hasMethod($methodName)) {

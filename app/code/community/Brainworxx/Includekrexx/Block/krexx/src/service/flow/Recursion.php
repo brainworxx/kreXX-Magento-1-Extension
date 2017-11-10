@@ -74,7 +74,7 @@ class Recursion
     protected $globalsWereRendered = false;
 
     /**
-     * THe $GLOBALS array.
+     * The $GLOBALS array.
      *
      * @var array
      */
@@ -136,6 +136,7 @@ class Recursion
             if ($this->globalsWereRendered) {
                 return true;
             }
+
             $this->globalsWereRendered = true;
         }
 

@@ -144,6 +144,7 @@ abstract class AbstractController
         if ($outputSetting === 'browser') {
             $this->outputService = $pool->createClass('Brainworxx\\Krexx\\View\\Output\\Shutdown');
         }
+
         if ($outputSetting === 'file') {
             $this->outputService = $pool->createClass('Brainworxx\\Krexx\\View\\Output\\File');
         }
@@ -215,10 +216,9 @@ abstract class AbstractController
      */
     protected function outputCssAndJs()
     {
-        $krexxDir = $this->pool->krexxDir;
         // Get the css file.
         $css = $this->pool->fileService->getFileContents(
-            $krexxDir .
+            KREXX_DIR .
             'resources/skins/' .
             $this->pool->config->getSetting('skin') .
             '/skin.css'
@@ -227,20 +227,22 @@ abstract class AbstractController
         $css = preg_replace('/\s+/', ' ', $css);
 
         // Adding our DOM tools to the js.
-        if (is_readable($krexxDir . 'resources/jsLibs/kdt.min.js')) {
-            $jsFile = $krexxDir . 'resources/jsLibs/kdt.min.js';
+        if (is_readable(KREXX_DIR . 'resources/jsLibs/kdt.min.js')) {
+            $jsFile = KREXX_DIR . 'resources/jsLibs/kdt.min.js';
         } else {
-            $jsFile = $krexxDir . 'resources/jsLibs/kdt.js';
+            $jsFile = KREXX_DIR . 'resources/jsLibs/kdt.js';
         }
+
         $jsCode = $this->pool->fileService->getFileContents($jsFile);
 
         // Krexx.js is comes directly form the template.
-        $path = $krexxDir . 'resources/skins/' . $this->pool->config->getSetting('skin');
+        $path = KREXX_DIR . 'resources/skins/' . $this->pool->config->getSetting('skin');
         if (is_readable($path . '/krexx.min.js')) {
             $jsFile = $path . '/krexx.min.js';
         } else {
             $jsFile = $path . '/krexx.js';
         }
+
         $jsCode .= $this->pool->fileService->getFileContents($jsFile);
 
         return $this->pool->render->renderCssJs($css, $jsCode);
@@ -318,6 +320,7 @@ abstract class AbstractController
                 $prevMomentName = $moment;
             }
         }
+
         return $result;
     }
 
@@ -369,22 +372,5 @@ abstract class AbstractController
         }
 
         return $this->pool->encodingService->encodeString($protocol . '://' . $host . $server['REQUEST_URI']);
-    }
-
-    /**
-     * Simply outputs a formatted var_dump.
-     *
-     * This is an internal debugging function, because it is
-     * rather difficult to debug a debugger, when your tool of
-     * choice is the debugger itself.
-     *
-     * @param mixed $data
-     *   The data for the var_dump.
-     */
-    public static function formattedVarDump($data)
-    {
-        echo '<pre>';
-        var_dump($data);
-        echo '</pre>';
     }
 }

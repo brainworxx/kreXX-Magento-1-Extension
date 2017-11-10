@@ -32,6 +32,8 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+use Brainworxx\Krexx\Service\Overwrites;
+
 /**
  * Event observer for kreXX, includes the mainlibrary at an early level.
  */
@@ -46,27 +48,29 @@ class Brainworxx_Includekrexx_Model_Observer
      */
     public function includeKreXX(Varien_Event_Observer $observer)
     {
-        // We need to do this only once
+        // We need to do this only once,
         // the static should save some time.
         static $beenHere = false;
 
-
         if (!$beenHere) {
+            // We needto check, if the kreXX overwrite class, as well as the
+            // main class havebeen loaded before. If not, load them.
             $blockPath = Mage::getModuleDir('Block', 'Brainworxx_Includekrexx');
-            $filename = $blockPath . '/Block/krexx/Krexx.php';
-            // Tell kreXX that we want to use some special classes for the getter analysis.
-            if (!is_array($GLOBALS['kreXXoverwrites']['classes'])) {
-                $GLOBALS['kreXXoverwrites']['classes'] = array();
-            }
-            
-            $GLOBALS['kreXXoverwrites']['classes'] = array(
-                'Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter' =>
-                    'Brainworxx_Includekrexx_Model_Dynamicgetter',
-                'Brainworxx\\Krexx\\Service\\Config\\Config' => 'Brainworxx_Includekrexx_Model_Config',
-            );
 
-            if (file_exists($filename) && !class_exists('Krexx', false)) {
-                include_once $filename;
+            $pathToOverwrites = $blockPath . '/Block/krexx/src/Service/Overwrites.php';
+            if (!class_exists('\Overwrites', false)) {
+                include_once $pathToOverwrites;
+            }
+
+            // Tell kreXX that we want to use some special classes for the getter analysis.
+            Overwrites::$classes['Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter'] =
+                'Brainworxx_Includekrexx_Model_Dynamicgetter';
+            Overwrites::$classes['Brainworxx\\Krexx\\Service\\Config\\Config'] =
+                'Brainworxx_Includekrexx_Model_Config';
+
+            $pathToKrexx = $blockPath . '/Block/krexx/Krexx.php';
+            if (!class_exists('\Krexx', false)) {
+                include_once $pathToKrexx;
             }
 
             $beenHere = true;

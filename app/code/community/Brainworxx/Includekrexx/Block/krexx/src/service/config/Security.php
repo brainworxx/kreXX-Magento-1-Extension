@@ -85,6 +85,7 @@ class Security extends Fallback
         if (!$result) {
             $this->pool->messages->addMessage('configError' . ucfirst($name));
         }
+
         return $result;
     }
 
@@ -101,10 +102,11 @@ class Security extends Fallback
      */
     protected function evalSkin($value, $name)
     {
-        $result = is_readable($this->pool->krexxDir . 'resources/skins/' . $value . '/header.html');
+        $result = is_readable(KREXX_DIR . 'resources/skins/' . $value . '/header.html');
         if (!$result) {
             $this->pool->messages->addMessage('configError' . ucfirst($name));
         }
+
         return $result;
     }
 
@@ -125,6 +127,7 @@ class Security extends Fallback
         if (!$result) {
             $this->pool->messages->addMessage('configError' . ucfirst($name));
         }
+
         return $result;
     }
 
@@ -200,6 +203,7 @@ class Security extends Fallback
             // No need to check any further.
             return true;
         }
+
         if ($maxTime < (int)$value) {
             $this->pool->messages->addMessage(
                 'configError' . ucfirst($name) . 'Big',
@@ -231,6 +235,7 @@ class Security extends Fallback
         if (!$result) {
             $this->pool->messages->addMessage('configErrorBool', array($group, $name));
         }
+
         return $result;
     }
 

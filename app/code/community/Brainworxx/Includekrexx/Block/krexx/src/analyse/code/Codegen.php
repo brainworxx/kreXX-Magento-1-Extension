@@ -132,7 +132,7 @@ class Codegen
                 return 'iterator_to_array(;firstMarker;)' . $this->concatenation($model);
             }
 
-            // Test for private or protected.
+            // Test for private or protected access.
             if (strpos($type, 'protected') === false && strpos($type, 'private') === false) {
                 // Is not protected.
                 return $this->concatenation($model);
@@ -229,7 +229,7 @@ class Codegen
         // Check for type value
         if ($reflectionParameter->isArray()) {
             $parameterType = 'array';
-        } elseif (!is_null($reflectionParameter->getClass())) {
+        } elseif ($reflectionParameter->getClass() !== null) {
             // We got ourselves an object!
             $parameterType = $reflectionParameter->getClass()->name;
         }
@@ -260,7 +260,7 @@ class Codegen
             return '\'' . $this->pool->encodingService->encodeString($default) . '\'';
         }
 
-        if (is_null($default)) {
+        if ($default === null) {
             return 'NULL';
         }
 
@@ -277,7 +277,7 @@ class Codegen
             }
         }
 
-        // Still here ?!?
+        // Still here?
         return (string) $default;
     }
 }

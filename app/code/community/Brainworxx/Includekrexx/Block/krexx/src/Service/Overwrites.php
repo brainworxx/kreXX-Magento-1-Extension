@@ -32,37 +32,29 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-namespace Brainworxx\Krexx\Analyse\Callback\Analyse\Objects;
+namespace Brainworxx\Krexx\Service;
 
 /**
- * Analysis of protected properties.
+ * Storing overwrites for the factory or the configuration.
  *
- * @package Brainworxx\Krexx\Analyse\Callback\Analyse\Objects
+ * @package Brainworxx\Krexx\Service
  */
-class ProtectedProperties extends AbstractObjectAnalysis
+class Overwrites
 {
     /**
-     * Dump all protected properties.
+     * Storing the global overwrites here. These will not get flushed.
      *
-     * @return string
-     *   The generated HTML markup
+     * @var array
      */
-    public function callMe()
-    {
-        /** @var \ReflectionClass $ref */
-        $ref = $this->parameters['ref'];
-        $refProps = $ref->getProperties(\ReflectionProperty::IS_PROTECTED);
-        if (empty($refProps)) {
-            return '';
-        }
-        
-        usort($refProps, array($this, 'reflectionSorting'));
+    public static $classes = array();
 
-        return $this->getReflectionPropertiesData(
-            $refProps,
-            $ref,
-            $this->parameters['data'],
-            'Protected properties'
-        );
-    }
+    /**
+     * Overwriting the path to the following folders:
+     * - chunks
+     * - config
+     * - log
+     *
+     * @var array
+     */
+    public static $directories = array();
 }
