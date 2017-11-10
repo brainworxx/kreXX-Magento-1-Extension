@@ -32,7 +32,6 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-use Brainworxx\Krexx\View\Messages;
 
 /**
  * Helper class for kreXX. Relays messages from kreXX to the magento
