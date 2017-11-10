@@ -109,6 +109,10 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
      * Extracts the _data value from the object.
      *
      * @param \reflectionClass $ref
+     *   A reflection of the class we are analysing.
+     *
+     * @return array
+     *   The retrieved data array.
      */
     protected function getTheUnderscoreDataArray($ref)
     {

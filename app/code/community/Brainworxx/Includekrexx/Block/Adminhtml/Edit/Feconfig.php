@@ -161,9 +161,13 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
      *
      * @param array $values
      *   The values we want to convert.
+     *
+     * @return string|null
+     *   The converted value.
      */
     protected function convertKrexxFeSetting($values)
     {
+        $result = null;
         if (is_array($values)) {
             // The values are:
             // full    -> is editable and values will be accepted
@@ -184,8 +188,8 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
                 // It's only visible.
                 $result = 'display';
             }
-
-            return $result;
         }
+        
+        return $result;
     }
 }
