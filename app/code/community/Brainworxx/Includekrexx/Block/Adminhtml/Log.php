@@ -45,14 +45,23 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
     public function _construct()
     {
         parent::_construct();
-        $pool = \Krexx::$pool;
 
         // 1. Get the log folder.
-        $dir = $pool->config->getLogDir() . DIRECTORY_SEPARATOR;
+        $dir = \Krexx::$pool->config->getLogDir();
 
         // 2. Get the file list and sort it.
-        // Meh, Varien_Io_File does not allow a filter or sorting.
-        $files = glob($dir . '*.Krexx.html');
+        $ioFile = new Varien_Io_File();
+        $ioFile->open(array('path' => $dir));
+        $files = $ioFile->ls();
+
+        // Filter them.
+        foreach ($files as $key => $file) {
+            if ($file['filetype'] !== 'html' ||
+                strpos($file['text'], 'Krexx') === false
+            ) {
+                unset($files[$key]);
+            }
+        }
 
         // When we have no files, we stop right here.
         if (empty($files)) {
@@ -64,7 +73,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
         usort(
             $files,
             function ($a, $b) {
-                return filemtime($b) - filemtime($a);
+                return strtotime($b['mod_date']) - strtotime($a['mod_date']);
             }
         );
 
@@ -72,23 +81,25 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
         $fileList = array();
         foreach ($files as $file) {
             $fileinfo = array();
+            $fileObject = new Varien_File_Object($dir . $file['text']);
 
             // Getting the basic info.
-            $fileinfo['name'] = basename($file);
-            $fileinfo['size'] = $this->fileSizeConvert(filesize($file));
-            $fileinfo['time'] = date("d.m.y H:i:s", filemtime($file));
+            $fileinfo['name'] = $fileObject->getBasename();
+            $fileinfo['size'] = $this->fileSizeConvert($fileObject->getSize());
+            /** @var Mage_Core_Model_Date $dateTime */
+            $dateTime = Mage::getSingleton('core/date');
+            $fileinfo['time'] = $dateTime->date("d.m.y H:i:s", $fileObject->getMTime());
             $fileinfo['id'] = str_replace('.Krexx.html', '', $fileinfo['name']);
 
             // Parsing a potentialls 80MB file for it's content is not a good idea.
             // That is why the kreXX lib provides some meta data. We will open
             // this file and add it's content to the template.
-            if (is_readable($file . '.json')) {
-                $ioFile = new Varien_Io_File();
-                $fileinfo['meta'] = json_decode($ioFile->read($file . '.json'), true);
 
-                foreach ($fileinfo['meta'] as &$meta) {
-                    $meta['filename'] = basename($meta['file']);
-                }
+            $fileinfo['meta'] = json_decode($ioFile->read($dir . $file['text'] . '.json'), true);
+            foreach ($fileinfo['meta'] as &$meta) {
+                $array = explode(DIRECTORY_SEPARATOR, $meta['file']);
+                $array = array_values(array_slice($array, -1));
+                $meta['filename'] = $array[0];
             }
 
             $fileList[] = $fileinfo;
