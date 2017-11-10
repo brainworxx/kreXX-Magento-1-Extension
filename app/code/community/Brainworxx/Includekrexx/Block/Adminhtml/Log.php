@@ -48,7 +48,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
         $pool = \Krexx::$pool;
 
         // 1. Get the log folder.
-        $dir = $pool->krexxDir . 'log' . DIRECTORY_SEPARATOR;
+        $dir = $pool->config->getLogDir() . DIRECTORY_SEPARATOR;
 
         // 2. Get the file list and sort it.
         // Meh, Varien_Io_File does not allow a filter or sorting.
