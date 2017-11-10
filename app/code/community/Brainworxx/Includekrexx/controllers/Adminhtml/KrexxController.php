@@ -179,23 +179,24 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         $allOk = true;
         $pool = \Krexx::$pool;
 
-        $filepath = $pool->krexxDir . 'config/Krexx.ini';
+        $filepath = $pool->config->getPathToIniFile();
         // We must preserve the section 'feEditing'.
         // Everything else will be overwritten.
-        $oldValues = parse_ini_file($filepath, true);
-        $oldValues = array('feEditing' => $oldValues['feEditing']);
+        $iniParser = New Zend_Config_Ini($filepath);
+        $values = $iniParser->toArray();
+        $values = array('feEditing' => $values['feEditing']);
 
         // Iterating through the form.
         foreach ($arguments as $section => $data) {
             if (is_array($data) && in_array($section, $this->_allowedSections)) {
                 // We've got a section key.
-                foreach ($data as $settingName => $value) {
+                foreach ($data as $settingName => $setting) {
                     if (in_array($settingName, $this->_allowedSettingsNames)) {
                         // We escape the value, just in case, since we can not whitelist it.
-                        $value = htmlspecialchars(preg_replace('/\s+/', '', $value));
+                        $setting = htmlspecialchars(preg_replace('/\s+/', '', $setting));
                         // Evaluate the setting!
-                        if ($pool->config->security->evaluateSetting($section, $settingName, $value)) {
-                            $oldValues[$section][$settingName] = $value;
+                        if ($pool->config->security->evaluateSetting($section, $settingName, $setting)) {
+                            $values[$section][$settingName] = $setting;
                         } else {
                             // Validation failed! kreXX will generate a message, which we will
                             // display at the buttom.
@@ -206,37 +207,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
             }
         }
 
-        // Now we must create the ini file.
-        $ini = '';
-        foreach ($oldValues as $key => $setting) {
-            $ini .= '[' . $key . ']' . PHP_EOL;
-            foreach ($setting as $settingName => $value) {
-                $ini .= $settingName . ' = "' . $value . '"' . PHP_EOL;
-            }
-        }
-
-        // Now we should write the file!
-        if ($allOk) {
-            $file = new Varien_Io_File();
-            if ($file->write($filepath, $ini) === false) {
-                $allOk = false;
-                $pool->messages->addMessage('Configuration file ' . $filepath . ' is not writeable!');
-            }
-        }
-
-        // Something went wrong, we need to tell the user.
-        if (!$allOk) {
-            Mage::getSingleton('core/session')->addError(
-                strip_tags($pool->messages->outputMessages()),
-                "The settings were NOT saved."
-            );
-        } else {
-            Mage::getSingleton('core/session')->addSuccess(
-                "The settings were saved to: <br /> " . $filepath,
-                "The data was saved."
-            );
-        }
-
+        $this->finalizeIni($filepath, $values, $allOk);
         $this->_redirect('*/*/config');
 
     }
@@ -249,15 +220,16 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         $arguments = $this->getRequest()->getPost();
         $allOk = true;
         $pool = \Krexx::$pool;
-        $filepath = $pool->krexxDir . 'config/Krexx.ini';
+        $filepath = $pool->config->getPathToIniFile();
 
         // Whitelist of the vales we are accepting.
         $allowedValues = array('full', 'display', 'none');
 
         // Get the old values . . .
-        $oldValues = parse_ini_file($filepath, true);
+        $iniParser = New Zend_Config_Ini($filepath);
+        $values = $iniParser->toArray();
         // . . . and remove our part.
-        unset($oldValues['feEditing']);
+        unset($values['feEditing']);
 
         // We need to correct the allowed settings, since we do not allow anything.
         unset($this->_allowedSettingsNames['destination']);
@@ -267,22 +239,38 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         // Iterating through the form.
         foreach ($arguments as $key => $data) {
             if (is_array($data)) {
-                foreach ($data as $settingName => $value) {
-                    if (in_array($value, $allowedValues) && in_array($settingName, $this->_allowedSettingsNames)) {
+                foreach ($data as $settingName => $setting) {
+                    if (in_array($setting, $allowedValues) && in_array($settingName, $this->_allowedSettingsNames)) {
                         // Whitelisted values are ok.
-                        $oldValues['feEditing'][$settingName] = $value;
+                        $values['feEditing'][$settingName] = $setting;
                     } else {
                         // Validation failed!
                         $allOk = false;
-                        $pool->messages->addMessage(htmlentities($value) . ' is not an allowed value!');
+                        $pool->messages->addMessage(htmlentities($setting) . ' is not an allowed value!');
                     }
                 }
             }
         }
 
-        // Now we must create the ini file.
+        $this->finalizeIni($filepath, $values, $allOk);
+        $this->_redirect('*/*/feconfig');
+    }
+
+    /**
+     * Either write the file, or give feedback of what went wrong.
+     *
+     * @param string $filepath
+     *   The path to the ini file.
+     * @param array $values
+     *   The generated content of the ini file.
+     * @param bool $allOk
+     *   Did we encounter any errors during the $ini generation?
+     */
+    protected function finalizeIni($filepath, $values, $allOk)
+    {
         $ini = '';
-        foreach ($oldValues as $key => $setting) {
+        $pool = \Krexx::$pool;
+        foreach ($values as $key => $setting) {
             $ini .= '[' . $key . ']' . PHP_EOL;
             foreach ($setting as $settingName => $value) {
                 $ini .= $settingName . ' = "' . $value . '"' . PHP_EOL;
@@ -310,7 +298,5 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
                 "The data was saved."
             );
         }
-
-        $this->_redirect('*/*/feconfig');
     }
 }
