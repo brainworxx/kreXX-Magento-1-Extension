@@ -56,7 +56,13 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
 
         foreach ($dataArray as $key => $value) {
             // Transform the $key to getCamelCase.
-            $key = 'get' . preg_replace('/(?:^|_)(.?)/e', "strtoupper('$1')", $key);
+            $key = 'get' . preg_replace_callback(
+                '/(?:^|_)(.?)/',
+                function ($part) {
+                    return strtoupper($part[1]);
+                },
+                $key
+            );
 
             // Prepare the model.
             /** @var \Brainworxx\Krexx\Analyse\Model $model */
