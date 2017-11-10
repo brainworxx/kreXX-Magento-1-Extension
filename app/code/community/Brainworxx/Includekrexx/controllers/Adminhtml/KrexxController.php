@@ -182,8 +182,14 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         $filepath = $pool->config->getPathToIniFile();
         // We must preserve the section 'feEditing'.
         // Everything else will be overwritten.
-        $iniParser = New Zend_Config_Ini($filepath);
-        $values = $iniParser->toArray();
+        $ioFile = new Varien_Io_File();
+        if ($ioFile->fileExists($filepath)) {
+            $iniParser = New Zend_Config_Ini($filepath);
+            $values = $iniParser->toArray();
+        } else {
+            $values = array();
+        }
+
         $values = array('feEditing' => $values['feEditing']);
 
         // Iterating through the form.
@@ -226,10 +232,14 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         $allowedValues = array('full', 'display', 'none');
 
         // Get the old values . . .
-        $iniParser = New Zend_Config_Ini($filepath);
-        $values = $iniParser->toArray();
-        // . . . and remove our part.
-        unset($values['feEditing']);
+        $ioFile = new Varien_Io_File();
+        if ($ioFile->fileExists($filepath)) {
+            $iniParser = New Zend_Config_Ini($filepath);
+            $values = $iniParser->toArray();
+            unset($values['feEditing']);
+        } else {
+            $values = array();
+        }
 
         // We need to correct the allowed settings, since we do not allow anything.
         unset($this->_allowedSettingsNames['destination']);
