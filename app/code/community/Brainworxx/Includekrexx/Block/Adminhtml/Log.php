@@ -86,9 +86,8 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
             // Getting the basic info.
             $fileinfo['name'] = $fileObject->getBasename();
             $fileinfo['size'] = $this->fileSizeConvert($fileObject->getSize());
-            /** @var Mage_Core_Model_Date $dateTime */
-            $dateTime = Mage::getSingleton('core/date');
-            $fileinfo['time'] = $dateTime->date("d.m.y H:i:s", $fileObject->getMTime());
+            $fileinfo['time'] =  Mage::getSingleton('core/date')
+                ->date("d.m.y H:i:s", $fileObject->getMTime());
             $fileinfo['id'] = str_replace('.Krexx.html', '', $fileinfo['name']);
 
             // Parsing a potentialls 80MB file for it's content is not a good idea.
