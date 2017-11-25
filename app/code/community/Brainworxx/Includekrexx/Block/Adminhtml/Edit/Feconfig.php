@@ -189,7 +189,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
                 $result = 'display';
             }
         }
-        
+
         return $result;
     }
 }

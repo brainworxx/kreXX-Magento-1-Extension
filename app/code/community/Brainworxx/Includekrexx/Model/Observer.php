@@ -41,6 +41,20 @@ class Brainworxx_Includekrexx_Model_Observer
 {
 
     /**
+     * @var Varien_Io_File
+     */
+    protected $_ioFile;
+
+    /**
+     * Create the io file object on creation.
+     */
+    public function __construct()
+    {
+       $this->_ioFile = new Varien_Io_File();
+       $this->_ioFile->setAllowCreateFolders(true);
+    }
+
+    /**
      * Includes the kreXX mainfile
      *
      * @param Varien_Event_Observer $observer
@@ -53,8 +67,8 @@ class Brainworxx_Includekrexx_Model_Observer
         static $beenHere = false;
 
         if (!$beenHere) {
-            // We needto check, if the kreXX overwrite class, as well as the
-            // main class havebeen loaded before. If not, load them.
+            // We need to check, if the kreXX overwrite class, as well as the
+            // main class have been loaded before. If not, load them.
             $blockPath = Mage::getModuleDir('', 'Brainworxx_Includekrexx') .
                 DIRECTORY_SEPARATOR . 'Libraries' . DIRECTORY_SEPARATOR;
 
@@ -69,12 +83,59 @@ class Brainworxx_Includekrexx_Model_Observer
             Overwrites::$classes['Brainworxx\\Krexx\\Service\\Config\\Config'] =
                 'Brainworxx_Includekrexx_Model_Config';
 
+            // We will use the standard folders for cache or logging provided
+            // by Magento.
+            $cacheDir = Mage::getBaseDir('cache') . '/krexx';
+            $logDir = Mage::getBaseDir('log') . '/krexx';
+
+            // Check if these folders are protected.
+            $this->processDir($cacheDir);
+            $this->processDir($logDir);
+
+            // Tell kreXX to use the now processed folders.
+            Overwrites::$directories['chunks'] = $cacheDir;
+            Overwrites::$directories['config'] = $logDir;
+            Overwrites::$directories['log'] = $logDir;
+
             $pathToKrexx = $blockPath . 'krexx/Krexx.php';
             if (!class_exists('\Krexx', false)) {
                 include_once $pathToKrexx;
             }
 
             $beenHere = true;
+        }
+    }
+
+    /**
+     * Checks if a directory is protected. If not, create an index.php
+     * an a .htaccess file.
+     *
+     * @param string $path
+     *   The path to the directory we want to prectect.
+     */
+    protected function processDir($path)
+    {
+        $path .= DIRECTORY_SEPARATOR;
+
+        try {
+            $this->_ioFile->createDestinationDir($path);
+        } catch (Exception $e) {
+            // We have no write access here. Nothing more to do here.
+            // kreXX will notice later on that he can not write here
+            // and inform the dev.
+            return;
+        }
+
+        // Empty index.html in caqse the htacess is not enough.
+        if (!$this->_ioFile->fileExists($path . 'index.html')) {
+            $indexHtml = '';
+            $this->_ioFile->filePutContent($path . 'index.html', $indexHtml);
+        }
+
+        // htAccess to prevent a listing
+        if (!$this->_ioFile->fileExists($path . '.htaccess')) {
+            $htAccess = 'order deny,allow' . "\n" . 'deny from all';
+            $this->_ioFile->filePutContent($path . '.htaccess', $htAccess);
         }
     }
 }
