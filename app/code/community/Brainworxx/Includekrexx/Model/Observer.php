@@ -69,13 +69,14 @@ class Brainworxx_Includekrexx_Model_Observer
         if (!$beenHere) {
             // We need to check, if the kreXX overwrite class, as well as the
             // main class have been loaded before. If not, load them.
-            $blockPath = Mage::getModuleDir('', 'Brainworxx_Includekrexx') .
+            $libPath = Mage::getModuleDir('', 'Brainworxx_Includekrexx') .
                 DIRECTORY_SEPARATOR . 'Libraries' . DIRECTORY_SEPARATOR;
 
-            $pathToOverwrites = $blockPath . 'krexx/src/Service/Overwrites.php';
-            if (!class_exists('\Overwrites', false)) {
-                include_once $pathToOverwrites;
+            $pathToKrexx = $libPath . 'krexx/Krexx.php';
+            if (!class_exists('\Krexx', false)) {
+                include_once $pathToKrexx;
             }
+
 
             // Tell kreXX that we want to use some special classes for the getter analysis.
             Overwrites::$classes['Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter'] =
@@ -97,10 +98,7 @@ class Brainworxx_Includekrexx_Model_Observer
             Overwrites::$directories['config'] = $logDir;
             Overwrites::$directories['log'] = $logDir;
 
-            $pathToKrexx = $blockPath . 'krexx/Krexx.php';
-            if (!class_exists('\Krexx', false)) {
-                include_once $pathToKrexx;
-            }
+
 
             $beenHere = true;
         }

@@ -136,13 +136,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
                 )
             )
         );
-        $help['registerAutomatically'] = htmlspecialchars(
-            strip_tags(
-                $pool->messages->getHelp(
-                    'registerAutomaticallyHelp'
-                )
-            )
-        );
         $help['analyseConstants'] = htmlspecialchars(
             strip_tags(
                 $pool->messages->getHelp(
@@ -271,12 +264,8 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
             'methods',
             'analysePrivateMethods'
         );
-        $settings['backtraceAndError']['registerAutomatically'] = $pool->config->iniConfig->getConfigFromFile(
-            'backtraceAndError',
-            'registerAutomatically'
-        );
-        $settings['backtraceAndError']['maxStepNumber'] = $pool->config->iniConfig->getConfigFromFile(
-            'backtraceAndError',
+        $settings['backtrace']['maxStepNumber'] = $pool->config->iniConfig->getConfigFromFile(
+            'backtrace',
             'maxStepNumber'
         );
         $settings['methods']['analyseGetter'] = $pool->config->iniConfig->getConfigFromFile(

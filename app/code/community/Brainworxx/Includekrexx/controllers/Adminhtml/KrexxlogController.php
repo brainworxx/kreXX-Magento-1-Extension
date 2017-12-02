@@ -57,6 +57,8 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxlogController extends Mage_Adminhtm
      */
     protected function init()
     {
+        Krexx::createPool();
+
         Mage::helper('includekrexx')->relayMessages();
         $this->loadLayout();
         $this->_setActiveMenu('system/krexxdocu');
@@ -90,7 +92,14 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxlogController extends Mage_Adminhtm
         $file = $pool->config->getLogDir() . $id . '.Krexx.html';
 
         $ioFile = new Varien_Io_File();
-        if ($ioFile->streamOpen($file, 'rb')) {
+
+        try {
+            $canOpen = $ioFile->streamOpen($file, 'rb');
+        } catch (Exception $e) {
+            $canOpen = false;
+        }
+
+        if ($canOpen) {
             // Dispatch it!
             $stream = $ioFile->streamRead();
             while ($stream !== false) {

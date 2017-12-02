@@ -73,8 +73,7 @@ class Brainworxx_Includekrexx_Model_Config extends Brainworxx\Krexx\Service\Conf
             'analyseGetter' => 'true',
             'debugMethods' => '__toArray,toString',
         ),
-        'backtraceAndError' => array(
-            'registerAutomatically' => 'false',
+        'backtrace' => array(
             'maxStepNumber' => 10,
         ),
     );

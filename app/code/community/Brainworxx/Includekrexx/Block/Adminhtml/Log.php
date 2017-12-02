@@ -52,7 +52,21 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
         // 2. Get the file list and sort it.
         $ioFile = new Varien_Io_File();
         $ioFile->open(array('path' => $dir));
-        $files = $ioFile->ls();
+
+        try {
+            $files = $ioFile->ls();
+        } catch (Exception $e) {
+            // Error during reading
+            // Fallback to empty array.
+            Mage::getSingleton('core/session')->addError('Directory: ' . $dir . ' is not readable!');
+            $files = array();
+        }
+
+        // When we have no files, we stop right here.
+        if (empty($files)) {
+            $this->assign('files', array());
+            return;
+        }
 
         // Filter them.
         foreach ($files as $key => $file) {
@@ -63,11 +77,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
             }
         }
 
-        // When we have no files, we stop right here.
-        if (empty($files)) {
-            $this->assign('files', array());
-            return;
-        }
+
 
         // The function filemtime gets cached by php btw.
         usort(

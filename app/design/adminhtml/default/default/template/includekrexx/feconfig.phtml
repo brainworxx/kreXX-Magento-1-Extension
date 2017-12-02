@@ -31,7 +31,6 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* @var Brainworxx_Includekrexx_Block_Adminhtml_Krexx $this */
 ?>
 
 <h1>Administer kreXX FE Editing</h1>
@@ -370,35 +369,14 @@
         </tr>
 
         <tr>
-            <th colspan="3"><b>Error Handling and Backtrace</b></th>
+            <th colspan="3"><b>Backtrace</b></th>
         </tr>
-        <tr>
-            <td><label for="registerAutomatically">Register fatal error handler automatically:</label></td>
-            <td>
-                <select name="backtraceAndError[registerAutomatically]" id="registerAutomatically">
-                    <?php foreach ($data['settings'] as $key => $value) {
-                        if ($key == $settings['backtraceAndError']['registerAutomatically']) {
-                            $selected = 'selected="selected"';
-                        } else {
-                            $selected = '';
-                        } ?>
-                        <option
-                            value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
-                    <?php } ?>
-                </select>
-            </td>
-            <td>
-                <input id="factory.registerAutomatically" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['registerAutomatically']; ?>/>
-                <label for="factory.registerAutomatically">Use factory settings</label>
-            </td>
-        </tr>
-
         <tr>
             <td><label for="maxStepNumber">Maximum count of steps in the backtrace:</label></td>
             <td>
-                <select name="backtraceAndError[maxStepNumber]" id="maxStepNumber">
+                <select name="backtrace[maxStepNumber]" id="maxStepNumber">
                     <?php foreach ($data['settings'] as $key => $value) {
-                        if ($key == $settings['backtraceAndError']['maxStepNumber']) {
+                        if ($key == $settings['backtrace']['maxStepNumber']) {
                             $selected = 'selected="selected"';
                         } else {
                             $selected = '';
@@ -455,10 +433,10 @@
         }
 
         var savebutton = document.getElementById('editconfig_save');
-        if (typeof savebutton === 'object' && savebutton != 'undefined' && savebutton != null) {
+        if (typeof savebutton === 'object' && savebutton !== 'undefined' && savebutton != null) {
             savebutton.addEventListener('click', function () {
                 var form = document.getElementById('editconfig');
-                if (typeof form === 'object' && form != 'undefined' && form != null) {
+                if (typeof form === 'object' && form !== 'undefined' && form != null) {
                     form.submit();
                 }
             }, true);
@@ -468,13 +446,11 @@
 
     toggle = function (checkbox) {
         var id = checkbox.id.split('.');
-        if (id[1] != 'undefined') {
+        if (id[1] !== 'undefined') {
             var element = document.getElementById(id[1]);
         }
 
-        if (typeof element === 'object' && element != 'undefined' && element != null) {
-
-
+        if (typeof element === 'object' && element !== 'undefined' && element != null) {
             if (checkbox.checked) {
                 element.disabled = true;
             }

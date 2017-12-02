@@ -39,6 +39,13 @@
  */
 class Brainworxx_Includekrexx_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    /**
+     * Create the Krexx pool, because we ill neet it later on.
+     */
+    public function __construct()
+    {
+        Krexx::createPool();
+    }
 
     public function relayMessages()
     {

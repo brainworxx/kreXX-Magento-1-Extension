@@ -57,7 +57,6 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         'level',
         'analyseProtectedMethods',
         'analysePrivateMethods',
-        'registerAutomatically',
         'backtraceAnalysis',
         'analyseConstants',
         'iprange',
@@ -78,7 +77,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         'output',
         'properties',
         'methods',
-        'backtraceAndError',
+        'backtrace',
     );
 
     /**
@@ -118,8 +117,9 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      */
     protected function init()
     {
-        Mage::helper('includekrexx')->relayMessages();
+        Krexx::createPool();
 
+        Mage::helper('includekrexx')->relayMessages();
         $this->loadLayout();
         $this->_setActiveMenu('system/krexxdocu');
         $this->_addBreadcrumb(
@@ -175,6 +175,8 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      */
     public function saveconfigAction()
     {
+        Krexx::createPool();
+
         $arguments = $this->getRequest()->getPost();
         $allOk = true;
         $pool = \Krexx::$pool;

@@ -31,7 +31,6 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* @var Brainworxx_Includekrexx_Block_Adminhtml_Krexx $this */
 ?>
 <h1>Edit kreXX Configuration File</h1>
 <form action="<?php echo $this->getSaveUrl() ?>" method="post" id="editconfig">
@@ -426,37 +425,15 @@
         </tr>
 
 
-        <!-- Fatal error handling -->
-        <tr><th colspan="4"><b>Error Handling and Backtrace</b></th></tr>
-        <tr>
-            <td><label for="registerAutomatically">Register fatal error handler automatically:</label></td>
-            <td>
-                <div class="link-store-scope" title="<?php echo $help['registerAutomatically']; ?>"></div>
-            </td>
-            <td>
-                <select name="backtraceAndError[registerAutomatically]" id="registerAutomatically">
-                    <?php foreach ($this->getSelectBool() as $key => $value) {
-                        if ($value == $settings['backtraceAndError']['registerAutomatically']) {
-                            $selected = 'selected="selected"';
-                        } else {
-                            $selected = '';
-                        } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
-                    <?php } ?>
-                </select>
-            </td>
-            <td>
-                <input id="factory.registerAutomatically" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['registerAutomatically']; ?>/>
-                <label for="factory.registerAutomatically">Use factory settings</label>
-            </td>
-        </tr>
+        <!-- Backtrace handling -->
+        <tr><th colspan="4"><b>Backtrace</b></th></tr>
         <tr>
             <td><label for="maxStepNumber">Maximum count of steps in the backtrace:</label></td>
             <td>
                 <div class="link-store-scope" title="<?php echo $help['maxStepNumber']; ?>"></div>
             </td>
             <td>
-                <input type="text" value="<?php echo $settings['backtraceAndError']['maxStepNumber']; ?>" name="backtraceAndError[maxStepNumber]" id="maxStepNumber">
+                <input type="text" value="<?php echo $settings['backtrace']['maxStepNumber']; ?>" name="backtraceAndError[maxStepNumber]" id="maxStepNumber">
             </td>
             <td>
                 <input id="factory.maxStepNumber" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['maxStepNumber']; ?>/>
@@ -510,10 +487,10 @@
         }
 
         var savebutton = document.getElementById('editconfig_save');
-        if (typeof savebutton === 'object' && savebutton != 'undefined' && savebutton != null) {
+        if (typeof savebutton === 'object' && savebutton !== 'undefined' && savebutton != null) {
             savebutton.addEventListener('click', function () {
                 var form = document.getElementById('editconfig');
-                if (typeof form === 'object' && form != 'undefined' && form != null) {
+                if (typeof form === 'object' && form !== 'undefined' && form != null) {
                     form.submit();
                 }
             }, true);
@@ -523,13 +500,11 @@
 
     toggle = function (checkbox) {
         var id = checkbox.id.split('.');
-        if (id[1] != 'undefined') {
+        if (id[1] !== 'undefined') {
             var element = document.getElementById(id[1]);
         }
 
-        if (typeof element === 'object' && element != 'undefined' && element != null) {
-
-
+        if (typeof element === 'object' && element !== 'undefined' && element != null) {
             if (checkbox.checked) {
                 element.disabled = true;
             }
