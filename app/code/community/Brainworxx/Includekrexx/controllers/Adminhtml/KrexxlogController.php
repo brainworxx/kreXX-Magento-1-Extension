@@ -84,6 +84,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxlogController extends Mage_Adminhtm
      */
     public function getContentAction()
     {
+        Krexx::createPool();
         $pool = \Krexx::$pool;
 
         // No directory traversal for you!

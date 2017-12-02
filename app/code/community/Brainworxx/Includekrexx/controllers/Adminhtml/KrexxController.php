@@ -225,6 +225,8 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      */
     public function savefeconfigAction()
     {
+        Krexx::createPool();
+        
         $arguments = $this->getRequest()->getPost();
         $allOk = true;
         $pool = \Krexx::$pool;

@@ -47,6 +47,7 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Log extends Mage_Adminhtml_Block_T
         parent::_construct();
 
         // 1. Get the log folder.
+        \Krexx::createPool();
         $dir = \Krexx::$pool->config->getLogDir();
 
         // 2. Get the file list and sort it.
