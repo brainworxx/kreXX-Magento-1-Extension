@@ -37,96 +37,127 @@ $linkToCookieEdit = Mage::helper("adminhtml")->getUrl("/krexx/feconfig");
 ?>
 <h1>kreXX Quick Docu</h1>
 <div class="entry-edit">
-
-  <div class="section-config">
-    <div class="entry-edit-head collapseable">
-      <a onclick="Fieldset.toggleCollapse('usage'); return false;" href="#" id="usage-head" class="">
-        Usage
-       </a>
+    <div class="section-config">
+        <div class="entry-edit-head collapseable">
+            <a onclick="Fieldset.toggleCollapse('usage'); return false;" href="#" id="usage-head" class="">
+                Usage
+            </a>
+        </div>
+        <fieldset id="usage" class="config collapseable" style="display: none;">
+            <h3>Usage</h3>
+            <div class="comment">kreXX will be called in the PHP source code:
+                <div style="background-color: #efefef;
+                            border: 1px solid #d8d8d8;
+                            margin: -1px 0 0;
+                            padding: 10px 10px 10px 26px;">
+                    <pre><code>krexx($myObject);</code></pre>
+                </div>
+                Most of the time you will use this method. kreXX will analyse the
+                $object and give you detailed information about it:
+                <ul>
+                    <li class="krexx-li">Public attributes of the object</li>
+                    <li class="krexx-li">Protected attributes of the object (can be toggled)</li>
+                    <li class="krexx-li">Private attributes of the object (can be toggled)</li>
+                    <li class="krexx-li">Content of the traversable part of the object (can be toggled)</li>
+                    <li class="krexx-li">Result of all configured debugging callbacks (can be configured)</li>
+                </ul>
+                In case the variable is not an object, it will simply display its content.
+                <br /><br />
+                Define a "moment" during a benchmark test. The $string should be
+                something meaningful, like "Model invoice db call":
+                <div class="krexx-code"><pre><code>krexx::timerMoment($string);</code></pre></div>
+                <br />
+                End the benchmark test and displays the result:
+                <div class="krexx-code"><pre><code>krexx::timerEnd();</code></pre></div>
+                <br />
+                Outputs backtrace with sourcecode. When kreXX finds objects inside the backtrace, it will analyse them:
+                <div class="krexx-code"><pre><code>krexx::backtrace();</code></pre></div>
+                <br />
+                Register the fatal error handler in the system:
+                <div class="krexx-code"><pre><code>krexx::registerFatal();</code></pre></div>
+                <br />
+                Unregister the fatal error handler in the system:
+                <div class="krexx-code"><pre><code>krexx::unregisterFatal();</code></pre></div>
+            </div>
+        </fieldset>
+        <script type="text/javascript">//&lt;![CDATA[Fieldset.applyCollapse('usage');//]]&gt;</script>
     </div>
-    <fieldset id="usage" class="config collapseable" style="display: none;">
-      <h3>Usage</h3>
-      <div class="comment">
-        kreXX will be called in the PHP source code:
-        <div style="background-color: #efefef; border: 1px solid #d8d8d8; margin: -1px 0 0; padding: 10px 10px 10px 26px;"><pre><code>krexx($myObject);</code></pre></div>
-
-        Most of the time you will use this method. kreXX will analyse the $object and give you detailed information about it:
-        <ul>
-          <li style="padding-left: 5px;list-style: disc; margin-left: 20px;">Public attributes of the object</li>
-          <li style="padding-left: 5px;list-style: disc; margin-left: 20px;">Protected attributes of the object (can be toggled)</li>
-          <li style="padding-left: 5px;list-style: disc; margin-left: 20px;">Private attributes of the object (can be toggled)</li>
-          <li style="padding-left: 5px;list-style: disc; margin-left: 20px;">Content of the traversable part of the object (can be toggled)</li>
-          <li style="padding-left: 5px;list-style: disc; margin-left: 20px;">Result of all configured debugging callbacks (can be configured)</li>
-        </ul>
-        In case the variable is not an object, it will simply display its content.
-
-        <br /><br />
-        Define a "moment" during a benchmark test. The $string should be something meaningful, like "Model invoice db call":
-        <div style="background-color: #efefef; border: 1px solid #d8d8d8; margin: -1px 0 0; padding: 10px 10px 10px 26px;"><pre><code>krexx::timerMoment($string);</code></pre></div>
-        <br />
-        End the benchmark test and displays the result:
-        <div style="background-color: #efefef; border: 1px solid #d8d8d8; margin: -1px 0 0; padding: 10px 10px 10px 26px;"><pre><code>krexx::timerEnd();</code></pre></div>
-        <br />
-        Outputs backtrace with sourcecode. When kreXX finds objects inside the backtrace, it will analyse them:
-        <div style="background-color: #efefef; border: 1px solid #d8d8d8; margin: -1px 0 0; padding: 10px 10px 10px 26px;"><pre><code>krexx::backtrace();</code></pre></div>
-        <br />
-        Register the fatal error handler in the system:
-        <div style="background-color: #efefef; border: 1px solid #d8d8d8; margin: -1px 0 0; padding: 10px 10px 10px 26px;"><pre><code>krexx::registerFatal();</code></pre></div>
-        <br />
-        Unregister the fatal error handler in the system:
-        <div style="background-color: #efefef; border: 1px solid #d8d8d8; margin: -1px 0 0; padding: 10px 10px 10px 26px;"><pre><code>krexx::unregisterFatal();</code></pre></div>
-      </div>
-    </fieldset>
-    <script type="text/javascript">//&lt;![CDATA[Fieldset.applyCollapse('usage');//]]&gt;</script>
-  </div>
 
 
-
-  <div class="section-config">
-    <div class="entry-edit-head collapseable">
-      <a onclick="Fieldset.toggleCollapse('configuration'); return false;" href="#" id="configuration-head" class="">
-        Configuration
-      </a>
-     </div>
-    <fieldset id="configuration" class="config collapseable" style="display: none;">
-      <h3>Configuration</h3>
-      kreXX is already preconfigured, you don't have to cofigure it. But there are always moments when you want to change it. There are 3 levels of configuration:<br /><br />
-      <h4>1.) Factory settings</h4>
-      The factory settings are hardcoded fallback settings.<br /><br />
-      <h4>2.) Configuration file Krexx.ini</h4>
-      The configuration file settings are stored in the file Krexx.ini. kreXX shows in it's output footer where it is searching for this file. In Magento this is normally:
-      <div style="background-color: #efefef; border: 1px solid #d8d8d8; margin: -1px 0 0; padding: 10px 10px 10px 26px;"><pre><code>app/code/community/Brainworxx/Includekrexx/Block/krexx/Krexx.ini</code></pre></div>
-      You can edit these settings <a href="<?php echo $linkToConfig ?>">here.</a><br />
-      Configuration file settings overwrite factory settings.<br /><br />
-      <h4>3.) Local browser settings</h4>
-      You can edit the local browser settings on the fly in the footer of the kreXX output. They are stored in a cookie, and only affect your current browser. Unlike the configuration file, not all settings can be edited there.<br />
-      Local browser settings overwrite configuration file settings.<br />
-      You can edit these settings <a href="<?php echo $linkToCookieEdit ?>">here.</a><br />
-      <b>Please note, that these are only local settings, only affecting your current browser.</b>
-    </fieldset>
-    <script type="text/javascript">//&lt;![CDATA[Fieldset.applyCollapse('configuration');//]]&gt;</script>
-  </div>
-
-
-
-
-
-  <div class="section-config">
-    <div class="entry-edit-head collapseable">
-      <a onclick="Fieldset.toggleCollapse('on_the_web'); return false;" href="#" id="on_the_web-head" class="">
-         kreXX on the web
-      </a>
+    <div class="section-config">
+        <div class="entry-edit-head collapseable">
+            <a onclick="Fieldset.toggleCollapse('configuration'); return false;"
+               href="#"
+               id="configuration-head" class="">
+                Configuration
+            </a>
+        </div>
+        <fieldset id="configuration" class="config collapseable" style="display: none;">
+            <h3>Configuration</h3>
+            kreXX is already preconfigured, you don't have to cofigure it. But there are
+            always moments when you want to change it. There are 3 levels of configuration:<br /><br />
+            <h4>1.) Factory settings</h4>
+            The factory settings are hardcoded fallback settings.<br /><br />
+            <h4>2.) Configuration file Krexx.ini</h4>
+            The configuration file settings are stored in the file Krexx.ini. kreXX
+            shows in it's output footer where it is searching for this file. In Magento this is normally:
+            <div class="krexx-code">
+                <pre><code>var/log/krexx/Krexx.ini</code></pre>
+            </div>
+            You can edit these settings <a href="<?php echo $this->escapeHtml($linkToConfig) ?>">here.</a><br />
+            Configuration file settings overwrite factory settings.<br /><br />
+            <h4>3.) Local browser settings</h4>
+            You can edit the local browser settings on the fly in the footer of the kreXX
+            output. They are stored in a cookie, and only affect your current browser.
+            Unlike the configuration file, not all settings can be edited there.<br />
+            Local browser settings overwrite configuration file settings.<br />
+            You can edit these settings <a href="<?php echo $this->escapeHtml($linkToCookieEdit) ?>">here.</a><br />
+            <b>Please note, that these are only local settings, only affecting your current browser.</b>
+        </fieldset>
+        <script type="text/javascript">//&lt;![CDATA[Fieldset.applyCollapse('configuration');//]]&gt;</script>
     </div>
-    <fieldset id="on_the_web" class="config collapseable" style="display: none;">
-      <h3>kreXX on the WeBB</h3>
-      <a target="_blank" href="https://docs.typo3.org/typo3cms/extensions/includekrexx/">Documentation</a><br />
-      <a target="_blank" href="https://github.com/brainworxx/kreXX/issues">Bug reports for kreXX</a><br />
-      <a target="_blank" href="https://github.com/brainworxx/kreXX-Magento-1-Extension/issues">Bug reports for the Magento kreXX extension</a><br />
-      <a target="_blank" href="http://typo3.org/extensions/repository/view/includekrexx">TYPO3 kreXX</a><br />
-      <a target="_blank" href="https://www.magentocommerce.com/magento-connect/krexx-debugger.html">Magento kreXX</a>
-    </fieldset>
-    <script type="text/javascript">//&lt;![CDATA[Fieldset.applyCollapse('on_the_web');//]]&gt;</script>
-  </div>
+
+    <div class="section-config">
+        <div class="entry-edit-head collapseable">
+            <a onclick="Fieldset.toggleCollapse('on_the_web'); return false;" href="#" id="on_the_web-head" class="">
+                kreXX on the web
+            </a>
+        </div>
+        <fieldset id="on_the_web" class="config collapseable" style="display: none;">
+            <h3>kreXX on the WeBB</h3>
+            <a target="_blank" href="https://docs.typo3.org/typo3cms/extensions/includekrexx/">
+                Documentation
+            </a><br />
+            <a target="_blank" href="https://github.com/brainworxx/kreXX/issues">
+                Bug reports for kreXX
+            </a><br />
+            <a target="_blank" href="https://github.com/brainworxx/kreXX-Magento-1-Extension/issues">
+                Bug reports for the Magento kreXX extension
+            </a><br />
+            <a target="_blank" href="http://typo3.org/extensions/repository/view/includekrexx">
+                TYPO3 kreXX
+            </a><br />
+            <a target="_blank" href="https://www.magentocommerce.com/magento-connect/krexx-debugger.html">
+                Magento kreXX
+            </a>
+        </fieldset>
+        <script type="text/javascript">//&lt;![CDATA[Fieldset.applyCollapse('on_the_web');//]]&gt;</script>
+    </div>
 </div>
+
+<style type="text/css">
+    li.krexx-li {
+        padding-left: 5px;
+        list-style: disc;
+        margin-left: 20px;
+    }
+    .krexx-code {
+        background-color: #efefef;
+        border: 1px solid #d8d8d8;
+        margin: -1px 0 0;
+        padding: 10px 10px 10px 26px;
+    }
+
+</style>
 
 

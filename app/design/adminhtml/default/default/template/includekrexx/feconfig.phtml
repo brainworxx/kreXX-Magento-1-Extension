@@ -34,7 +34,7 @@
 ?>
 
 <h1>Administer kreXX FE Editing</h1>
-<form action="<?php echo $this->getSaveUrl() ?>" method="post" id="editconfig">
+<form action="<?php echo $this->escapeHtml($this->getSaveUrl()) ?>" method="post" id="editconfig">
     <table border="0" class="krexx-config">
         <tr><th colspan="3"><b>Here you can edit the frontend configuration form.</b></th></tr>
         <tr><td>full edit</td><td colspan="2"> = The value can be edited in the frontend.</td></tr>
@@ -54,12 +54,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.disabled" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['disabled']; ?>/>
+                <input
+                    id="factory.disabled"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['disabled']); ?>/>
                 <label for="factory.disabled">Use factory settings</label>
             </td>
         </tr>
@@ -77,12 +86,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.skin" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['skin']; ?>/>
+                <input
+                    id="factory.skin"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['skin']); ?>/>
                 <label for="factory.skin">Use factory settings</label>
             </td>
         </tr>
@@ -110,12 +128,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.detectAjax" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['detectAjax']; ?>/>
+                <input
+                    id="factory.detectAjax"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['detectAjax']); ?>/>
                 <label for="factory.detectAjax">Use factory settings</label>
             </td>
         </tr>
@@ -129,12 +156,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.level" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['level']; ?>/>
+                <input
+                    id="factory.level"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['level']); ?>/>
                 <label for="factory.level">Use factory settings</label>
             </td>
         </tr>
@@ -148,12 +184,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.maxCall" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['maxCall']; ?>/>
+                <input
+                    id="factory.maxCall"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['maxCall']); ?>/>
                 <label for="factory.maxCall">Use factory settings</label>
             </td>
         </tr>
@@ -168,13 +213,21 @@
                             $selected = '';
                         }
                         ?>
-                        <option
-                            value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.memoryLeft" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['memoryLeft']; ?>/>
+                <input
+                    id="factory.memoryLeft"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['memoryLeft']); ?>/>
                 <label for="factory.memoryLeft">Use factory settings</label>
             </td>
         </tr>
@@ -188,12 +241,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.maxRuntime" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['maxRuntime']; ?>/>
+                <input
+                    id="factory.maxRuntime"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['maxRuntime']); ?>/>
                 <label for="factory.maxRuntime">Use factory settings</label>
             </td>
         </tr>
@@ -207,12 +269,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.useScopeAnalysis" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['useScopeAnalysis']; ?>/>
+                <input
+                    id="factory.useScopeAnalysis"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['useScopeAnalysis']); ?>/>
                 <label for="factory.useScopeAnalysis">Use factory settings</label>
             </td>
         </tr>
@@ -230,12 +301,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.analyseProtected" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['analyseProtected']; ?>/>
+                <input
+                    id="factory.analyseProtected"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['analyseProtected']); ?>/>
                 <label for="factory.analyseProtected">Use factory settings</label>
             </td>
         </tr>
@@ -249,12 +329,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.analysePrivate" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['analysePrivate']; ?>/>
+                <input
+                    id="factory.analysePrivate"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['analysePrivate']); ?>/>
                 <label for="factory.analysePrivate">Use factory settings</label>
             </td>
         </tr>
@@ -268,12 +357,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.analyseConstants" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['analyseConstants']; ?>/>
+                <input
+                    id="factory.analyseConstants"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['analyseConstants']); ?>/>
                 <label for="factory.analyseConstants">Use factory settings</label>
             </td>
         </tr>
@@ -287,12 +385,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.analyseTraversable" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['analyseTraversable']; ?>/>
+                <input
+                    id="factory.analyseTraversable"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['analyseTraversable']); ?>/>
                 <label for="factory.analyseTraversable">Use factory settings</label>
             </td>
         </tr>
@@ -312,12 +419,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.analyseProtectedMethods" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['analyseProtectedMethods']; ?>/>
+                <input
+                    id="factory.analyseProtectedMethods"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['analyseProtectedMethods']); ?>/>
                 <label for="factory.analyseProtectedMethods">Use factory settings</label>
             </td>
         </tr>
@@ -331,12 +447,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.analysePrivateMethods" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['analysePrivateMethods']; ?>/>
+                <input
+                    id="factory.analysePrivateMethods"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['analysePrivateMethods']); ?>/>
                 <label for="factory.analysePrivateMethods">Use factory settings</label>
             </td>
         </tr>
@@ -351,12 +476,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.analyseGetter" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['analyseGetter']; ?>/>
+                <input
+                    id="factory.analyseGetter"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['analyseGetter']); ?>/>
                 <label for="factory.analyseGetter">Use factory settings</label>
             </td>
         </tr>
@@ -381,13 +515,21 @@
                         } else {
                             $selected = '';
                         } ?>
-                        <option
-                            value="<?php echo $key; ?>" <?php echo $selected; ?> ><?php echo $value; ?></option>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
                     <?php } ?>
                 </select>
             </td>
             <td>
-                <input id="factory.maxStepNumber" class="checkbox" type="checkbox" value="1" name="factory" <?php echo $factory['maxStepNumber']; ?>/>
+                <input
+                    id="factory.maxStepNumber"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['maxStepNumber']); ?>/>
                 <label for="factory.maxStepNumber">Use factory settings</label>
             </td>
         </tr>
@@ -422,7 +564,6 @@
 <script type="text/javascript">
     document.observe("dom:loaded", function () {
         var checkboxes = document.getElementsByName('factory');
-        var id, element;
 
         for (var i = 0, n = checkboxes.length; i < n; i++) {
             toggle(checkboxes[i]);

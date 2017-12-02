@@ -31,8 +31,6 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* @var Brainworxx_Includekrexx_Block_Adminhtml_Log $this */
-
 $linkToConfig = Mage::helper("adminhtml")->getUrl("/krexx/config");
 $linkToDispatcher = Mage::helper("adminhtml")->getUrl("/krexxlog/getcontent");
 ?>
@@ -41,7 +39,7 @@ $linkToDispatcher = Mage::helper("adminhtml")->getUrl("/krexxlog/getcontent");
         This is an overview of all logfiles that kreXX has created. You can
         easily access them here, just by clicking the filename.<br/>
         You can activate file logging on the configuration page found here: <a
-            href="<?php echo $linkToConfig ?>">Edit configuration file</a>
+            href="<?php echo $this->escapeHtml($linkToConfig) ?>">Edit configuration file</a>
     </p>
     <br/><br/>
 <?php if (empty($files)) { ?>
@@ -70,12 +68,15 @@ $linkToDispatcher = Mage::helper("adminhtml")->getUrl("/krexxlog/getcontent");
                 $class = 'even';
                 foreach ($files as $file) {
                     ?>
-                    <tr class="<?php echo $class; ?>">
+                    <tr class="<?php echo $this->escapeHtml($class); ?>">
                         <td class="a-left">
-                            <a target="_blank" href="<?php echo $linkToDispatcher . '?id=' . $file['id']; ?>"><?php echo $file['name'] ?></a>
+                            <a target="_blank"
+                               href="<?php echo $this->escapeHtml($linkToDispatcher . '?id=' . $file['id']); ?>">
+                                <?php echo $this->escapeHtml($file['name']) ?>
+                            </a>
                         </td>
-                        <td class="a-left"><?php echo $file['time'] ?></td>
-                        <td class="a-left"><?php echo $file['size'] ?></td>
+                        <td class="a-left"><?php echo $this->escapeHtml($file['time']) ?></td>
+                        <td class="a-left"><?php echo $this->escapeHtml($file['size']) ?></td>
                         <td class="a-left">
                             <table class="noborder">
                                 <colgroup>
@@ -87,15 +88,21 @@ $linkToDispatcher = Mage::helper("adminhtml")->getUrl("/krexxlog/getcontent");
                                 <?php foreach ($file['meta'] as $metadata) { ?>
                                 <tr>
                                     <td class="a-left">
-                                        <?php echo $metadata['type'] ?>
+                                        <?php echo $this->escapeHtml($metadata['type']) ?>
                                         <?php
                                         if ($metadata['type'] == 'Analysis') {
-                                            echo ' of <b>' . $metadata['varname'] . '</b>';
+                                            echo ' of <b>' . $this->escapeHtml($metadata['varname']) . '</b>';
                                         }
                                         ?>
                                     </td>
-                                    <td class="a-right"> in <b title="<?php echo $metadata['file']; ?>"><?php echo $metadata['filename']; ?></b></td>
-                                    <td class="a-left"> line <b><?php echo $metadata['line']; ?></b></td>
+                                    <td class="a-right"> in
+                                        <b title="<?php echo $this->escapeHtml($metadata['file']); ?>">
+                                            <?php echo $this->escapeHtml($metadata['filename']); ?>
+                                        </b>
+                                    </td>
+                                    <td class="a-left"> line
+                                        <b><?php echo $this->escapeHtml($metadata['line']); ?></b>
+                                    </td>
                                 </tr>
                                 <?php } ?>
                                 </tbody>
