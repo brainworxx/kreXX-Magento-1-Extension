@@ -226,7 +226,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
     public function savefeconfigAction()
     {
         Krexx::createPool();
-        
+
         $arguments = $this->getRequest()->getPost();
         $allOk = true;
         $pool = \Krexx::$pool;
@@ -286,15 +286,24 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         $pool = \Krexx::$pool;
         foreach ($values as $key => $setting) {
             $ini .= '[' . $key . ']' . PHP_EOL;
-            foreach ($setting as $settingName => $value) {
-                $ini .= $settingName . ' = "' . $value . '"' . PHP_EOL;
+            if (!empty($setting)) {
+                foreach ($setting as $settingName => $value) {
+                    $ini .= $settingName . ' = "' . $value . '"' . PHP_EOL;
+                }
             }
+        }
+
+        $file = new Varien_Io_File();
+        $file->open();
+        try {
+            $file->cd($file->dirname($filepath));
+        } catch (Exception $e) {
+            $allOk = false;
         }
 
         // Now we should write the file!
         if ($allOk) {
-            $file = new Varien_Io_File();
-            if ($file->write($filepath, $ini) === false) {
+            if ($file->filePutContent('Krexx.ini', $ini) === false) {
                 $allOk = false;
                 $pool->messages->addMessage('Configuration file ' . $filepath . ' is not writeable!');
             }

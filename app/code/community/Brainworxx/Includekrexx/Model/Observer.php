@@ -50,8 +50,10 @@ class Brainworxx_Includekrexx_Model_Observer
      */
     public function __construct()
     {
-       $this->_ioFile = new Varien_Io_File();
-       $this->_ioFile->setAllowCreateFolders(true);
+
+        $this->_ioFile = new Varien_Io_File();
+        $this->_ioFile->setAllowCreateFolders(true);
+
     }
 
     /**
@@ -77,7 +79,6 @@ class Brainworxx_Includekrexx_Model_Observer
                 include_once $pathToKrexx;
             }
 
-
             // Tell kreXX that we want to use some special classes for the getter analysis.
             Overwrites::$classes['Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter'] =
                 'Brainworxx_Includekrexx_Model_Dynamicgetter';
@@ -98,8 +99,6 @@ class Brainworxx_Includekrexx_Model_Observer
             Overwrites::$directories['config'] = $logDir;
             Overwrites::$directories['log'] = $logDir;
 
-
-
             $beenHere = true;
         }
     }
@@ -116,6 +115,8 @@ class Brainworxx_Includekrexx_Model_Observer
         $path .= DIRECTORY_SEPARATOR;
 
         try {
+            $this->_ioFile->open();
+            $this->_ioFile->cd($path);
             $this->_ioFile->createDestinationDir($path);
         } catch (Exception $e) {
             // We have no write access here. Nothing more to do here.
@@ -124,16 +125,16 @@ class Brainworxx_Includekrexx_Model_Observer
             return;
         }
 
-        // Empty index.html in caqse the htacess is not enough.
-        if (!$this->_ioFile->fileExists($path . 'index.html')) {
+        // Empty index.html in case the htacess is not enough.
+        if (!$this->_ioFile->fileExists('index.html', true)) {
             $indexHtml = '';
-            $this->_ioFile->filePutContent($path . 'index.html', $indexHtml);
+            $this->_ioFile->filePutContent('index.html', $indexHtml);
         }
 
         // htAccess to prevent a listing
-        if (!$this->_ioFile->fileExists($path . '.htaccess')) {
+        if (!$this->_ioFile->fileExists('.htaccess', true)) {
             $htAccess = 'order deny,allow' . "\n" . 'deny from all';
-            $this->_ioFile->filePutContent($path . '.htaccess', $htAccess);
+            $this->_ioFile->filePutContent('.htaccess', $htAccess);
         }
     }
 }
