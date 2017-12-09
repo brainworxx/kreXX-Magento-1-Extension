@@ -87,12 +87,12 @@ class Brainworxx_Includekrexx_Model_Observer
 
             // We will use the standard folders for cache or logging provided
             // by Magento.
-            $cacheDir = Mage::getBaseDir('cache') . '/krexx';
-            $logDir = Mage::getBaseDir('log') . '/krexx';
+            $cacheDir = Mage::getBaseDir('cache');
+            $logDir = Mage::getBaseDir('log');
 
             // Check if these folders are protected.
-            $this->processDir($cacheDir);
-            $this->processDir($logDir);
+            $this->processDir($cacheDir, '/krexx');
+            $this->processDir($logDir, '/krexx');
 
             // Tell kreXX to use the now processed folders.
             Overwrites::$directories['chunks'] = $cacheDir;
@@ -110,14 +110,15 @@ class Brainworxx_Includekrexx_Model_Observer
      * @param string $path
      *   The path to the directory we want to prectect.
      */
-    protected function processDir($path)
+    protected function processDir($path, $newDir)
     {
         $path .= DIRECTORY_SEPARATOR;
 
         try {
             $this->_ioFile->open();
             $this->_ioFile->cd($path);
-            $this->_ioFile->createDestinationDir($path);
+            $this->_ioFile->createDestinationDir($path . $newDir);
+            $this->_ioFile->cd($path . $newDir);
         } catch (Exception $e) {
             // We have no write access here. Nothing more to do here.
             // kreXX will notice later on that he can not write here
