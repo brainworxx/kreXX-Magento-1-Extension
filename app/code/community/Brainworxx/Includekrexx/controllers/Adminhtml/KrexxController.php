@@ -301,6 +301,9 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
             $allOk = false;
         }
 
+        // Censor the filepath.
+        $filepath = $pool->fileService->filterFilePath($filepath);
+
         // Now we should write the file!
         if ($allOk) {
             if ($file->filePutContent('Krexx.ini', $ini) === false) {
