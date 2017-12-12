@@ -53,7 +53,6 @@ class Brainworxx_Includekrexx_Model_Observer
 
         $this->_ioFile = new Varien_Io_File();
         $this->_ioFile->setAllowCreateFolders(true);
-
     }
 
     /**
@@ -71,8 +70,7 @@ class Brainworxx_Includekrexx_Model_Observer
         if (!$beenHere) {
             // We need to check, if the kreXX overwrite class, as well as the
             // main class have been loaded before. If not, load them.
-            $libPath = Mage::getModuleDir('', 'Brainworxx_Includekrexx') .
-                DIRECTORY_SEPARATOR . 'Libraries' . DIRECTORY_SEPARATOR;
+            $libPath = Mage::getModuleDir('', 'Brainworxx_Includekrexx') . '/Libraries/';
 
             $pathToKrexx = $libPath . 'krexx/Krexx.php';
             if (!class_exists('\Krexx', false)) {
@@ -91,13 +89,13 @@ class Brainworxx_Includekrexx_Model_Observer
             $logDir = Mage::getBaseDir('log');
 
             // Check if these folders are protected.
-            $this->processDir($cacheDir, '/krexx');
-            $this->processDir($logDir, '/krexx');
+            $this->processDir($cacheDir, '/krexx/');
+            $this->processDir($logDir, '/krexx/');
 
             // Tell kreXX to use the now processed folders.
-            Overwrites::$directories['chunks'] = $cacheDir;
-            Overwrites::$directories['config'] = $logDir;
-            Overwrites::$directories['log'] = $logDir;
+            Overwrites::$directories['chunks'] = $cacheDir . '/krexx';
+            Overwrites::$directories['config'] = $logDir . '/krexx';
+            Overwrites::$directories['log'] = $logDir . '/krexx';
 
             $beenHere = true;
         }
@@ -112,7 +110,7 @@ class Brainworxx_Includekrexx_Model_Observer
      */
     protected function processDir($path, $newDir)
     {
-        $path .= DIRECTORY_SEPARATOR;
+        $path .= '/';
 
         try {
             $this->_ioFile->open();
