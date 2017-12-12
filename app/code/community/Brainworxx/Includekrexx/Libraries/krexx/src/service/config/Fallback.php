@@ -294,7 +294,7 @@ class Fallback
      *
      * @var string
      */
-    public $version = '2.3.2 dev';
+    public $version = '2.3.2';
 
     /**
      * Limit for the count in an array. If an array is larger that this,
@@ -305,5 +305,5 @@ class Fallback
      *
      * @var int
      */
-    public $arrayCountLimit = 100;
+    public $arrayCountLimit = 300;
 }
