@@ -188,20 +188,38 @@ class Pool extends Factory
      */
     protected function checkEnvironment()
     {
+        $ioFile = new \Varien_Io_File();
+        $ioFile->open();
+
         // Check chunk folder is writable.
         // If not, give feedback!
         $chunkFolder = $this->config->getChunkDir();
-        if (!is_writeable($chunkFolder)) {
+        try {
+            $ioFile->cd($chunkFolder);
+            $notWritable = $ioFile->isWriteable($chunkFolder);
+        } catch (\Exception $e) {
+            $notWritable = true;
+        }
+
+        if (!$notWritable) {
             $chunkFolder = $this->fileService->filterFilePath($chunkFolder);
             $this->messages->addMessage('chunksNotWritable', array($chunkFolder));
             // We can work without chunks, but this will require much more memory!
             $this->chunks->setUseChunks(false);
         }
 
+
         // Check if the log folder is writable.
         // If not, give feedback!
         $logFolder = $this->config->getLogDir();
-        if (!is_writeable($logFolder)) {
+        try {
+            $ioFile->cd($logFolder);
+            $notWritable = $ioFile->isWriteable($logFolder);
+        } catch (\Exception $e) {
+            $notWritable = true;
+        }
+
+        if (!$notWritable) {
             $logFolder = $this->fileService->filterFilePath($logFolder);
             $this->messages->addMessage('logNotWritable', array($logFolder));
             // Tell the chunk output that we have no write access in the logging
