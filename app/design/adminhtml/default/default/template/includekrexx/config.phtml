@@ -128,38 +128,6 @@
             </td>
         </tr>
         <tr>
-            <td><label for="destination">Destination:</label></td>
-            <td>
-                <div class="link-store-scope" title="<?php echo $this->escapeHtml($help['destination']); ?>"></div>
-            </td>
-            <td>
-                <select name="output[destination]" id="destination">
-                    <?php foreach ($this->getSelectDestination() as $key => $value) {
-                        if ($value == $settings['output']['destination']) {
-                            $selected = 'selected="selected"';
-                        } else {
-                            $selected = '';
-                        } ?>
-                        <option
-                            value="<?php echo $this->escapeHtml($key); ?>"
-                            <?php echo $this->escapeHtml($selected); ?> >
-                            <?php echo $this->escapeHtml($value); ?>
-                        </option>
-                    <?php } ?>
-                </select>
-            </td>
-            <td >
-                <input
-                    id="factory.destination"
-                    class="checkbox"
-                    type="checkbox"
-                    value="1"
-                    name="factory"
-                    <?php echo $this->escapeHtml($factory['destination']); ?>/>
-                <label for="factory.destination">Use factory settings</label>
-            </td>
-        </tr>
-        <tr>
             <td><label for="maxfiles">Maximum files in the logfolder:</label></td>
             <td>
                 <div class="link-store-scope" title="<?php echo $this->escapeHtml($help['maxfiles']); ?>"></div>

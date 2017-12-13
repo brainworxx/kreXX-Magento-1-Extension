@@ -50,7 +50,6 @@ class Brainworxx_Includekrexx_Model_Config extends Brainworxx\Krexx\Service\Conf
             'disabled' => 'false',
             'iprange' => '*',
             'skin' => 'smokygrey',
-            'destination' => 'browser',
             'maxfiles' => '10',
         ),
         'runtime' => array(

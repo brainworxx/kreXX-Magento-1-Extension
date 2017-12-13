@@ -73,7 +73,6 @@ class Fallback
             'disabled' => 'false',
             'iprange' => '*',
             'skin' => 'smokygrey',
-            'destination' => 'browser',
             'maxfiles' => '10',
         ),
         'runtime' => array(
@@ -147,10 +146,6 @@ class Fallback
             'type' => 'Select',
             'editable' => 'true',
         ),
-        'destination' => array(
-            'type' => 'Select',
-            'editable' => 'false',
-        ),
         'maxfiles' => array(
             'type' => 'Input',
             'editable' => 'false',
@@ -203,7 +198,6 @@ class Fallback
      * @var array
      */
     protected $feConfigNoEdit = array(
-        'destination',
         'maxfiles',
         'debugMethods',
         'iprange',
@@ -277,7 +271,6 @@ class Fallback
         'maxCall' => 'evalInt',
         'disabled' => 'evalBool',
         'detectAjax' => 'evalBool',
-        'destination' => 'evalDestination',
         'maxfiles' => 'evalInt',
         'skin' => 'evalSkin',
         'devHandle' => 'evalDevHandle',

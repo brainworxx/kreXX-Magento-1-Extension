@@ -46,7 +46,6 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
     protected $_allowedSettingsNames = array(
         'skin',
         'maxfiles',
-        'destination',
         'maxCall',
         'disabled',
         'detectAjax',
@@ -246,7 +245,6 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         }
 
         // We need to correct the allowed settings, since we do not allow anything.
-        unset($this->_allowedSettingsNames['destination']);
         unset($this->_allowedSettingsNames['maxfiles']);
         unset($this->_allowedSettingsNames['debugMethods']);
 

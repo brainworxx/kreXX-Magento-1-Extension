@@ -70,13 +70,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
                 )
             )
         );
-        $help['destination'] = htmlspecialchars(
-            strip_tags(
-                $pool->messages->getHelp(
-                    'destinationHelp'
-                )
-            )
-        );
         $help['maxCall'] = htmlspecialchars(
             strip_tags(
                 $pool->messages->getHelp(
@@ -181,14 +174,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
 
         $this->assign('help', $help);
 
-        // Initializing the select data for the template.
-        $this->setSelectDestination(
-            array(
-                'browser' => 'browser',
-                'file' => 'file'
-            )
-        );
-
         $this->setSelectBool(array('true' => 'true', 'false' => 'false'));
         $this->setSelectBacktrace(
             array(
@@ -211,10 +196,6 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Config extends Mage_Adminhtml
         $settings['output']['maxfiles'] = $pool->config->iniConfig->getConfigFromFile(
             'output',
             'maxfiles'
-        );
-        $settings['output']['destination'] = $pool->config->iniConfig->getConfigFromFile(
-            'output',
-            'destination'
         );
         $settings['runtime']['maxCall'] = $pool->config->iniConfig->getConfigFromFile(
             'runtime',

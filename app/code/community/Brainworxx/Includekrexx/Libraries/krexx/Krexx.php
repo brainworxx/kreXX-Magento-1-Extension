@@ -179,7 +179,6 @@ class Krexx
         include_once KREXX_DIR . 'src/View/Output/AbstractOutput.php';
         include_once KREXX_DIR . 'src/View/Output/Chunks.php';
         include_once KREXX_DIR . 'src/View/Output/File.php';
-        include_once KREXX_DIR . 'src/View/Output/Shutdown.php';
 
         include_once KREXX_DIR . 'src/View/RenderInterface.php';
         include_once KREXX_DIR . 'src/View/AbstractRender.php';
