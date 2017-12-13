@@ -98,33 +98,4 @@ class Factory
     {
         $this->rewrite = Overwrites::$classes;
     }
-
-    /**
-     * Return a part the superglobal $GLOBALS.
-     *
-     * @param string $what
-     *   The part of the globals we want to access.
-     *
-     * @return array
-     *   The part we are requesting.
-     */
-    public function &getGlobals($what)
-    {
-        if (empty($what)) {
-            return $GLOBALS;
-        }
-
-        return $GLOBALS[$what];
-    }
-
-    /**
-     * Returns the superglobal $_SERVER.
-     *
-     * @return array
-     *   The superglobal $_SERVER
-     */
-    public function &getServer()
-    {
-        return $_SERVER;
-    }
 }

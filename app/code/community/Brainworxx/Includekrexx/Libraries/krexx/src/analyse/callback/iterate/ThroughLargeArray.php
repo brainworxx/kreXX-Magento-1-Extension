@@ -68,18 +68,10 @@ class ThroughLargeArray extends AbstractCallback
     public function callMe()
     {
         $output = '';
-        $recursionMarker = $this->pool->recursionHandler->getMarker();
         $output .= $this->pool->render->renderSingeChildHr();
 
         // Iterate through.
         foreach ($this->parameters['data'] as $key => &$value) {
-            // We will not output our recursion marker.
-            // Meh, the only reason for the recursion marker
-            // in arrays is because of the $GLOBAL array, which
-            // we will only render once.
-            if ($key === $recursionMarker) {
-                continue;
-            }
 
             /** @var Model $model */
             $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model');

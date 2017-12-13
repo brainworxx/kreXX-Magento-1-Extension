@@ -80,12 +80,6 @@ class Recursion
      */
     protected $globalsWereRendered = false;
 
-    /**
-     * The $GLOBALS array.
-     *
-     * @var array
-     */
-    protected $globals;
 
     /**
      * Generate the recursion marker during class construction.
@@ -95,19 +89,7 @@ class Recursion
     public function __construct($pool)
     {
         $this->recursionMarker = 'Krexx' . substr(str_shuffle(md5(microtime())), 0, 10);
-        // Mark the $GLOBALS array.
-        $this->globals = $pool->getGlobals('');
-        $this->globals[$this->recursionMarker] = true;
         $this->recursionHive = new \SplObjectStorage();
-    }
-
-    /**
-     * Resets all Arrays inside the recursion array.
-     */
-    public function __destruct()
-    {
-        // Remove our mark from the $GLOBALS.
-        unset($this->globals[$this->recursionMarker]);
     }
 
     /**
@@ -137,8 +119,9 @@ class Recursion
             return $this->recursionHive->contains($bee);
         }
 
-        // Check arrays (only the $GLOBAL array may apply).
-        if (isset($bee[$this->recursionMarker])) {
+        // We must not access the $_GLOBALS directly. There are other means of
+        // checking if this is this dreaded array.
+        if (isset($bee['_GET']) && isset($bee['_POST']) && isset($bee['_COOKIE'])) {
             // We render the $GLOBALS only once.
             if ($this->globalsWereRendered) {
                 return true;

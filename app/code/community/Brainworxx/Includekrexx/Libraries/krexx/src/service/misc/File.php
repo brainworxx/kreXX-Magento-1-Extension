@@ -71,8 +71,7 @@ class File
     public function __construct(Pool $pool)
     {
         $this->pool = $pool;
-        $server = $pool->getServer();
-        $this->docRoot = trim(realpath($server['DOCUMENT_ROOT']), DIRECTORY_SEPARATOR);
+        $this->docRoot = \Mage::getBaseDir('base');
         if (empty($this->docRoot)) {
             $this->docRoot = false;
         }

@@ -66,11 +66,11 @@ class Cookie
     public function __construct(Pool $pool)
     {
         $this->security = $pool->createClass('Brainworxx\\Krexx\\Service\\Config\\Security');
-        $cookies = $pool->getGlobals('_COOKIE');
+        $cookie = \Mage::getModel('core/cookie')->get('KrexxDebugSettings');
 
-        if (isset($cookies['KrexxDebugSettings'])) {
+        if (!empty($cookie)) {
             // We have local settings.
-            $settings = json_decode($cookies['KrexxDebugSettings'], true);
+            $settings = json_decode($cookie, true);
             if (is_array($settings)) {
                 $this->settings = $settings;
             }
