@@ -83,12 +83,10 @@ class Recursion
 
     /**
      * Generate the recursion marker during class construction.
-     *
-     * @param Pool $pool
      */
-    public function __construct($pool)
+    public function __construct()
     {
-        $this->_recursionMarker = 'Krexx' . substr(str_shuffle(md5(microtime())), 0, 10);
+        $this->_recursionMarker = 'Krexx' . substr(str_shuffle(hash('sha256', microtime())), 0, 10);
         $this->_recursionHive = new \SplObjectStorage();
     }
 
