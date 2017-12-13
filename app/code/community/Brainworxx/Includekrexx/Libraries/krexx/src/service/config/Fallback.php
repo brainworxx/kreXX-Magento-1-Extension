@@ -294,7 +294,7 @@ class Fallback
      *
      * @var string
      */
-    public $version = '2.3.2';
+    public $version = '2.3.2 m1';
 
     /**
      * Limit for the count in an array. If an array is larger that this,
