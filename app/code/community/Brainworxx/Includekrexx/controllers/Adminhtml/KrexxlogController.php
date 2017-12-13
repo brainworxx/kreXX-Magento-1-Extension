@@ -101,20 +101,16 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxlogController extends Mage_Adminhtm
         }
 
         if ($canOpen) {
-            // Dispatch it!
-            $stream = $ioFile->streamRead();
-            while ($stream !== false) {
-                echo $stream;
-                // Use output buffering.
-                ob_flush();
-                flush();
-                // Get new data.
-                $stream = $ioFile->streamRead();
+            $dispatcher = new Varien_File_Transfer_Adapter_Http();
+            try {
+                $dispatcher->send($file);
+            } catch (\Exception $e) {
+                Mage::getSingleton('core/session')
+                    ->addError('File: ' . $pool->fileService->filterFilePath($file) . ' is not readable!');
             }
-
-            $ioFile->streamClose();
         } else {
-            Mage::getSingleton('core/session')->addError('File: ' . $file . ' is not readable!');
+            Mage::getSingleton('core/session')
+                ->addError('File: ' . $pool->fileService->filterFilePath($file) . ' is not readable!');
         }
     }
 }
