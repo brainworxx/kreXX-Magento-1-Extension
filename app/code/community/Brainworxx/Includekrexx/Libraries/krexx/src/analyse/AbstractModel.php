@@ -50,14 +50,14 @@ abstract class AbstractModel
      *
      * @var Pool
      */
-    protected $pool;
+    protected $_pool;
 
     /**
      * Callback for the renderMe() method.
      *
      * @var AbstractCallback
      */
-    protected $callback;
+    protected $_callback;
 
     /**
      * Parameters for the renderMe method.
@@ -66,7 +66,7 @@ abstract class AbstractModel
      *
      * @var array
      */
-    protected $parameters = array();
+    protected $_parameters = array();
 
     /**
      * Additional data, we are sending to the FE vas a json, hence the name.
@@ -75,15 +75,14 @@ abstract class AbstractModel
      *
      * @var array
      */
-    protected $json = array();
+    protected $_json = array();
 
     /**
      * The connector service, used for source generation.
      *
      * @var Connectors
      */
-    protected $connectorService;
-
+    protected $_connectorService;
 
     /**
      * Inject the pool and create the connector service.
@@ -92,10 +91,10 @@ abstract class AbstractModel
      */
     public function __construct(Pool $pool)
     {
-        $this->connectorService = $pool->createClass(
+        $this->_connectorService = $pool->createClass(
             'Brainworxx\\Krexx\\Analyse\\Code\\Connectors'
         );
-        $this->pool = $pool;
+        $this->_pool = $pool;
     }
 
     /**
@@ -109,7 +108,7 @@ abstract class AbstractModel
      */
     public function injectCallback(AbstractCallback $object)
     {
-        $this->callback = $object;
+        $this->_callback = $object;
         return $this;
     }
 
@@ -120,9 +119,9 @@ abstract class AbstractModel
      */
     public function renderMe()
     {
-        if (isset($this->callback)) {
-            $this->callback->setParams($this->parameters);
-            return $this->callback->callMe();
+        if (isset($this->_callback)) {
+            $this->_callback->setParams($this->_parameters);
+            return $this->_callback->callMe();
         }
 
         return '';
@@ -141,7 +140,7 @@ abstract class AbstractModel
      */
     public function addParameter($name, &$value)
     {
-        $this->parameters[$name] = $value;
+        $this->_parameters[$name] = $value;
         return $this;
     }
 
@@ -156,7 +155,7 @@ abstract class AbstractModel
      */
     public function setHelpid($helpId)
     {
-        $this->addToJson('Help', $this->pool->messages->getHelp($helpId));
+        $this->addToJson('Help', $this->_pool->messages->getHelp($helpId));
         return $this;
     }
 
@@ -178,9 +177,9 @@ abstract class AbstractModel
         // Remove leftover linebreaks.
         $value = trim(preg_replace("/\r|\n/", "", $value));
         if ($value === '') {
-            unset($this->json[$key]);
+            unset($this->_json[$key]);
         } else {
-            $this->json[$key] = $value;
+            $this->_json[$key] = $value;
         }
 
         return $this;
@@ -194,6 +193,6 @@ abstract class AbstractModel
      */
     public function getJson()
     {
-        return $this->json;
+        return $this->_json;
     }
 }

@@ -55,7 +55,7 @@ class Fatal extends AbstractError
      *
      * @see $this->tickCallback().
      */
-    protected $tickedBacktrace = array();
+    protected $_tickedBacktrace = array();
 
     /**
      * Registered tick callback.
@@ -64,7 +64,7 @@ class Fatal extends AbstractError
      */
     public function tickCallback()
     {
-        $this->tickedBacktrace = debug_backtrace();
+        $this->_tickedBacktrace = debug_backtrace();
     }
 
     /**
@@ -79,7 +79,7 @@ class Fatal extends AbstractError
      */
     public function setIsActive($value)
     {
-        $this->isActive = $value;
+        $this->_isActive = $value;
     }
 
     /**
@@ -111,13 +111,13 @@ class Fatal extends AbstractError
                     'errline' => $error['line'],
                     'handler' => __FUNCTION__,
                     'file' => $error['file'],
-                    'backtrace' => $this->tickedBacktrace,
+                    'backtrace' => $this->_tickedBacktrace,
                 );
 
                 // Tell static main class, that we start a new analysis, to
                 // prevent an infinite loop.
                 AbstractController::$analysisInProgress = true;
-                $this->pool
+                $this->_pool
                     ->createClass('Brainworxx\\Krexx\\Controller\\ErrorController')
                     ->errorAction($errorData);
             }

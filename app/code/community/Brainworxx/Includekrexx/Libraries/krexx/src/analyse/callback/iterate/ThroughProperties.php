@@ -58,14 +58,14 @@ class ThroughProperties extends AbstractCallback
      *
      * @var File
      */
-    protected $fileService;
+    protected $_fileService;
 
     /**
      * A list with the default properties from this object.
      *
      * @var array
      */
-    protected $defaultProperties = array();
+    protected $_defaultProperties = array();
 
     /**
      * Renders the properties of a class.
@@ -78,13 +78,13 @@ class ThroughProperties extends AbstractCallback
         // I need to preprocess them, since I do not want to render a
         // reflection property.
         /** @var \ReflectionClass $ref */
-        $ref = $this->parameters['ref'];
+        $ref = $this->_parameters['ref'];
         $output = '';
-        $this->defaultProperties = $ref->getDefaultProperties();
+        $this->_defaultProperties = $ref->getDefaultProperties();
 
-        foreach ($this->parameters['data'] as $refProperty) {
+        foreach ($this->_parameters['data'] as $refProperty) {
             // Check memory and runtime.
-            if ($this->pool->emergencyHandler->checkEmergencyBreak()) {
+            if ($this->_pool->emergencyHandler->checkEmergencyBreak()) {
                 return '';
             }
 
@@ -129,20 +129,20 @@ class ThroughProperties extends AbstractCallback
             } else {
                 // Since we are dealing with a declared Property here, we can
                 // get the comment and the declaration place.
-                $comment = $this->pool
+                $comment = $this->_pool
                     ->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Properties')
                     ->getComment($refProperty);
 
-                $declarationPlace = $this->pool->fileService->filterFilePath(
+                $declarationPlace = $this->_pool->fileService->filterFilePath(
                     $refProperty->getDeclaringClass()->getFileName()
                 );
             }
 
             // Stitch together our model
-            $output .= $this->pool->routing->analysisHub(
-                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            $output .= $this->_pool->routing->analysisHub(
+                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                     ->setData($value)
-                    ->setName($this->pool->encodingService->encodeString($propName))
+                    ->setName($this->_pool->encodingService->encodeString($propName))
                     ->addToJson('Comment', $comment)
                     ->addToJson('Declared in', $declarationPlace)
                     ->setAdditional($additional)
@@ -169,10 +169,10 @@ class ThroughProperties extends AbstractCallback
         $refProperty->setAccessible(true);
 
         // Getting our values from the reflection.
-        $value = $refProperty->getValue($this->parameters['orgObject']);
-        if (($value === null) && $refProperty->isDefault() && isset($this->defaultProperties[$propName])) {
+        $value = $refProperty->getValue($this->_parameters['orgObject']);
+        if (($value === null) && $refProperty->isDefault() && isset($this->_defaultProperties[$propName])) {
             // We might want to look at the default value.
-            return $this->defaultProperties[$propName];
+            return $this->_defaultProperties[$propName];
         }
 
         return $value;

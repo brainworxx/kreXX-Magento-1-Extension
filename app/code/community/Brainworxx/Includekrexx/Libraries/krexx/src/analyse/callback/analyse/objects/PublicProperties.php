@@ -49,9 +49,9 @@ class PublicProperties extends AbstractObjectAnalysis
      */
     public function callMe()
     {
-        $data = $this->parameters['data'];
+        $data = $this->_parameters['data'];
         /** @var \ReflectionClass $ref */
-        $ref = $this->parameters['ref'];
+        $ref = $this->_parameters['ref'];
 
         $refProps = $ref->getProperties(\ReflectionProperty::IS_PUBLIC);
         $publicProps = array();
@@ -70,7 +70,7 @@ class PublicProperties extends AbstractObjectAnalysis
         foreach ($refProps as $refProp) {
             $publicProps[$refProp->name] = true;
         }
-        
+
         // For every not-declared property, we add a another reflection.
         // Those are simply added during runtime
         foreach (array_keys(array_diff_key(get_object_vars($data), $publicProps)) as $key) {
@@ -87,6 +87,6 @@ class PublicProperties extends AbstractObjectAnalysis
         // Adding a HR to reflect that the following stuff are not public
         // properties anymore.
         return $this->getReflectionPropertiesData($refProps, $ref, $data, 'Public properties') .
-            $this->pool->render->renderSingeChildHr();
+            $this->_pool->render->renderSingeChildHr();
     }
 }

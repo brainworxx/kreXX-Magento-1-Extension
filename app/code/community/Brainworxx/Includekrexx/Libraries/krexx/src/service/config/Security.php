@@ -60,11 +60,11 @@ class Security extends Fallback
         if ($group === 'feEditing') {
             // Logging options can never be changed in the frontend.
             // The debug methods will also not be editable.
-            return !in_array($name, $this->feConfigNoEdit);
+            return !in_array($name, $this->_feConfigNoEdit);
         }
 
         // We simply call the configured evaluation method.
-        $callback = $this->evalSettings[$name];
+        $callback = $this->_evalSettings[$name];
         return $this->$callback($value, $name, $group);
     }
 
@@ -83,7 +83,7 @@ class Security extends Fallback
     {
         $result = preg_match('/[^a-zA-Z]/', $value) === 0;
         if (!$result) {
-            $this->pool->messages->addMessage('configError' . ucfirst($name));
+            $this->_pool->messages->addMessage('configError' . ucfirst($name));
         }
 
         return $result;
@@ -102,11 +102,11 @@ class Security extends Fallback
      */
     protected function evalSkin($value, $name)
     {
-        $result = $this->pool->fileService->fileIsReadable(
+        $result = $this->_pool->fileService->fileIsReadable(
             KREXX_DIR . 'resources/skins/' . $value . '/header.html'
         );
         if (!$result) {
-            $this->pool->messages->addMessage('configError' . ucfirst($name));
+            $this->_pool->messages->addMessage('configError' . ucfirst($name));
         }
 
         return $result;
@@ -127,7 +127,7 @@ class Security extends Fallback
     {
         $result = empty($value);
         if ($result) {
-            $this->pool->messages->addMessage('configError' . ucfirst($name));
+            $this->_pool->messages->addMessage('configError' . ucfirst($name));
         }
 
         return !$result;
@@ -165,7 +165,7 @@ class Security extends Fallback
         }
 
         if ($maxTime < (int)$value) {
-            $this->pool->messages->addMessage(
+            $this->_pool->messages->addMessage(
                 'configError' . ucfirst($name) . 'Big',
                 array($maxTime)
             );
@@ -193,7 +193,7 @@ class Security extends Fallback
     {
         $result = ($value === 'true' || $value === 'false');
         if (!$result) {
-            $this->pool->messages->addMessage('configErrorBool', array($group, $name));
+            $this->_pool->messages->addMessage('configErrorBool', array($group, $name));
         }
 
         return $result;
@@ -219,7 +219,7 @@ class Security extends Fallback
     {
         $result = ((int) $value) > 0;
         if (!$result) {
-            $this->pool->messages->addMessage('configErrorInt', array($group, $name));
+            $this->_pool->messages->addMessage('configErrorInt', array($group, $name));
         }
 
         return $result;

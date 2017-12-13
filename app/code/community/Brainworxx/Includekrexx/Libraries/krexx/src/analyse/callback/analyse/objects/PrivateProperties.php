@@ -51,9 +51,9 @@ class PrivateProperties extends AbstractObjectAnalysis
     {
         $refProps = array();
         /** @var \ReflectionClass $ref */
-        $ref = $this->parameters['ref'];
+        $ref = $this->_parameters['ref'];
         $reflectionClass = $ref;
-        $analysePrivate = $this->pool->config->getSetting('analysePrivate');
+        $analysePrivate = $this->_pool->config->getSetting('analysePrivate');
 
         // The main problem here is, that you only get the private properties of
         // the current class, but not the inherited private properties.
@@ -76,13 +76,13 @@ class PrivateProperties extends AbstractObjectAnalysis
         if (empty($refProps)) {
             return '';
         }
-        
+
         usort($refProps, array($this, 'reflectionSorting'));
 
         return $this->getReflectionPropertiesData(
             $refProps,
             $ref,
-            $this->parameters['data'],
+            $this->_parameters['data'],
             'Private properties'
         );
     }

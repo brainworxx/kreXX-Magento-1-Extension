@@ -50,14 +50,14 @@ abstract class AbstractObjectAnalysis extends AbstractCallback
      *
      * @var Pool
      */
-    protected $pool;
+    protected $_pool;
 
     /**
      * The parameters from the objects callback class.
      *
      * @var array
      */
-    protected $parameters = array();
+    protected $_parameters = array();
 
     /**
      * Gets the properties from a reflection property of the object.
@@ -79,17 +79,17 @@ abstract class AbstractObjectAnalysis extends AbstractCallback
         // We are dumping public properties direct into the main-level, without
         // any "abstraction level", because they can be accessed directly.
         /** @var Model $model */
-        $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+        $model = $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
             ->addParameter('data', $refProps)
             ->addParameter('ref', $ref)
             ->addParameter('orgObject', $data)
             ->injectCallback(
-                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughProperties')
+                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughProperties')
             );
 
         if (strpos(strtoupper($label), 'PUBLIC') === false) {
             // Protected or private properties.
-            return $this->pool->render->renderExpandableChild(
+            return $this->_pool->render->renderExpandableChild(
                 $model->setName($label)
                     ->setType('class internals')
             );

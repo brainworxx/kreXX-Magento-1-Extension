@@ -46,7 +46,7 @@ class Registry
      *
      * @var array
      */
-    protected $data = array();
+    protected $_data = array();
 
     /**
      * Storing stuff in the registry.
@@ -64,7 +64,7 @@ class Registry
     public function set($key, $value)
     {
         // We don't really care if there is already a value.
-        $this->data[$key] = $value;
+        $this->_data[$key] = $value;
 
         return $this;
     }
@@ -80,11 +80,11 @@ class Registry
      */
     public function get($key)
     {
-        if (empty($this->data[$key])) {
+        if (empty($this->_data[$key])) {
             return null;
         }
 
-        return $this->data[$key];
+        return $this->_data[$key];
     }
 
     /**
@@ -98,6 +98,6 @@ class Registry
      */
     public function has($key)
     {
-        return isset($this->data[$key]);
+        return isset($this->_data[$key]);
     }
 }

@@ -51,7 +51,7 @@ class Fallback
      *
      * @var Pool
      */
-    protected $pool;
+    protected $_pool;
 
     /**
      * Injects the pool and initializes the security.
@@ -60,7 +60,7 @@ class Fallback
      */
     public function __construct(Pool $pool)
     {
-        $this->pool = $pool;
+        $this->_pool = $pool;
     }
 
     /**
@@ -197,7 +197,7 @@ class Fallback
      *
      * @var array
      */
-    protected $feConfigNoEdit = array(
+    protected $_feConfigNoEdit = array(
         'maxfiles',
         'debugMethods',
         'iprange',
@@ -211,7 +211,7 @@ class Fallback
      *
      * @var array
      */
-    protected $methodBlacklist = array(
+    protected $_methodBlacklist = array(
 
         // TYPO3 viewhelpers dislike this function.
         // In the TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper the private
@@ -237,7 +237,7 @@ class Fallback
      *
      * @var array
      */
-    protected $classBlacklist = array(
+    protected $_classBlacklist = array(
         // Fun with reflection classes. Not really.
         '\\ReflectionClass',
         '\\ReflectionFunction',
@@ -259,7 +259,7 @@ class Fallback
      *
      * @var array
      */
-    protected $evalSettings = array(
+    protected $_evalSettings = array(
         'analyseProtectedMethods' => 'evalBool',
         'analysePrivateMethods' => 'evalBool',
         'analyseProtected' => 'evalBool',

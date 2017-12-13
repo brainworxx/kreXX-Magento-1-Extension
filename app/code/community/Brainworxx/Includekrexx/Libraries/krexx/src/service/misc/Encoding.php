@@ -48,7 +48,7 @@ class Encoding
      *
      * @var Pool
      */
-    protected $pool;
+    protected $_pool;
 
     /**
      * Injects the pool.
@@ -57,7 +57,7 @@ class Encoding
      */
     public function __construct(Pool $pool)
     {
-        $this->pool = $pool;
+        $this->_pool = $pool;
     }
 
     /**
@@ -111,7 +111,7 @@ class Encoding
             if (strlen($data) < 102400) {
                 $result = implode("", array_map($sortingCallback, unpack("N*", $data)));
             } else {
-                $result = $this->pool->messages->getHelp('stringTooLarge');
+                $result = $this->_pool->messages->getHelp('stringTooLarge');
             }
         } else {
             if ($code) {

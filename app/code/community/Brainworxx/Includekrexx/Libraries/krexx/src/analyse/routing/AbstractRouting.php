@@ -48,52 +48,52 @@ abstract class AbstractRouting
      *
      * @var Pool
      */
-    protected $pool;
+    protected $_pool;
 
     /**
      * @var \Brainworxx\Krexx\Analyse\Routing\Process\ProcessArray
      */
-    protected $processArray;
+    protected $_processArray;
 
     /**
      * @var \Brainworxx\Krexx\Analyse\Routing\Process\ProcessBoolean
      */
-    protected $processBoolean;
+    protected $_processBoolean;
 
     /**
      * @var \Brainworxx\Krexx\Analyse\Routing\Process\ProcessClosure
      */
-    protected $processClosure;
+    protected $_processClosure;
 
     /**
      * @var \Brainworxx\Krexx\Analyse\Routing\Process\ProcessFloat
      */
-    protected $processFloat;
+    protected $_processFloat;
 
     /**
      * @var \Brainworxx\Krexx\Analyse\Routing\Process\ProcessInteger
      */
-    protected $processInteger;
+    protected $_processInteger;
 
     /**
      * @var \Brainworxx\Krexx\Analyse\Routing\Process\ProcessNull
      */
-    protected $processNull;
+    protected $_processNull;
 
     /**
      * @var \Brainworxx\Krexx\Analyse\Routing\Process\ProcessObject
      */
-    protected $processObject;
+    protected $_processObject;
 
     /**
      * @var \Brainworxx\Krexx\Analyse\Routing\Process\ProcessResource
      */
-    protected $processResource;
+    protected $_processResource;
 
     /**
      * @var \Brainworxx\Krexx\Analyse\Routing\Process\ProcessString
      */
-    protected $processString;
+    protected $_processString;
 
     /**
      * Injects the pool.
@@ -103,7 +103,7 @@ abstract class AbstractRouting
      */
     public function __construct(Pool $pool)
     {
-         $this->pool = $pool;
+         $this->_pool = $pool;
     }
 
     /**
@@ -121,6 +121,6 @@ abstract class AbstractRouting
      */
     protected function generateDomIdFromObject($data)
     {
-        return 'k' . $this->pool->emergencyHandler->getKrexxCount() . '_' . spl_object_hash($data);
+        return 'k' . $this->_pool->emergencyHandler->getKrexxCount() . '_' . spl_object_hash($data);
     }
 }

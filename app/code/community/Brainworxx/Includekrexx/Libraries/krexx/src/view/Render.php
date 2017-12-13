@@ -70,7 +70,7 @@ class Render extends AbstractRender
                 $this->renderConnector($model->getConnector2()),
                 $this->generateDataAttribute(
                     'source',
-                    $this->pool->codegenHandler->generateSource($model)
+                    $this->_pool->codegenHandler->generateSource($model)
                 ),
             ),
             $this->getTemplateFileContent('recursion')
@@ -95,15 +95,15 @@ class Render extends AbstractRender
                 '{encoding}'
             ),
             array(
-                $this->pool->config->version,
+                $this->_pool->config->version,
                 $doctype,
-                $this->pool->emergencyHandler->getKrexxCount(),
+                $this->_pool->emergencyHandler->getKrexxCount(),
                 $headline,
                 $cssJs,
-                $this->pool->recursionHandler->getMarker(),
+                $this->_pool->recursionHandler->getMarker(),
                 $this->renderSearch(),
-                $this->pool->messages->outputMessages(),
-                $this->pool->chunks->getOfficialEncoding(),
+                $this->_pool->messages->outputMessages(),
+                $this->_pool->chunks->getOfficialEncoding(),
             ),
             $this->getTemplateFileContent('header')
         );
@@ -185,7 +185,7 @@ class Render extends AbstractRender
 
         // Generating our code and adding the Codegen button, if there is something
         // to generate.
-        $gensource = $this->pool->codegenHandler->generateSource($model);
+        $gensource = $this->_pool->codegenHandler->generateSource($model);
 
         if (empty($gensource)) {
             // Remove the markers, because here is nothing to add.
@@ -226,8 +226,8 @@ class Render extends AbstractRender
                 $this->renderHelp($model),
                 $this->renderConnector($model->getConnector1()),
                 $this->renderConnector($model->getConnector2()),
-                $this->generateDataAttribute('codewrapper1', $this->pool->codegenHandler->generateWrapper1()),
-                $this->generateDataAttribute('codewrapper2', $this->pool->codegenHandler->generateWrapper2()),
+                $this->generateDataAttribute('codewrapper1', $this->_pool->codegenHandler->generateWrapper1()),
+                $this->generateDataAttribute('codewrapper2', $this->_pool->codegenHandler->generateWrapper2()),
             ),
             $this->getTemplateFileContent('singleChild')
         );
@@ -239,7 +239,7 @@ class Render extends AbstractRender
     public function renderExpandableChild(Model $model, $isExpanded = false)
     {
         // Check for emergency break.
-        if ($this->pool->emergencyHandler->checkEmergencyBreak()) {
+        if ($this->_pool->emergencyHandler->checkEmergencyBreak()) {
             return '';
         }
 
@@ -251,7 +251,7 @@ class Render extends AbstractRender
 
         // Generating our code and adding the Codegen button, if there is
         // something to generate.
-        $gencode = $this->pool->codegenHandler->generateSource($model);
+        $gencode = $this->_pool->codegenHandler->generateSource($model);
         if ($gencode === ';stop;' || empty($gencode)) {
             // Remove the button marker, because here is nothing to add.
             $sourceButton = '';
@@ -294,9 +294,9 @@ class Render extends AbstractRender
                 $this->generateDataAttribute('source', $gencode),
                 $sourceButton,
                 $expandedClass,
-                $this->pool->chunks->chunkMe($this->renderNest($model, $isExpanded)),
-                $this->generateDataAttribute('codewrapper1', $this->pool->codegenHandler->generateWrapper1()),
-                $this->generateDataAttribute('codewrapper1', $this->pool->codegenHandler->generateWrapper2()),
+                $this->_pool->chunks->chunkMe($this->renderNest($model, $isExpanded)),
+                $this->generateDataAttribute('codewrapper1', $this->_pool->codegenHandler->generateWrapper1()),
+                $this->generateDataAttribute('codewrapper1', $this->_pool->codegenHandler->generateWrapper2()),
             ),
             $this->getTemplateFileContent('expandableChildNormal')
         );
@@ -394,7 +394,7 @@ class Render extends AbstractRender
     {
         $readFrom = $errline -6;
         $readTo = $errline +5;
-        $source = $this->pool->fileService->readSourcecode($errfile, $errline -1, $readFrom, $readTo -1);
+        $source = $this->_pool->fileService->readSourcecode($errfile, $errline -1, $readFrom, $readTo -1);
 
         return str_replace(
             array(
@@ -410,7 +410,7 @@ class Render extends AbstractRender
                 $errstr,
                 $errfile,
                 $source,
-                $this->pool->emergencyHandler->getKrexxCount(),
+                $this->_pool->emergencyHandler->getKrexxCount(),
                 $errline
             ),
             $this->getTemplateFileContent('fatalMain')
@@ -432,10 +432,10 @@ class Render extends AbstractRender
             ),
             array(
                 $cssJs,
-                $this->pool->config->version,
+                $this->_pool->config->version,
                 $doctype,
                 $this->renderSearch(),
-                $this->pool->recursionHandler->getMarker()
+                $this->_pool->recursionHandler->getMarker()
             ),
             $this->getTemplateFileContent('fatalHeader')
         );

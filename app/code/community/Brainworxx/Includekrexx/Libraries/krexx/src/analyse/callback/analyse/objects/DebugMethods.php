@@ -57,24 +57,24 @@ class DebugMethods extends AbstractObjectAnalysis
      */
     public function callMe()
     {
-        $data = $this->parameters['data'];
+        $data = $this->_parameters['data'];
 
         $output = '';
 
-        foreach (explode(',', $this->pool->config->getSetting('debugMethods')) as $funcName) {
+        foreach (explode(',', $this->_pool->config->getSetting('debugMethods')) as $funcName) {
             // We need to check if:
             // 1.) Method exists
             // 2.) Method can be called
             // 3.) It's not blacklisted.
             if (method_exists($data, $funcName) &&
                 is_callable(array($data, $funcName)) &&
-                $this->pool->config->isAllowedDebugCall($data, $funcName)
+                $this->_pool->config->isAllowedDebugCall($data, $funcName)
             ) {
                 $onlyOptionalParams = true;
                 // We need to check if the callable function requires any parameters.
                 // We will not call those, because we simply can not provide them.
                 /** @var \ReflectionClass $reflectionClass */
-                $reflectionClass = $this->parameters['ref'];
+                $reflectionClass = $this->_parameters['ref'];
                 $ref = $reflectionClass->getMethod($funcName);
 
                 /** @var \ReflectionParameter $param */
@@ -108,8 +108,8 @@ class DebugMethods extends AbstractObjectAnalysis
                     restore_error_handler();
 
                     if (isset($result)) {
-                        $output .= $this->pool->render->renderExpandableChild(
-                            $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+                        $output .= $this->_pool->render->renderExpandableChild(
+                            $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                                 ->setName($funcName)
                                 ->setType('debug method')
                                 ->setNormal('. . .')
@@ -117,7 +117,7 @@ class DebugMethods extends AbstractObjectAnalysis
                                 ->setConnectorType(Connectors::METHOD)
                                 ->addParameter('data', $result)
                                 ->injectCallback(
-                                    $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\Debug')
+                                    $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\Debug')
                                 )
                         );
                         unset($result);

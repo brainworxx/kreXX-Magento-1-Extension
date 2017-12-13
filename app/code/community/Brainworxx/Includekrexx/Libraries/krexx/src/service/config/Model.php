@@ -46,83 +46,83 @@ class Model
      *
      * @var string
      */
-    protected $value;
+    protected $_value;
 
     /**
      * The section of this setting.
      *
      * @var string
      */
-    protected $section;
+    protected $_section;
 
     /**
      * The type of this setting.
      *
      * @var string
      */
-    protected $type;
+    protected $_type;
 
     /**
      * Whether or not his setting is editable
      *
      * @var boolean
      */
-    protected $editable;
+    protected $_editable;
 
     /**
      * Source of this setting.
      *
      * @var string
      */
-    protected $source;
+    protected $_source;
 
     /**
      * Setter for the editable value.
      *
-     * @param boolean $editable
+     * @param boolean $_editable
      *
      * @return $this
      *   Return $this for Chaining.
      */
-    public function setEditable($editable)
+    public function setEditable($_editable)
     {
-        $this->editable = $editable;
+        $this->_editable = $_editable;
         return $this;
     }
 
     /**
      * Setter for the type.
      *
-     * @param string $type
+     * @param string $_type
      *
      * @return $this
      *   Return $this for Chaining.
      */
-    public function setType($type)
+    public function setType($_type)
     {
-        $this->type = $type;
+        $this->_type = $_type;
         return $this;
     }
 
     /**
      * Setter for the value.
      *
-     * @param string $value
+     * @param string $_value
      *
      * @return $this
      *   Return $this for Chaining.
      */
-    public function setValue($value)
+    public function setValue($_value)
     {
-        if ($value === 'true') {
-            $value = true;
+        if ($_value === 'true') {
+            $_value = true;
         }
 
-        if ($value === 'false') {
-            $value = false;
+        if ($_value === 'false') {
+            $_value = false;
         }
 
-        $this->value = $value;
+        $this->_value = $_value;
         return $this;
     }
 
@@ -133,7 +133,7 @@ class Model
      */
     public function getEditable()
     {
-        return $this->editable;
+        return $this->_editable;
     }
 
     /**
@@ -143,7 +143,7 @@ class Model
      */
     public function getSection()
     {
-        return $this->section;
+        return $this->_section;
     }
 
     /**
@@ -153,7 +153,7 @@ class Model
      */
     public function getType()
     {
-        return $this->type;
+        return $this->_type;
     }
 
     /**
@@ -163,20 +163,20 @@ class Model
      */
     public function getValue()
     {
-        return $this->value;
+        return $this->_value;
     }
 
     /**
      * Setter for the section.
      *
-     * @param string $section
+     * @param string $_section
      *
      * @return $this
      *   Return $this for Chaining.
      */
-    public function setSection($section)
+    public function setSection($_section)
     {
-        $this->section = $section;
+        $this->_section = $_section;
         return $this;
     }
 
@@ -187,16 +187,16 @@ class Model
      */
     public function getSource()
     {
-        return $this->source;
+        return $this->_source;
     }
 
     /**
      * Setter for the source value.
      *
-     * @param string $source
+     * @param string $_source
      */
-    public function setSource($source)
+    public function setSource($_source)
     {
-        $this->source = $source;
+        $this->_source = $_source;
     }
 }

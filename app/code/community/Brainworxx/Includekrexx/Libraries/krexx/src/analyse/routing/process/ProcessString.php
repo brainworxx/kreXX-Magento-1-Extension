@@ -74,10 +74,10 @@ class ProcessString extends AbstractProcess
         // We also need to check for linebreaks, because the preview can not
         // display those.
         if ($length > 50 || strstr($data, PHP_EOL) !== false) {
-            $cut = $this->pool->encodingService->encodeString(mb_substr($data, 0, 50)) . '. . .';
+            $cut = $this->_pool->encodingService->encodeString(mb_substr($data, 0, 50)) . '. . .';
             $model->hasExtras();
         } else {
-            $cut = $this->pool->encodingService->encodeString($data);
+            $cut = $this->_pool->encodingService->encodeString($data);
         }
 
         // Check if this is a possible callback.
@@ -87,8 +87,8 @@ class ProcessString extends AbstractProcess
             $model->setIsCallback(true);
         }
 
-        $data = $this->pool->encodingService->encodeString($data);
-        return $this->pool->render->renderSingleChild(
+        $data = $this->_pool->encodingService->encodeString($data);
+        return $this->_pool->render->renderSingleChild(
             $model->setData($data)
                 ->setNormal($cut)
                 ->setType('string ' . $strlen)

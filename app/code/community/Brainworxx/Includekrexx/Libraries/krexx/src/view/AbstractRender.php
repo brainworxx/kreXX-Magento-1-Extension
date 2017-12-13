@@ -49,22 +49,22 @@ abstract class AbstractRender implements RenderInterface
      *
      * @var Pool
      */
-    protected $pool;
+    protected $_pool;
 
     /**
      * The name of the current skin.
      *
      * @var string
      */
-    protected $skinPath;
+    protected $_skinPath;
 
     /**
      * {@inheritdoc}
      */
     public function __construct(Pool $pool)
     {
-        $this->pool = $pool;
-        $this->skinPath = KREXX_DIR . 'resources/skins/' . $this->pool->config->getSetting('skin') . '/';
+        $this->_pool = $pool;
+        $this->_skinPath = KREXX_DIR . 'resources/skins/' . $this->_pool->config->getSetting('skin') . '/';
     }
 
     /**
@@ -164,7 +164,7 @@ abstract class AbstractRender implements RenderInterface
     {
         return str_replace(
             '{KrexxId}',
-            $this->pool->recursionHandler->getMarker(),
+            $this->_pool->recursionHandler->getMarker(),
             $this->getTemplateFileContent('search')
         );
     }
@@ -251,7 +251,7 @@ abstract class AbstractRender implements RenderInterface
         $fileCache[$what] = preg_replace(
             '/\s+/',
             ' ',
-            $this->pool->fileService->getFileContents($this->skinPath . $what . '.html')
+            $this->_pool->fileService->getFileContents($this->_skinPath . $what . '.html')
         );
         return $fileCache[$what];
     }

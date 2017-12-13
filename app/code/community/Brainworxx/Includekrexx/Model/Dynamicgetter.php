@@ -52,7 +52,7 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
         $output = '';
 
         // Try to get the _data protected property from the class.
-        $dataArray = $this->getTheUnderscoreDataArray($this->parameters['ref']);
+        $dataArray = $this->getTheUnderscoreDataArray($this->_parameters['ref']);
 
         foreach ($dataArray as $key => $value) {
             // Transform the $key to getCamelCase.
@@ -66,7 +66,7 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
 
             // Prepare the model.
             /** @var \Brainworxx\Krexx\Analyse\Model $model */
-            $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            $model = $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setName($key)
                 ->setConnectorType(Connectors::METHOD)
                 ->setData($value)
@@ -74,30 +74,30 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
 
             // Check if there is a getter method in there. We should add the
             // comment to the model.
-            foreach ($this->parameters['methodList'] as $id => $reflectionMethod) {
+            foreach ($this->_parameters['methodList'] as $id => $reflectionMethod) {
                 $name = $reflectionMethod->getName();
                 if ($name === $key) {
                     $model->addToJson(
                         'method comment',
                         nl2br(
-                            $this->pool
+                            $this->_pool
                                 ->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Methods')
                                 ->getComment(
                                     $reflectionMethod,
-                                    $this->parameters['ref']
+                                    $this->_parameters['ref']
                                 )
                         )
                     );
                     // Remove the reflection from the list. We still need to
                     // process the parent, and don't want to have double entries in
                     // there.
-                    unset($this->parameters['methodList'][$id]);
+                    unset($this->_parameters['methodList'][$id]);
                     break;
                 }
             }
 
             // And send the result on it's way.
-            $output .= $this->pool
+            $output .= $this->_pool
                     ->createClass('Brainworxx\\Krexx\\Analyse\\Routing\\Routing')
                     ->analysisHub($model);
         }
@@ -120,7 +120,7 @@ class Brainworxx_Includekrexx_Model_Dynamicgetter extends \Brainworxx\Krexx\Anal
         try {
             $refProp = $ref->getProperty('_data');
             $refProp->setAccessible(true);
-            $data = $refProp->getValue($this->parameters['data']);
+            $data = $refProp->getValue($this->_parameters['data']);
             if (!is_array($data)) {
                 // No Properties, it's empty.
                 $data = array();

@@ -49,7 +49,7 @@ abstract class AbstractError
      *
      * @var array
      */
-    protected $errorTranslation = array(
+    protected $_errorTranslation = array(
         E_ERROR => array('Fatal', 'traceFatals'),
         E_WARNING => array('Warning', 'traceWarnings'),
         E_PARSE => array('Parse error', 'traceFatals'),
@@ -72,7 +72,7 @@ abstract class AbstractError
      *
      * @var Pool
      */
-    protected $pool;
+    protected $_pool;
 
     /**
      * Stores if the handler is active.
@@ -83,7 +83,7 @@ abstract class AbstractError
      *
      * @var bool
      */
-    protected $isActive = false;
+    protected $_isActive = false;
 
     /**
      * Injects the pool.
@@ -93,7 +93,7 @@ abstract class AbstractError
      */
     public function __construct(Pool $pool)
     {
-        $this->pool = $pool;
+        $this->_pool = $pool;
     }
 
     /**
@@ -107,7 +107,7 @@ abstract class AbstractError
     {
         // We will only handle errors when kreXX and the handler
         // itself is enabled.
-        return $this->isActive && !$this->pool->config->getSetting('disabled');
+        return $this->_isActive && !$this->_pool->config->getSetting('disabled');
     }
 
     /**
@@ -125,8 +125,8 @@ abstract class AbstractError
      */
     protected function translateErrorType($errorint)
     {
-        if (isset($this->errorTranslation[$errorint])) {
-            return $this->errorTranslation[$errorint];
+        if (isset($this->_errorTranslation[$errorint])) {
+            return $this->_errorTranslation[$errorint];
         }
 
         // Fallback to 'unknown'.

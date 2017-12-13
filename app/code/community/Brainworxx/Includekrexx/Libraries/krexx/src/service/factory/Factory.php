@@ -54,7 +54,7 @@ class Factory
      *
      * @var array
      */
-    protected $rewrite = array();
+    protected $_rewrite = array();
 
     /**
      * Create objects and returns them. Singletons are handled by the pool.
@@ -67,8 +67,8 @@ class Factory
     public function createClass($classname)
     {
         // Check for possible overwrite.
-        if (isset($this->rewrite[$classname])) {
-            $classname = $this->rewrite[$classname];
+        if (isset($this->_rewrite[$classname])) {
+            $classname = $this->_rewrite[$classname];
         }
 
         return new $classname($this);
@@ -87,7 +87,7 @@ class Factory
      */
     public function addRewrite($originalClassName, $newClassName)
     {
-        $this->rewrite[$originalClassName] = $newClassName;
+        $this->_rewrite[$originalClassName] = $newClassName;
         return $this;
     }
 
@@ -96,6 +96,6 @@ class Factory
      */
     public function flushRewrite()
     {
-        $this->rewrite = Overwrites::$classes;
+        $this->_rewrite = Overwrites::$classes;
     }
 }

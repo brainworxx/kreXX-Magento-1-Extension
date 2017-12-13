@@ -68,16 +68,16 @@ class ThroughLargeArray extends AbstractCallback
     public function callMe()
     {
         $output = '';
-        $output .= $this->pool->render->renderSingeChildHr();
+        $output .= $this->_pool->render->renderSingeChildHr();
 
         // Iterate through.
-        foreach ($this->parameters['data'] as $key => &$value) {
+        foreach ($this->_parameters['data'] as $key => &$value) {
 
             /** @var Model $model */
-            $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model');
+            $model = $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model');
 
             // Are we dealing with multiline code generation?
-            if ($this->parameters['multiline']) {
+            if ($this->_parameters['multiline']) {
                 // Here we tell the Codegen service that we need some
                 // special handling.
                 $model->setMultiLineCodeGen(Codegen::ITERATOR_TO_ARRAY);
@@ -85,7 +85,7 @@ class ThroughLargeArray extends AbstractCallback
 
             // Handling string keys of the array.
             if (is_string($key)) {
-                $model->setName($this->pool->encodingService->encodeString($key))
+                $model->setName($this->_pool->encodingService->encodeString($key))
                     ->setConnectorType(Connectors::ASSOCIATIVE_ARRAY);
             } else {
                 $model->setName($key)
@@ -97,20 +97,20 @@ class ThroughLargeArray extends AbstractCallback
                 $model->setType('simplified class analysis')
                     ->setNormal(get_class($value));
 
-                $output .= $this->pool->render->renderSingleChild($model);
+                $output .= $this->_pool->render->renderSingleChild($model);
             } elseif (is_array($value)) {
                 // Adding another array to the output may be as bad as a
                 // complete object analysis.
                 $model->setType('simplified array analysis')
                     ->setNormal('count: ' . count($value));
 
-                $output .= $this->pool->render->renderSingleChild($model);
+                $output .= $this->_pool->render->renderSingleChild($model);
             } else {
                 // We handle the simple type normally with the analysis hub.
-                $output .= $this->pool->routing->analysisHub($model->setData($value));
+                $output .= $this->_pool->routing->analysisHub($model->setData($value));
             }
         }
 
-        return $output . $this->pool->render->renderSingeChildHr();
+        return $output . $this->_pool->render->renderSingeChildHr();
     }
 }

@@ -52,7 +52,7 @@ class Constants extends AbstractObjectAnalysis
         // This is actually an array, we ara analysing. But We do not want to render
         // an array, so we need to process it like the return from an iterator.
         /** @var \ReflectionClass $ref */
-        $ref = $this->parameters['ref'];
+        $ref = $this->_parameters['ref'];
         $refConst = $ref->getConstants();
 
         if (empty($refConst)) {
@@ -62,15 +62,15 @@ class Constants extends AbstractObjectAnalysis
 
         // We've got some values, we will dump them.
         $classname = '\\' . $ref->getName();
-        return $this->pool->render->renderExpandableChild(
-            $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+        return $this->_pool->render->renderExpandableChild(
+            $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setName('Constants')
                 ->setType('class internals')
                 ->setIsMetaConstants(true)
                 ->addParameter('data', $refConst)
                 ->addParameter('classname', $classname)
                 ->injectCallback(
-                    $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughConstants')
+                    $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughConstants')
                 )
         );
     }

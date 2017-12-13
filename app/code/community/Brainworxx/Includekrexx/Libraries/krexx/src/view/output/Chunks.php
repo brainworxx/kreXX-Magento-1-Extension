@@ -61,7 +61,7 @@ class Chunks
      *
      * @var Pool
      */
-    protected $pool;
+    protected $_pool;
 
     /**
      * Here we store the metadata from the call.
@@ -71,7 +71,7 @@ class Chunks
      *
      * @var array
      */
-    protected $metadata = array();
+    protected $_metadata = array();
 
     /**
      * Is the chunks folder write protected?
@@ -81,49 +81,49 @@ class Chunks
      *
      * @var bool
      */
-    protected $useChunks = true;
+    protected $_useChunks = true;
 
     /**
      * Is the log folder write protected?
      *
      * @var bool
      */
-    protected $useLogging = true;
+    protected $_useLogging = true;
 
     /**
      * The logfolder.
      *
      * @var string
      */
-    protected $logDir;
+    protected $_logDir;
 
     /**
      * The folder for the output chunks.
      *
      * @var string
      */
-    protected $chunkDir;
+    protected $_chunkDir;
 
     /**
      * Microtime stamp for chunk operations.
      *
      * @var string
      */
-    protected $fileStamp;
+    protected $_fileStamp;
 
     /**
      * Here we save the encoding we are currently using.
      *
      * @var string
      */
-    protected $officialEncoding = 'utf8';
+    protected $_officialEncoding = 'utf8';
 
     /**
      * List of encodings, where we do not change the $officialEncoding var.
      *
      * @var array
      */
-    protected $doNothingEncoding = array('ASCII', 'UTF-8', false);
+    protected $_doNothingEncoding = array('ASCII', 'UTF-8', false);
 
     /**
      * Injects the pool.
@@ -133,11 +133,11 @@ class Chunks
      */
     public function __construct(Pool $pool)
     {
-        $this->pool = $pool;
-        $this->chunkDir = $pool->config->getChunkDir();
-        $this->logDir = $pool->config->getLogDir();
-        $this->fileStamp = explode(' ', microtime());
-        $this->fileStamp = $this->fileStamp[1] . str_replace('0.', '', $this->fileStamp[0]);
+        $this->_pool = $pool;
+        $this->_chunkDir = $pool->config->getChunkDir();
+        $this->_logDir = $pool->config->getLogDir();
+        $this->_fileStamp = explode(' ', microtime());
+        $this->_fileStamp = $this->_fileStamp[1] . str_replace('0.', '', $this->_fileStamp[0]);
     }
 
     /**
@@ -153,13 +153,13 @@ class Chunks
      */
     public function chunkMe($string)
     {
-        if ($this->useChunks && strlen($string) > 10000) {
+        if ($this->_useChunks && strlen($string) > 10000) {
             // Get the key.
             $key = $this->genKey();
             // Detect the encoding in the chunk.
             $this->detectEncoding($string);
             // Write the key to the chunks folder.
-            $this->pool->fileService->putFileContents($this->chunkDir . $key . '.Krexx.tmp', $string);
+            $this->_pool->fileService->putFileContents($this->_chunkDir . $key . '.Krexx.tmp', $string);
             // Return the first part plus the key.
             return '@@@' . $key . '@@@';
         }
@@ -179,7 +179,7 @@ class Chunks
         static $counter = 0;
         ++$counter;
 
-        return $this->fileStamp . '_' . $counter;
+        return $this->_fileStamp . '_' . $counter;
     }
 
     /**
@@ -198,11 +198,11 @@ class Chunks
      */
     protected function dechunkMe($key)
     {
-        $filename = $this->chunkDir . $key . '.Krexx.tmp';
+        $filename = $this->_chunkDir . $key . '.Krexx.tmp';
         // Read the file.
-        $string = $this->pool->fileService->getFileContents($filename);
+        $string = $this->_pool->fileService->getFileContents($filename);
         // Delete it, we don't need it anymore.
-        $this->pool->fileService->deleteFile($filename);
+        $this->_pool->fileService->deleteFile($filename);
         return $string;
     }
 
@@ -218,21 +218,21 @@ class Chunks
     {
         $this->cleanupOldChunks();
 
-        if (!$this->useLogging) {
+        if (!$this->_useLogging) {
             // We have no write access. Do nothing.
             return;
         }
 
         // Cleanup old logfiles to prevent a overflow.
-        $this->cleanupOldLogs($this->logDir);
+        $this->cleanupOldLogs($this->_logDir);
 
         // Determine the filename.
-        $filename = $this->logDir . $this->fileStamp . '.Krexx.html';
+        $filename = $this->_logDir . $this->_fileStamp . '.Krexx.html';
         $chunkPos = strpos($string, '@@@');
 
         while ($chunkPos !== false) {
             // We have a chunk, we save the html part.
-            $this->pool->fileService->putFileContents($filename, substr($string, 0, $chunkPos));
+            $this->_pool->fileService->putFileContents($filename, substr($string, 0, $chunkPos));
 
             $chunkPart = substr($string, $chunkPos);
 
@@ -245,15 +245,15 @@ class Chunks
         }
 
         // No more chunks, we save what is left.
-        $this->pool->fileService->putFileContents($filename, $string);
+        $this->_pool->fileService->putFileContents($filename, $string);
         // Save our metadata, so a potential backend module can display it.
         // We may or may not have already some output for this file.
-        if (!empty($this->metadata)) {
+        if (!empty($this->_metadata)) {
             // Remove the old metadata file. We still have all it's content
             // available in $this->metadata.
-            $this->pool->fileService->deleteFile($filename . '.json');
+            $this->_pool->fileService->deleteFile($filename . '.json');
             // Create a new metadata file with new info.
-            $this->pool->fileService->putFileContents($filename . '.json', json_encode($this->metadata));
+            $this->_pool->fileService->putFileContents($filename . '.json', json_encode($this->_metadata));
         }
     }
 
@@ -262,7 +262,7 @@ class Chunks
      */
     protected function cleanupOldChunks()
     {
-        if (!$this->useChunks) {
+        if (!$this->_useChunks) {
             // We have no write access. Do nothing.
             return;
         }
@@ -276,13 +276,13 @@ class Chunks
 
         $beenHere = true;
         // Clean up leftover files.
-        $chunkList = glob($this->chunkDir . '*.Krexx.tmp');
+        $chunkList = glob($this->_chunkDir . '*.Krexx.tmp');
         if (!empty($chunkList)) {
             $now = time();
             foreach ($chunkList as $file) {
                 // We delete everything that is older than 15 minutes.
                 if ((filemtime($file) + 900) < $now) {
-                    $this->pool->fileService->deleteFile($file);
+                    $this->_pool->fileService->deleteFile($file);
                 }
             }
         }
@@ -296,7 +296,7 @@ class Chunks
      */
     protected function cleanupOldLogs($logDir)
     {
-        if (!$this->useLogging) {
+        if (!$this->_useLogging) {
             // We have no write access. Do nothing.
             return;
         }
@@ -308,13 +308,13 @@ class Chunks
         }
 
         array_multisort(array_map('filemtime', $logList), SORT_DESC, $logList);
-        $maxFileCount = (int)$this->pool->config->getSetting('maxfiles');
+        $maxFileCount = (int)$this->_pool->config->getSetting('maxfiles');
         $count = 1;
         // Cleanup logfiles.
         foreach ($logList as $file) {
             if ($count > $maxFileCount) {
-                $this->pool->fileService->deleteFile($file);
-                $this->pool->fileService->deleteFile($file . '.json');
+                $this->_pool->fileService->deleteFile($file);
+                $this->_pool->fileService->deleteFile($file . '.json');
             }
 
             ++$count;
@@ -332,7 +332,7 @@ class Chunks
      */
     public function setUseChunks($bool)
     {
-        $this->useChunks = $bool;
+        $this->_useChunks = $bool;
     }
 
     /**
@@ -343,7 +343,7 @@ class Chunks
      */
     public function setUseLogging($bool)
     {
-        $this->useLogging = $bool;
+        $this->_useLogging = $bool;
     }
 
     /**
@@ -354,7 +354,7 @@ class Chunks
      */
     public function addMetadata($caller)
     {
-        $this->metadata[] = $caller;
+        $this->_metadata[] = $caller;
     }
 
     /**
@@ -363,14 +363,14 @@ class Chunks
     public function __destruct()
     {
         // Get a list of all chunk files from the run.
-        $chunkList = glob($this->chunkDir . $this->fileStamp . '_*');
+        $chunkList = glob($this->_chunkDir . $this->_fileStamp . '_*');
         if (empty($chunkList)) {
             return;
         }
 
         // Delete them all!
         foreach ($chunkList as $file) {
-            $this->pool->fileService->deleteFile($file);
+            $this->_pool->fileService->deleteFile($file);
         }
     }
 
@@ -394,8 +394,8 @@ class Chunks
         // We need to decide, if we need to change the official encoding of
         // the HTML output with a meta tag. We ignore everything in the
         // doNothingEncoding array.
-        if (in_array($encoding, $this->doNothingEncoding, true) === false) {
-            $this->officialEncoding = $encoding;
+        if (in_array($encoding, $this->_doNothingEncoding, true) === false) {
+            $this->_officialEncoding = $encoding;
         }
     }
 
@@ -406,6 +406,6 @@ class Chunks
      */
     public function getOfficialEncoding()
     {
-        return $this->officialEncoding;
+        return $this->_officialEncoding;
     }
 }

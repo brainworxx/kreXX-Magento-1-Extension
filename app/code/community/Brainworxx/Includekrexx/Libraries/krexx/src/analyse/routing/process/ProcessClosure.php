@@ -59,13 +59,13 @@ class ProcessClosure extends AbstractProcess
         $result = array();
 
         // Adding comments from the file.
-        $result['comments'] =  $this->pool
+        $result['comments'] =  $this->_pool
             ->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Functions')
             ->getComment($ref);
 
         // Adding the sourcecode
         $highlight = $ref->getStartLine() -1;
-        $result['source'] = $this->pool->fileService->readSourcecode(
+        $result['source'] = $this->_pool->fileService->readSourcecode(
             $ref->getFileName(),
             $highlight,
             $highlight - 3,
@@ -73,7 +73,7 @@ class ProcessClosure extends AbstractProcess
         );
 
         // Adding the place where it was declared.
-        $result['declared in'] = $this->pool->fileService->filterFilePath($ref->getFileName()) . "\n";
+        $result['declared in'] = $this->_pool->fileService->filterFilePath($ref->getFileName()) . "\n";
         $result['declared in'] .= 'in line ' . $ref->getStartLine();
 
         // Adding the namespace, but only if we have one.
@@ -87,12 +87,12 @@ class ProcessClosure extends AbstractProcess
 
         foreach ($ref->getParameters() as $key => $reflectionParameter) {
             ++$key;
-            $paramList .=  $result['Parameter #' . $key] = $this->pool
+            $paramList .=  $result['Parameter #' . $key] = $this->_pool
                 ->codegenHandler
                 ->parameterToString($reflectionParameter);
         }
 
-        return $this->pool->render->renderExpandableChild(
+        return $this->_pool->render->renderExpandableChild(
             $model->setType('closure')
                 ->setNormal('. . .')
                 // Remove the ',' after the last char.
@@ -100,7 +100,7 @@ class ProcessClosure extends AbstractProcess
                 ->setDomid($this->generateDomIdFromObject($model->getData()))
                 ->addParameter('data', $result)
                 ->injectCallback(
-                    $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughMethodAnalysis')
+                    $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughMethodAnalysis')
                 )
         );
     }

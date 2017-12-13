@@ -58,7 +58,7 @@ class ThroughGetter extends AbstractCallback
      *
      * @var int
      */
-    protected $deep = 0;
+    protected $_deep = 0;
 
     /**
      * Try to get the possible result of all getter methods.
@@ -70,21 +70,21 @@ class ThroughGetter extends AbstractCallback
     {
         $output = '';
         /** @var \Brainworxx\Krexx\Analyse\comment\Methods $commentAnalysis */
-        $commentAnalysis = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Methods');
+        $commentAnalysis = $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Methods');
 
         /** @var \ReflectionMethod $reflectionMethod */
-        foreach ($this->parameters['methodList'] as $reflectionMethod) {
+        foreach ($this->_parameters['methodList'] as $reflectionMethod) {
             // Back to level 0, we reset the deep counter.
-            $this->deep = 0;
+            $this->_deep = 0;
 
             // Now we have three possible outcomes:
             // 1.) We have an actual value
             // 2.) We got NULL as a value
             // 3.) We were unable to get any info at all.
-            $comments = nl2br($commentAnalysis->getComment($reflectionMethod, $this->parameters['ref']));
+            $comments = nl2br($commentAnalysis->getComment($reflectionMethod, $this->_parameters['ref']));
 
             /** @var Model $model */
-            $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            $model = $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setName($reflectionMethod->getName())
                 ->addToJson('method comment', $comments);
 
@@ -115,7 +115,7 @@ class ThroughGetter extends AbstractCallback
      */
     protected function retrievePropertyValue(\ReflectionMethod $reflectionMethod, Model $model)
     {
-        $refProp = $this->getReflectionProperty($this->parameters['ref'], $reflectionMethod);
+        $refProp = $this->getReflectionProperty($this->_parameters['ref'], $reflectionMethod);
 
         if (empty($refProp)) {
             // Found nothing  :-(
@@ -124,20 +124,20 @@ class ThroughGetter extends AbstractCallback
             $model->setType($noInfoMessage)
                 ->setNormal($noInfoMessage);
             // We render this right away, without any routing.
-            return $this->pool->render->renderSingleChild($model);
+            return $this->_pool->render->renderSingleChild($model);
         }
 
         // We've got ourselves a possible result!
         $refProp->setAccessible(true);
-        $value = $refProp->getValue($this->parameters['data']);
+        $value = $refProp->getValue($this->_parameters['data']);
         $model->setData($value);
         if ($value === null) {
             // A NULL value might mean that the values does not
             // exist, until the getter computes it.
-            $model->addToJson('hint', $this->pool->messages->getHelp('getterNull'));
+            $model->addToJson('hint', $this->_pool->messages->getHelp('getterNull'));
         }
 
-        return $this->pool->routing->analysisHub($model);
+        return $this->_pool->routing->analysisHub($model);
     }
 
     /**
@@ -244,7 +244,7 @@ class ThroughGetter extends AbstractCallback
         if (strpos($getterName, 'get') === 0) {
             $getterName = substr($getterName, 3);
         }
-        
+
         if (strpos($getterName, '_get') === 0) {
             $getterName = substr($getterName, 4);
         }
@@ -270,7 +270,7 @@ class ThroughGetter extends AbstractCallback
     protected function getReflectionPropertyDeep(\ReflectionClass $classReflection, \ReflectionMethod $reflectionMethod)
     {
         // Read the sourcecode into a string.
-        $sourcecode = $this->pool->fileService->readFile(
+        $sourcecode = $this->_pool->fileService->readFile(
             $reflectionMethod->getFileName(),
             $reflectionMethod->getStartLine(),
             $reflectionMethod->getEndLine()
@@ -290,8 +290,8 @@ class ThroughGetter extends AbstractCallback
             if ($classReflection->hasMethod($methodName)) {
                 // We need to be careful not to goo too deep, we might end up
                 // in a loop.
-                ++$this->deep;
-                if ($this->deep < 3) {
+                ++$this->_deep;
+                if ($this->_deep < 3) {
                     return $this->getReflectionProperty($classReflection, $classReflection->getMethod($methodName));
                 }
             }

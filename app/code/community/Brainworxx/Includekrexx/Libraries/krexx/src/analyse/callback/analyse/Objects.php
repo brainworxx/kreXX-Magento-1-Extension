@@ -56,78 +56,78 @@ class Objects extends AbstractCallback
      */
     public function callMe()
     {
-        $output = $this->pool->render->renderSingeChildHr();
+        $output = $this->_pool->render->renderSingeChildHr();
 
-        $data = $this->parameters['data'];
-        $ref = $this->parameters['ref'] = new \ReflectionClass($data);
+        $data = $this->_parameters['data'];
+        $ref = $this->_parameters['ref'] = new \ReflectionClass($data);
 
         // Dumping public properties.
-        $output .= $this->pool
+        $output .= $this->_pool
             ->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\Objects\\PublicProperties')
-            ->setParams($this->parameters)
+            ->setParams($this->_parameters)
             ->callMe();
 
         // Dumping getter methods.
         // We will not dump the getters for internal values, though.
-        if ($this->pool->config->getSetting('analyseGetter') &&
+        if ($this->_pool->config->getSetting('analyseGetter') &&
             $ref->isUserDefined()
         ) {
-            $output .= $this->pool
+            $output .= $this->_pool
                 ->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\Objects\\Getter')
-                ->setParams($this->parameters)
+                ->setParams($this->_parameters)
                 ->callMe();
         }
 
         // Dumping protected properties.
-        if ($this->pool->config->getSetting('analyseProtected') ||
-            $this->pool->scope->isInScope()
+        if ($this->_pool->config->getSetting('analyseProtected') ||
+            $this->_pool->scope->isInScope()
         ) {
-            $output .= $this->pool
+            $output .= $this->_pool
                 ->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\Objects\\ProtectedProperties')
-                ->setParams($this->parameters)
+                ->setParams($this->_parameters)
                 ->callMe();
         }
 
         // Dumping private properties.
-        if ($this->pool->config->getSetting('analysePrivate') ||
-            $this->pool->scope->isInScope()
+        if ($this->_pool->config->getSetting('analysePrivate') ||
+            $this->_pool->scope->isInScope()
         ) {
-            $output .= $this->pool
+            $output .= $this->_pool
                 ->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\Objects\\PrivateProperties')
-                ->setParams($this->parameters)
+                ->setParams($this->_parameters)
                 ->callMe();
         }
 
         // Dumping class constants.
-        if ($this->pool->config->getSetting('analyseConstants')) {
-            $output .= $this->pool
+        if ($this->_pool->config->getSetting('analyseConstants')) {
+            $output .= $this->_pool
                 ->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\Objects\\Constants')
-                ->setParams($this->parameters)
+                ->setParams($this->_parameters)
                 ->callMe();
         }
 
         // Dumping all methods.
-        $output .= $this->pool
+        $output .= $this->_pool
                 ->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\Objects\\Methods')
-                ->setParams($this->parameters)
+                ->setParams($this->_parameters)
                 ->callMe();
 
         // Dumping traversable data.
-        if ($this->pool->config->getSetting('analyseTraversable') &&
+        if ($this->_pool->config->getSetting('analyseTraversable') &&
             $data instanceof \Traversable
         ) {
-            $output .= $this->pool
+            $output .= $this->_pool
                 ->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\Objects\\Traversable')
-                ->setParams($this->parameters)
+                ->setParams($this->_parameters)
                 ->callMe();
         }
 
         // Dumping all configured debug functions.
         // Adding a HR for a better readability.
-        return $output . $this->pool
+        return $output . $this->_pool
                 ->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\Objects\\DebugMethods')
-                ->setParams($this->parameters)
+                ->setParams($this->_parameters)
                 ->callMe() .
-            $this->pool->render->renderSingeChildHr();
+            $this->_pool->render->renderSingeChildHr();
     }
 }
