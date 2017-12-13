@@ -25,12 +25,6 @@
                <action>adminhtml/krexxlog/index</action>
             </krexxlog>
 
-            <editlocalconfig translate="title" module="includekrexx">
-              <title>Edit local cookie settings</title>
-              <sort_order>20</sort_order>
-              <action>adminhtml/krexx/editlocalconfig</action>
-            </editlocalconfig>
-
             <docu translate="title" module="includekrexx">
               <title>kreXX quick docu</title>
               <sort_order>25</sort_order>
@@ -61,10 +55,6 @@
                   <krexxlog>
                     <title>Access logfiles</title>
                   </krexxlog>
-
-                  <editlocalconfig>
-                    <title>Edit local cookie settings</title>
-                  </editlocalconfig>
 
                   <docu>
                     <title>kreXX quick docu</title>

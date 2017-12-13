@@ -96,10 +96,6 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
             return Mage::getSingleton('admin/session')->isAllowed('system/krexx/editfe');
         }
 
-        if ($actionName == 'adminhtml_krexx_editlocalconfig') {
-            return Mage::getSingleton('admin/session')->isAllowed('system/krexx/editlocalconfig');
-        }
-
         if ($actionName == 'adminhtml_krexx_docu') {
             return Mage::getSingleton('admin/session')->isAllowed('system/krexx/docu');
         }
@@ -156,17 +152,6 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         $this->init();
         $this->getLayout()->getBlock('head')->setTitle(Mage::helper('includekrexx')->__('Administer krexX FE editing'));
         $this->renderLayout();
-    }
-
-    /**
-     * Displays the krexx::editSettings() as well as some help text.
-     */
-    public function editlocalconfigAction()
-    {
-        $this->init();
-        $this->getLayout()->getBlock('head')->setTitle(Mage::helper('includekrexx')->__('Edit local browser settings'));
-        $this->renderLayout();
-
     }
 
     /**
