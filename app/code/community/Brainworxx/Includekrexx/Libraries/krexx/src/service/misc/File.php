@@ -71,7 +71,8 @@ class File
     public function __construct(Pool $pool)
     {
         $this->_pool = $pool;
-        $this->_docRoot = \Mage::getBaseDir('base');
+        // We remove the leading \.
+        $this->_docRoot = ltrim(\Mage::getBaseDir('base'), DIRECTORY_SEPARATOR);
         if (empty($this->_docRoot)) {
             $this->_docRoot = false;
         }
