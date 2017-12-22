@@ -71,6 +71,8 @@ class DumpController extends AbstractController
         if (empty($headline)) {
             if (is_object($data)) {
                 $headline = get_class($data);
+            } else {
+                $headline = gettype($data);
             }
 
             // We are analysing stuff here.
