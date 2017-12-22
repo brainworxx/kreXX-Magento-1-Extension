@@ -114,7 +114,7 @@ class Codegen
                 return ';stop;';
             }
 
-            $connectors = $model->getConnectorLeft() . $model->getConnectorRight();
+            $connectors = $model->getConnector1() . $model->getConnector2();
             if (empty($connectors)) {
                 // No connectors, no nothing. We must be dealing with meta stuff.
                 // We will ignore this one.
@@ -195,7 +195,7 @@ class Codegen
             $model->getName()
         );
 
-        return $model->getConnectorLeft() . $name . $model->getConnectorRight();
+        return $model->getConnector1() . $name . $model->getConnector2();
     }
 
     /**

@@ -50,6 +50,7 @@ class Brainworxx_Includekrexx_Model_Observer
      */
     public function __construct()
     {
+
         $this->_ioFile = new Varien_Io_File();
         $this->_ioFile->setAllowCreateFolders(true);
     }

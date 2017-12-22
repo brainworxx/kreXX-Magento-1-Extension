@@ -246,18 +246,18 @@ class Model extends AbstractModel
     }
 
     /**
-     * Getter got connectorLeft.
+     * Getter got connector1.
      *
      * @return string
      *   The first connector.
      */
-    public function getConnectorLeft()
+    public function getConnector1()
     {
-        return $this->_connectorService->getConnectorLeft();
+        return $this->_connectorService->getConnector1();
     }
 
     /**
-     * Getter for connectorRight.
+     * Getter for connector2.
      *
      * @param integer $cap
      *   Maximum length of all parameters. 0 means no cap.
@@ -265,9 +265,9 @@ class Model extends AbstractModel
      * @return string
      *   The second connector.
      */
-    public function getConnectorRight($cap = 0)
+    public function getConnector2($cap = 0)
     {
-        return $this->_connectorService->getConnectorRight($cap);
+        return $this->_connectorService->getConnector2($cap);
     }
 
     /**
@@ -406,7 +406,7 @@ class Model extends AbstractModel
     }
 
     /**
-     * Sets a special and custom connectorLeft. Only used for constants code
+     * Sets a special and custom connector1. Only used for constants code
      * generation.
      *
      * @param string $string
@@ -414,9 +414,9 @@ class Model extends AbstractModel
      * @return $this
      *   Return $this for chaining.
      */
-    public function setCustomConnectorLeft($string)
+    public function setCustomConnector1($string)
     {
-        $this->_connectorService->setCustomConnectorLeft($string);
+        $this->_connectorService->setCustomConnector1($string);
         return $this;
     }
 

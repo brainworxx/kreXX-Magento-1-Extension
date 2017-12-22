@@ -254,8 +254,7 @@ class Pool extends Factory
     {
         $skin = $this->config->getSetting('skin');
         $classname = 'Brainworxx\\Krexx\\View\\' . ucfirst($skin) . '\\Render';
-        $filename = KREXX_DIR . 'resources/skins/' . $skin . '/Render.php';
-        include_once $filename;
+        include_once KREXX_DIR . 'resources/skins/' . $skin . '/Render.php';
         $this->render =  $this->createClass($classname);
     }
 }
