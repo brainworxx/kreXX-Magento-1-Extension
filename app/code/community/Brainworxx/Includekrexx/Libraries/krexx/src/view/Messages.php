@@ -132,6 +132,21 @@ class Messages
      */
     public function outputMessages()
     {
+
+        // Simple Wrapper for OutputActions::$render->renderMessages
+        if (php_sapi_name() === 'cli' &&
+            !empty($this->messages)
+        ) {
+            // Output the messages on the shell.
+            $result = "\n\nkreXX messages\n";
+            $result .= "==============\n";
+            foreach ($this->messages as $message) {
+                $result .= "$message\n";
+            }
+
+            echo $result . "\n\n";
+        }
+
         // Return the rendered messages.
         return $this->pool->render->renderMessages($this->messages);
     }
