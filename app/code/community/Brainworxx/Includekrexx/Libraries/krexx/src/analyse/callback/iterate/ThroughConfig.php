@@ -62,39 +62,39 @@ class ThroughConfig extends AbstractCallback
         // We need to "explode" our config array into the
         // sections again, for better readability.
         $sections = array();
-        foreach ($this->_pool->config->settings as $name => $setting) {
+        foreach ($this->pool->config->settings as $name => $setting) {
             $sections[$setting->getSection()][$name] = $setting;
         }
 
         foreach ($sections as $sectionName => $sectionData) {
             // Render a whole section.
-            $configOutput .= $this->_pool->render->renderExpandableChild(
-                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
-                    ->setName($this->_pool->messages->getHelp($sectionName . 'Readable'))
+            $configOutput .= $this->pool->render->renderExpandableChild(
+                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+                    ->setName($this->pool->messages->getHelp($sectionName . 'Readable'))
                     ->setType('Config')
                     ->setNormal('. . .')
                     ->addParameter('data', $sectionData)
                     ->injectCallback(
-                        $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\ConfigSection')
+                        $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\ConfigSection')
                     )
             );
         }
 
         // Render the dev-handle field.
-        $devHandleLabel = $this->_pool->messages->getHelp('devHandle');
-        $configOutput .= $this->_pool->render->renderSingleEditableChild(
-            $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+        $devHandleLabel = $this->pool->messages->getHelp('devHandle');
+        $configOutput .= $this->pool->render->renderSingleEditableChild(
+            $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setData($devHandleLabel)
                 ->setDomId('devHandle')
-                ->setName($this->_pool->config->getDevHandler())
+                ->setName($this->pool->config->getDevHandler())
                 ->setNormal('\krexx::')
                 ->setType('Input')
                 ->setHelpid('localFunction')
         );
 
         // Render the reset-button which will delete the debug-cookie.
-        return $configOutput . $this->_pool->render->renderButton(
-            $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+        return $configOutput . $this->pool->render->renderButton(
+            $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setName('resetbutton')
                 ->setNormal('Reset local settings')
                 ->setHelpid('resetbutton')

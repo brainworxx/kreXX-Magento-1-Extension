@@ -50,21 +50,21 @@ class Methods extends AbstractObjectAnalysis
     public function callMe()
     {
         /** @var \ReflectionClass $ref */
-        $ref = $this->_parameters['ref'];
+        $ref = $this->parameters['ref'];
 
         // We need to check, if we have a meta recursion here.
 
-        $doProtected = $this->_pool->config->getSetting('analyseProtectedMethods') ||
-            $this->_pool->scope->isInScope();
-        $doPrivate = $this->_pool->config->getSetting('analysePrivateMethods') ||
-            $this->_pool->scope->isInScope();
+        $doProtected = $this->pool->config->getSetting('analyseProtectedMethods') ||
+            $this->pool->scope->isInScope();
+        $doPrivate = $this->pool->config->getSetting('analysePrivateMethods') ||
+            $this->pool->scope->isInScope();
         $domId = $this->generateDomIdFromClassname($ref->getName(), $doProtected, $doPrivate);
 
-        if ($this->_pool->recursionHandler->isInMetaHive($domId)) {
+        if ($this->pool->recursionHandler->isInMetaHive($domId)) {
             // We have been here before.
             // We skip this one, and leave it to the js recursion handler!
-            return $this->_pool->render->renderRecursion(
-                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            return $this->pool->render->renderRecursion(
+                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                     ->setDomid($domId)
                     ->setNormal('Methods')
                     ->setName('Methods')
@@ -93,7 +93,7 @@ class Methods extends AbstractObjectAnalysis
     protected function analyseMethods(\ReflectionClass $ref, $domId, $doProtected, $doPrivate)
     {
         // Add it to the meta hive.
-        $this->_pool->recursionHandler->addToMetaHive($domId);
+        $this->pool->recursionHandler->addToMetaHive($domId);
 
         // Dumping all methods but only if we have any.
         $protected = array();
@@ -117,15 +117,15 @@ class Methods extends AbstractObjectAnalysis
         // We need to sort these alphabetically.
         usort($methods, array($this, 'reflectionSorting'));
 
-        return $this->_pool->render->renderExpandableChild(
-            $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+        return $this->pool->render->renderExpandableChild(
+            $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setName('Methods')
                 ->setType('class internals')
                 ->addParameter('data', $methods)
                 ->addParameter('ref', $ref)
                 ->setDomId($domId)
                 ->injectCallback(
-                    $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughMethods')
+                    $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughMethods')
                 )
         );
     }
@@ -148,7 +148,7 @@ class Methods extends AbstractObjectAnalysis
      */
     protected function generateDomIdFromClassname($data, $doProtected, $doPrivate)
     {
-        $string = 'k' . $this->_pool->emergencyHandler->getKrexxCount() . '_m_';
+        $string = 'k' . $this->pool->emergencyHandler->getKrexxCount() . '_m_';
         if ($doProtected) {
             $string .= 'pro_';
         }

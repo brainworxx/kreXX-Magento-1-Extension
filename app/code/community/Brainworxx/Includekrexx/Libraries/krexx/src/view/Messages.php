@@ -49,28 +49,28 @@ class Messages
      *
      * @var array
      */
-    protected $_messages = array();
+    protected $messages = array();
 
     /**
      * The translatable keys for backend integration.
      *
      * @var array
      */
-    protected $_keys = array();
+    protected $keys = array();
 
     /**
      * A simple array to hold the values.
      *
      * @var array
      */
-    protected $_helpArray = array();
+    protected $helpArray = array();
 
     /**
      * Here we store all relevant data.
      *
      * @var Pool
      */
-    protected $_pool;
+    protected $pool;
 
     /**
      * Injects the pool and reads the language file.
@@ -80,10 +80,10 @@ class Messages
      */
     public function __construct(Pool $pool)
     {
-        $this->_pool = $pool;
+        $this->pool = $pool;
         $file = KREXX_DIR . 'resources/language/Help.ini';
-        $this->_helpArray = (array)parse_ini_string(
-            $this->_pool->fileService->getFileContents($file)
+        $this->helpArray = (array)parse_ini_string(
+            $this->pool->fileService->getFileContents($file)
         );
     }
 
@@ -98,8 +98,8 @@ class Messages
     public function addMessage($key, array $args = array())
     {
         // Add it to the keys, so the CMS can display it.
-        $this->_keys[] = array('key' => $key, 'params' => $args);
-        $this->_messages[] = $this->getHelp($key, $args);
+        $this->keys[] = array('key' => $key, 'params' => $args);
+        $this->messages[] = $this->getHelp($key, $args);
     }
 
     /**
@@ -110,7 +110,7 @@ class Messages
      */
     public function removeKey($key)
     {
-        unset($this->_keys[$key]);
+        unset($this->keys[$key]);
     }
 
     /**
@@ -121,7 +121,7 @@ class Messages
      */
     public function getKeys()
     {
-        return $this->_keys;
+        return $this->keys;
     }
 
     /**
@@ -133,7 +133,7 @@ class Messages
     public function outputMessages()
     {
         // Return the rendered messages.
-        return $this->_pool->render->renderMessages($this->_messages);
+        return $this->pool->render->renderMessages($this->messages);
     }
 
     /**
@@ -150,11 +150,11 @@ class Messages
     public function getHelp($key, array $args = array())
     {
         // Check if we can get a value, at all.
-        if (empty($this->_helpArray[$key])) {
+        if (empty($this->helpArray[$key])) {
             return '';
         }
 
         // Return the value
-        return vsprintf($this->_helpArray[$key], $args);
+        return vsprintf($this->helpArray[$key], $args);
     }
 }

@@ -50,18 +50,18 @@ class BacktraceController extends AbstractController
      */
     public function backtraceAction()
     {
-        if ($this->_pool->emergencyHandler->checkMaxCall()) {
+        if ($this->pool->emergencyHandler->checkMaxCall()) {
             // Called too often, we might get into trouble here!
             return $this;
         }
 
-        $this->_pool->reset();
+        $this->pool->reset();
 
         // Find caller.
-        $caller = $this->_callerFinder->findCaller();
+        $caller = $this->callerFinder->findCaller();
         $caller['type'] = 'Backtrace';
 
-        $this->_pool->scope->setScope($caller['varname']);
+        $this->pool->scope->setScope($caller['varname']);
 
         // Remove the fist step from the backtrace,
         // because that is the internal function in kreXX.
@@ -72,27 +72,27 @@ class BacktraceController extends AbstractController
 
 
         $footer = $this->outputFooter($caller);
-        $analysis = $this->_pool
+        $analysis = $this->pool
             ->createClass('Brainworxx\\Krexx\\Analyse\\Routing\\Process\\ProcessBacktrace')
             ->process($backtrace);
 
         // Detect the encoding on the start-chunk-string of the analysis
         // for a complete encoding picture.
-        $this->_pool->chunks->detectEncoding($analysis);
+        $this->pool->chunks->detectEncoding($analysis);
 
         // Now that our analysis is done, we must check if there was an emergency
         // break.
-        if ($this->_pool->emergencyHandler->checkEmergencyBreak()) {
+        if ($this->pool->emergencyHandler->checkEmergencyBreak()) {
             return $this;
         }
 
         // Add the caller as metadata to the chunks class. It will be saved as
         // additional info, in case we are logging to a file.
-        $this->_pool->chunks->addMetadata($caller);
+        $this->pool->chunks->addMetadata($caller);
 
-        $this->_outputService->addChunkString($this->outputHeader('Backtrace'));
-        $this->_outputService->addChunkString($analysis);
-        $this->_outputService->addChunkString($footer);
+        $this->outputService->addChunkString($this->outputHeader('Backtrace'));
+        $this->outputService->addChunkString($analysis);
+        $this->outputService->addChunkString($footer);
 
         return $this;
     }

@@ -87,7 +87,7 @@ class Config extends Fallback
      *
      * @var array
      */
-    protected $_directories = array();
+    protected $directories = array();
 
     /**
      * Injection the pool and loading the configuration.
@@ -125,23 +125,23 @@ class Config extends Fallback
     {
         // Set the chunks folder.
         if (empty(Overwrites::$directories['chunks'])) {
-            $this->_directories['chunks'] = KREXX_DIR . 'chunks/' ;
+            $this->directories['chunks'] = KREXX_DIR . 'chunks/' ;
         } else {
-            $this->_directories['chunks'] = Overwrites::$directories['chunks'] . '/';
+            $this->directories['chunks'] = Overwrites::$directories['chunks'] . '/';
         }
 
         // Set the log folder.
         if (empty(Overwrites::$directories['log'])) {
-            $this->_directories['log'] = KREXX_DIR . 'log' . '/';
+            $this->directories['log'] = KREXX_DIR . 'log' . '/';
         } else {
-            $this->_directories['log'] = Overwrites::$directories['log'] . '/';
+            $this->directories['log'] = Overwrites::$directories['log'] . '/';
         }
 
         // Set the configuration file path.
         if (empty(Overwrites::$directories['config'])) {
-            $this->_directories['config'] = KREXX_DIR . 'config/Krexx.ini';
+            $this->directories['config'] = KREXX_DIR . 'config/Krexx.ini';
         } else {
-            $this->_directories['config'] = Overwrites::$directories['config'] . '/Krexx.ini';
+            $this->directories['config'] = Overwrites::$directories['config'] . '/Krexx.ini';
         }
     }
 
@@ -203,7 +203,7 @@ class Config extends Fallback
     {
         $feConfig = $this->iniConfig->getFeConfig($name);
         /** @var Model $model */
-        $model = $this->_pool->createClass('Brainworxx\\Krexx\\Service\\Config\\Model')
+        $model = $this->pool->createClass('Brainworxx\\Krexx\\Service\\Config\\Model')
             ->setSection($section)
             ->setEditable($feConfig[0])
             ->setType($feConfig[1]);
@@ -274,7 +274,7 @@ class Config extends Fallback
      */
     public function getChunkDir()
     {
-        return $this->_directories['chunks'];
+        return $this->directories['chunks'];
     }
 
     /**
@@ -285,7 +285,7 @@ class Config extends Fallback
      */
     public function getLogDir()
     {
-        return $this->_directories['log'];
+        return $this->directories['log'];
     }
 
     /**
@@ -337,7 +337,7 @@ class Config extends Fallback
     public function isAllowedDebugCall($data, $call)
     {
         // Check if the class itself is blacklisted.
-        foreach ($this->_classBlacklist as $classname) {
+        foreach ($this->classBlacklist as $classname) {
             if (is_a($data, $classname)) {
                 // No debug methods for you.
                 return false;
@@ -345,7 +345,7 @@ class Config extends Fallback
         }
 
         // Check for a class / method combination.
-        foreach ($this->_methodBlacklist as $classname => $methodList) {
+        foreach ($this->methodBlacklist as $classname => $methodList) {
             if (is_a($data, $classname) && in_array($call, $methodList)) {
                 // We have a winner, this one is blacklisted!
                 return false;
@@ -364,6 +364,6 @@ class Config extends Fallback
      */
     public function getPathToIniFile()
     {
-        return $this->_directories['config'];
+        return $this->directories['config'];
     }
 }

@@ -49,28 +49,28 @@ class EditSettingsController extends AbstractController
      */
     public function editSettingsAction()
     {
-        if ($this->_pool->emergencyHandler->checkMaxCall()) {
+        if ($this->pool->emergencyHandler->checkMaxCall()) {
             // Called too often, we might get into trouble here!
             return $this;
         }
 
-        $this->_pool->reset();
+        $this->pool->reset();
 
         // We will not check this for the cookie config, to avoid people locking
         // themselves out.
-        $this->_pool->emergencyHandler->setDisable(true);
+        $this->pool->emergencyHandler->setDisable(true);
 
 
         // Find caller.
-        $caller = $this->_callerFinder->findCaller();
+        $caller = $this->callerFinder->findCaller();
         $caller['type'] = 'Cookie Configuration';
-        $this->_pool->chunks->addMetadata($caller);
+        $this->pool->chunks->addMetadata($caller);
 
         // Render it.
         $footer = $this->outputFooter($caller, true);
-        $this->_outputService->addChunkString($this->outputHeader('Edit local settings'));
-        $this->_outputService->addChunkString($footer);
-        $this->_pool->emergencyHandler->setDisable(false);
+        $this->outputService->addChunkString($this->outputHeader('Edit local settings'));
+        $this->outputService->addChunkString($footer);
+        $this->pool->emergencyHandler->setDisable(false);
 
         return $this;
     }

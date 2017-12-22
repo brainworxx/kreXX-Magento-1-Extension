@@ -59,13 +59,13 @@ class ThroughMethods extends AbstractCallback
     {
         $result = '';
         /** @var \ReflectionClass $reflectionClass */
-        $reflectionClass = $this->_parameters['ref'];
+        $reflectionClass = $this->parameters['ref'];
 
-        $commentAnalysis = $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Methods');
+        $commentAnalysis = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Methods');
 
         // Deep analysis of the methods.
         /** @var \ReflectionMethod $reflectionMethod */
-        foreach ($this->_parameters['data'] as $reflectionMethod) {
+        foreach ($this->parameters['data'] as $reflectionMethod) {
             $methodData = array();
 
             // Get the comment from the class, it's parents, interfaces or traits.
@@ -82,7 +82,7 @@ class ThroughMethods extends AbstractCallback
             $paramList = '';
             foreach ($reflectionMethod->getParameters() as $key => $reflectionParameter) {
                 ++$key;
-                $paramList .= $methodData['Parameter #' . $key] = $this->_pool
+                $paramList .= $methodData['Parameter #' . $key] = $this->pool
                     ->codegenHandler
                     ->parameterToString($reflectionParameter);
                 // We add a comme to the parameter list, to separate them for a
@@ -108,15 +108,15 @@ class ThroughMethods extends AbstractCallback
             }
 
             // Render it!
-            $result .= $this->_pool->render->renderExpandableChild(
-                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            $result .= $this->pool->render->renderExpandableChild(
+                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                     ->setName($reflectionMethod->name)
                     ->setType($methodData['declaration keywords'] . ' method')
                     ->setConnectorType($connectorType)
                     ->setConnectorParameters($paramList)
                     ->addParameter('data', $methodData)
                     ->injectCallback(
-                        $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughMethodAnalysis')
+                        $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughMethodAnalysis')
                     )
             );
         }
@@ -139,7 +139,7 @@ class ThroughMethods extends AbstractCallback
     {
         /** @var \Brainworxx\Krexx\Service\Misc\File $fileService */
 
-        $filename = $this->_pool->fileService->filterFilePath($declaringClass->getFileName());
+        $filename = $this->pool->fileService->filterFilePath($declaringClass->getFileName());
 
         if (empty($filename)) {
             return ":: unable to determine declaration ::\n\nMaybe this is a predeclared class?";

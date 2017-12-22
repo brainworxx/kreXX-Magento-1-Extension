@@ -50,7 +50,7 @@ class Scope
      *
      * @var Pool
      */
-    protected $_pool;
+    protected $pool;
 
     /**
      * The "scope" we are starting with. When it is $this in combination with a
@@ -59,7 +59,7 @@ class Scope
      *
      * @var string
      */
-    protected $_scope = '';
+    protected $scope = '';
 
     /**
      * Initializes the code generation.
@@ -69,22 +69,22 @@ class Scope
      */
     public function __construct(Pool $pool)
     {
-        $this->_pool = $pool;
+        $this->pool = $pool;
     }
 
     /**
      * Sets the scope in which we are moving ('$this' or something else).
      *
-     * @param string $_scope
+     * @param string $scope
      *   The scope ('$this' or something else) .
      */
-    public function setScope($_scope)
+    public function setScope($scope)
     {
-        if ($_scope !== '. . .') {
-            $this->_scope = $_scope;
+        if ($scope !== '. . .') {
+            $this->scope = $scope;
             // Now that we have a scope, we can actually generate code to
             // reach the variables inside the analysis.
-            $this->_pool->codegenHandler->setAllowCodegen(true);
+            $this->pool->codegenHandler->setAllowCodegen(true);
         }
     }
 
@@ -95,7 +95,7 @@ class Scope
      */
     public function getScope()
     {
-        return $this->_scope;
+        return $this->scope;
     }
 
     /**
@@ -106,9 +106,9 @@ class Scope
      */
     public function isInScope()
     {
-        return  $this->_pool->emergencyHandler->getNestingLevel() <= 1 &&
-            $this->_scope === '$this' &&
-            $this->_pool->config->getSetting('useScopeAnalysis');
+        return  $this->pool->emergencyHandler->getNestingLevel() <= 1 &&
+            $this->scope === '$this' &&
+            $this->pool->config->getSetting('useScopeAnalysis');
     }
 
     /**
@@ -122,12 +122,12 @@ class Scope
      */
     public function testModelForCodegen(Model $model)
     {
-        $nestingLevel = $this->_pool->emergencyHandler->getNestingLevel();
+        $nestingLevel = $this->pool->emergencyHandler->getNestingLevel();
 
         // If we are too deep at this moment, we will stop right here!
         // Also, anything not coming from $this is not reachable, since
         // we are testing protected stuff here.
-        if ($nestingLevel > 2 || $this->_scope !== '$this') {
+        if ($nestingLevel > 2 || $this->scope !== '$this') {
             return false;
         }
 
@@ -146,6 +146,6 @@ class Scope
             --$nestingLevel;
         }
 
-        return $nestingLevel === 1 && $this->_scope === '$this';
+        return $nestingLevel === 1 && $this->scope === '$this';
     }
 }

@@ -53,10 +53,10 @@ class ErrorController extends AbstractController
      */
     public function errorAction(array $errorData)
     {
-        $this->_pool->reset();
+        $this->pool->reset();
 
         // Get the main part.
-        $main = $this->_pool->render->renderFatalMain(
+        $main = $this->pool->render->renderFatalMain(
             $errorData['type'],
             $errorData['errstr'],
             $errorData['errfile'],
@@ -64,47 +64,47 @@ class ErrorController extends AbstractController
         );
 
         // Get the backtrace.
-        $backtrace = $this->_pool
+        $backtrace = $this->pool
             ->createClass('Brainworxx\\Krexx\\Analyse\\Routing\\Process\\ProcessBacktrace')
             ->process($errorData['backtrace']);
 
-        if ($this->_pool->emergencyHandler->checkEmergencyBreak()) {
+        if ($this->pool->emergencyHandler->checkEmergencyBreak()) {
             return $this;
         }
 
         // Detect the encoding on the start-chunk-string of the analysis
         // for a complete encoding picture.
-        $this->_pool->chunks->detectEncoding($main);
+        $this->pool->chunks->detectEncoding($main);
 
         // Detect the encoding on the start-chunk-string of the analysis
         // for a complete encoding picture.
-        $this->_pool->chunks->detectEncoding($backtrace);
+        $this->pool->chunks->detectEncoding($backtrace);
 
         // Get the header.
-        if (static::$_headerSend) {
-            $header = $this->_pool->render->renderFatalHeader('', '<!DOCTYPE html>');
+        if (static::$headerSend) {
+            $header = $this->pool->render->renderFatalHeader('', '<!DOCTYPE html>');
         } else {
-            $header = $this->_pool->render->renderFatalHeader($this->outputCssAndJs(), '<!DOCTYPE html>');
+            $header = $this->pool->render->renderFatalHeader($this->outputCssAndJs(), '<!DOCTYPE html>');
         }
 
         // Get the footer.
         $footer = $this->outputFooter(array());
 
         // Get the messages.
-        $messages = $this->_pool->messages->outputMessages();
+        $messages = $this->pool->messages->outputMessages();
 
         // Add the caller as metadata to the chunks class. It will be saved as
         // additional info, in case we are logging to a file.
-        $this->_pool->chunks->addMetadata(
+        $this->pool->chunks->addMetadata(
             array(
                 'file' => $errorData['errfile'],
                 'line' => $errorData['errline'] + 1,
                 'varname' => ' Fatal Error',
             )
         );
-
+        
         // Save it to a file.
-        $this->_pool->chunks->saveDechunkedToFile($header . $messages . $main . $backtrace . $footer);
+        $this->pool->chunks->saveDechunkedToFile($header . $messages . $main . $backtrace . $footer);
 
 
         return $this;
@@ -124,29 +124,29 @@ class ErrorController extends AbstractController
         // Not to mention that fatals got removed anyway.
         if (version_compare(phpversion(), '7.0.0', '>=')) {
             // Too high! 420 Method Failure :-(
-            $this->_pool->messages->addMessage($this->_pool->messages->getHelp('php7yellow'));
-            krexx($this->_pool->messages->getHelp('php7'));
+            $this->pool->messages->addMessage($this->pool->messages->getHelp('php7yellow'));
+            krexx($this->pool->messages->getHelp('php7'));
 
             // Just return, there is nothing more to do here.
             return $this;
         }
 
-        $this->_pool->reset();
+        $this->pool->reset();
         // Do we need another shutdown handler?
-        if (!is_object($this->_krexxFatal)) {
-            $this->_krexxFatal = $this->_pool->createClass('Brainworxx\\Krexx\\Errorhandler\\Fatal');
+        if (!is_object($this->krexxFatal)) {
+            $this->krexxFatal = $this->pool->createClass('Brainworxx\\Krexx\\Errorhandler\\Fatal');
             declare(ticks = 1);
             register_shutdown_function(
                 array(
-                    $this->_krexxFatal,
+                    $this->krexxFatal,
                     'shutdownCallback',
                 )
             );
         }
 
-        $this->_krexxFatal->setIsActive(true);
-        $this->_fatalShouldActive = true;
-        register_tick_function(array($this->_krexxFatal, 'tickCallback'));
+        $this->krexxFatal->setIsActive(true);
+        $this->fatalShouldActive = true;
+        register_tick_function(array($this->krexxFatal, 'tickCallback'));
 
         return $this;
     }
@@ -163,14 +163,14 @@ class ErrorController extends AbstractController
      */
     public function unregisterFatalAction()
     {
-        if ($this->_krexxFatal  !== null) {
+        if ($this->krexxFatal  !== null) {
             // Now we need to tell the shutdown function, that is must
             // not do anything on shutdown.
-            $this->_krexxFatal->setIsActive(false);
-            unregister_tick_function(array($this->_krexxFatal, 'tickCallback'));
+            $this->krexxFatal->setIsActive(false);
+            unregister_tick_function(array($this->krexxFatal, 'tickCallback'));
         }
 
-        $this->_fatalShouldActive = false;
+        $this->fatalShouldActive = false;
 
         return $this;
     }

@@ -57,7 +57,7 @@ class Ini extends Fallback
      *
      * @var array
      */
-    protected $_iniSettings = array();
+    protected $iniSettings = array();
 
     /**
      * Inject the pool, create the security handler, load the ini file.
@@ -82,8 +82,8 @@ class Ini extends Fallback
     public function loadIniFile($path)
     {
 
-        $this->_iniSettings = (array)parse_ini_string(
-            $this->_pool->fileService->getFileContents($path, false),
+        $this->iniSettings = (array)parse_ini_string(
+            $this->pool->fileService->getFileContents($path, false),
             true
         );
 
@@ -195,10 +195,10 @@ class Ini extends Fallback
     {
         // Do we have a value in the ini?
         // Does it validate?
-        if (isset($this->_iniSettings[$group][$name]) &&
-            $this->security->evaluateSetting($group, $name, $this->_iniSettings[$group][$name])
+        if (isset($this->iniSettings[$group][$name]) &&
+            $this->security->evaluateSetting($group, $name, $this->iniSettings[$group][$name])
         ) {
-            return $this->_iniSettings[$group][$name];
+            return $this->iniSettings[$group][$name];
         }
 
         return null;

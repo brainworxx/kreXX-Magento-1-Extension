@@ -75,10 +75,10 @@ class BacktraceStep extends AbstractCallback
      */
     protected function fileToOutput()
     {
-        $stepData = $this->_parameters['data'];
+        $stepData = $this->parameters['data'];
         if (isset($stepData['file'])) {
-            return $this->_pool->render->renderSingleChild(
-                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            return $this->pool->render->renderSingleChild(
+                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                     ->setData($stepData['file'])
                     ->setName('File')
                     ->setNormal($stepData['file'])
@@ -97,13 +97,13 @@ class BacktraceStep extends AbstractCallback
      */
     protected function lineToOutput()
     {
-        $stepData = $this->_parameters['data'];
+        $stepData = $this->parameters['data'];
         $output = '';
         $source = '';
         if (isset($stepData['line'])) {
             // Adding the line info to the output
-            $output .= $this->_pool->render->renderSingleChild(
-                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            $output .= $this->pool->render->renderSingleChild(
+                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                     ->setData($stepData['line'])
                     ->setName('Line no.')
                     ->setNormal($stepData['line'])
@@ -113,7 +113,7 @@ class BacktraceStep extends AbstractCallback
             // Trying the read the sourcecode where it was called.
             $lineNo = $stepData['line'] - 1;
             $source = trim(
-                $this->_pool->fileService->readSourcecode(
+                $this->pool->fileService->readSourcecode(
                     $stepData['file'],
                     $lineNo,
                     $lineNo -5,
@@ -124,12 +124,12 @@ class BacktraceStep extends AbstractCallback
 
         // Check if we could load the code.
         if (empty($source)) {
-            $source = $this->_pool->messages->getHelp('noSourceAvailable');
+            $source = $this->pool->messages->getHelp('noSourceAvailable');
         }
 
         // Add the prettified code to the analysis.
-        $output .= $this->_pool->render->renderSingleChild(
-            $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+        $output .= $this->pool->render->renderSingleChild(
+            $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setData($source)
                 ->setName('Sourcecode')
                 ->setNormal('. . .')
@@ -148,11 +148,11 @@ class BacktraceStep extends AbstractCallback
      */
     protected function functionToOutput()
     {
-        $stepData = $this->_parameters['data'];
+        $stepData = $this->parameters['data'];
 
         if (isset($stepData['function'])) {
-            return $this->_pool->render->renderSingleChild(
-                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            return $this->pool->render->renderSingleChild(
+                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                     ->setData($stepData['function'])
                     ->setName('Last called function')
                     ->setNormal($stepData['function'])
@@ -171,13 +171,13 @@ class BacktraceStep extends AbstractCallback
      */
     protected function objectToOutput()
     {
-        $stepData = $this->_parameters['data'];
+        $stepData = $this->parameters['data'];
 
         if (isset($stepData['object'])) {
-            return $this->_pool
+            return $this->pool
                 ->createClass('Brainworxx\\Krexx\\Analyse\\Routing\\Process\\ProcessObject')
                 ->process(
-                    $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+                    $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                         ->setData($stepData['object'])
                         ->setName('Calling object')
                 );
@@ -194,11 +194,11 @@ class BacktraceStep extends AbstractCallback
      */
     protected function typeToOutput()
     {
-        $stepData = $this->_parameters['data'];
+        $stepData = $this->parameters['data'];
 
         if (isset($stepData['type'])) {
-            return $this->_pool->render->renderSingleChild(
-                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            return $this->pool->render->renderSingleChild(
+                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                     ->setData($stepData['type'])
                     ->setName('Call type')
                     ->setNormal($stepData['type'])
@@ -217,13 +217,13 @@ class BacktraceStep extends AbstractCallback
      */
     protected function argsToOutput()
     {
-        $stepData = $this->_parameters['data'];
+        $stepData = $this->parameters['data'];
 
         if (isset($stepData['args'])) {
-            return $this->_pool
+            return $this->pool
                 ->createClass('Brainworxx\\Krexx\\Analyse\\Routing\\Process\\ProcessArray')
                     ->process(
-                        $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+                        $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                             ->setData($stepData['args'])
                             ->setName('Arguments from the call')
                     );

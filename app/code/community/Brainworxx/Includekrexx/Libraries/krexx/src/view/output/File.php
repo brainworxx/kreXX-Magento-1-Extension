@@ -58,7 +58,7 @@ class File extends AbstractOutput
      *   - footer
      *   This means, that every output is split in 4 parts
      */
-    protected $_chunkStrings = array();
+    protected $chunkStrings = array();
 
     /**
      * Adds output to our shutdown handler.
@@ -68,7 +68,7 @@ class File extends AbstractOutput
      */
     public function addChunkString($chunkString)
     {
-        $this->_chunkStrings[] = $chunkString;
+        $this->chunkStrings[] = $chunkString;
     }
 
 
@@ -81,9 +81,9 @@ class File extends AbstractOutput
         // Output our chunks.
         // Every output is split into 4 chunk strings (header, messages,
         // data, footer).
-        foreach ($this->_chunkStrings as $chunkString) {
+        foreach ($this->chunkStrings as $chunkString) {
             // Save everything to the file after we are done.
-            $this->_pool->chunks->saveDechunkedToFile($chunkString);
+            $this->pool->chunks->saveDechunkedToFile($chunkString);
         }
     }
 }

@@ -71,7 +71,7 @@ class Render extends \Brainworxx\Krexx\View\Render
     {
 
         // Check for emergency break.
-        if ($this->_pool->emergencyHandler->checkEmergencyBreak()) {
+        if ($this->pool->emergencyHandler->checkEmergencyBreak()) {
             return '';
         }
 
@@ -84,7 +84,7 @@ class Render extends \Brainworxx\Krexx\View\Render
 
         // Generating our code and adding the Codegen button, if there is
         // something to generate.
-        $gencode = $this->_pool->codegenHandler->generateSource($model);
+        $gencode = $this->pool->codegenHandler->generateSource($model);
 
         if ($gencode === ';stop;' || empty($gencode)) {
             // Remove the button marker, because here is nothing to add.
@@ -122,10 +122,10 @@ class Render extends \Brainworxx\Krexx\View\Render
                 $this->generateDataAttribute('source', $gencode),
                 '',
                 $this->generateDataAttribute('addjson', $this->encodeJson($model->getJson())),
-                $this->_pool->chunks->chunkMe($this->renderNest($model, false)),
+                $this->pool->chunks->chunkMe($this->renderNest($model, false)),
                 $sourcebutton,
-                $this->generateDataAttribute('codewrapper1', $this->_pool->codegenHandler->generateWrapper1()),
-                $this->generateDataAttribute('codewrapper2', $this->_pool->codegenHandler->generateWrapper2()),
+                $this->generateDataAttribute('codewrapper1', $this->pool->codegenHandler->generateWrapper1()),
+                $this->generateDataAttribute('codewrapper2', $this->pool->codegenHandler->generateWrapper2()),
             ),
             $this->getTemplateFileContent('expandableChildNormal')
         );
@@ -237,7 +237,7 @@ class Render extends \Brainworxx\Krexx\View\Render
         // Add the search.
         return str_replace(
             array('{search}', '{KrexxId}'),
-            array($this->renderSearch(), $this->_pool->recursionHandler->getMarker()),
+            array($this->renderSearch(), $this->pool->recursionHandler->getMarker()),
             parent::renderFatalMain($type, $errstr, $errfile, $errline)
         );
     }

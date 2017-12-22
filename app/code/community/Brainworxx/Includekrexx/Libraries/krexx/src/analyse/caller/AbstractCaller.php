@@ -48,7 +48,7 @@ abstract class AbstractCaller
      *
      * @var Pool
      */
-    protected $_pool;
+    protected $pool;
 
     /**
      * Pattern that we use to identify the caller.
@@ -57,7 +57,7 @@ abstract class AbstractCaller
      *
      * @var string
      */
-    protected $_pattern;
+    protected $pattern;
 
     /**
      * Here we store a more sophisticated list of calls.
@@ -66,7 +66,7 @@ abstract class AbstractCaller
      *
      * @var array
      */
-    protected $_callPattern;
+    protected $callPattern;
 
     /**
      * Injects the pool.
@@ -76,21 +76,21 @@ abstract class AbstractCaller
      */
     public function __construct(Pool $pool)
     {
-        $this->_pool = $pool;
+        $this->pool = $pool;
     }
 
     /**
      * Setter for the identifier pattern.
      *
-     * @param string $_pattern
+     * @param string $pattern
      *   The pattern, duh!
      *
      * @return $this
      *   Return this for chaining.
      */
-    public function setPattern($_pattern)
+    public function setPattern($pattern)
     {
-        $this->_pattern = $_pattern;
+        $this->pattern = $pattern;
         return $this;
     }
 
@@ -101,7 +101,7 @@ abstract class AbstractCaller
      */
     public function getPattern()
     {
-        return $this->_pattern;
+        return $this->pattern;
     }
 
     /**

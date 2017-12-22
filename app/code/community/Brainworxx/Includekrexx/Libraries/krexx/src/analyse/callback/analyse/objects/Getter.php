@@ -49,13 +49,13 @@ class Getter extends AbstractObjectAnalysis
      */
     public function callMe()
     {
-        $data = $this->_parameters['data'];
+        $data = $this->parameters['data'];
         /** @var \ReflectionClass $ref */
-        $ref = $this->_parameters['ref'];
+        $ref = $this->parameters['ref'];
         // Get all public methods.
         $methodList = $ref->getMethods(\ReflectionMethod::IS_PUBLIC);
 
-        if ($this->_pool->scope->isInScope()) {
+        if ($this->pool->scope->isInScope()) {
             // Looks like we also need the protected and private methods.
             $methodList = array_merge(
                 $methodList,
@@ -90,8 +90,8 @@ class Getter extends AbstractObjectAnalysis
         // Got some getters right here.
         // We need to set at least one connector here to activate
         // code generation, even if it is a space.
-        return $this->_pool->render->renderExpandableChild(
-            $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+        return $this->pool->render->renderExpandableChild(
+            $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setName('Getter')
                 ->setType('class internals')
                 ->setHelpid('getterHelpInfo')
@@ -99,7 +99,7 @@ class Getter extends AbstractObjectAnalysis
                 ->addParameter('methodList', $methodList)
                 ->addParameter('data', $data)
                 ->injectCallback(
-                    $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter')
+                    $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter')
                 )
         );
     }

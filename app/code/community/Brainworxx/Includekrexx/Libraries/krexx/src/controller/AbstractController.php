@@ -59,21 +59,21 @@ abstract class AbstractController
      *
      * @var AbstractOutput
      */
-    protected $_outputService;
+    protected $outputService;
 
     /**
      * Have we already send the CSS and JS?
      *
      * @var bool
      */
-    protected static $_headerSend = false;
+    protected static $headerSend = false;
 
     /**
      * Here we store the fatal error handler.
      *
      * @var \Brainworxx\Krexx\Errorhandler\Fatal
      */
-    protected $_krexxFatal;
+    protected $krexxFatal;
 
     /**
      * Stores whether out fatal error handler should be active.
@@ -83,35 +83,35 @@ abstract class AbstractController
      *
      * @var boolean
      */
-    protected $_fatalShouldActive = false;
+    protected $fatalShouldActive = false;
 
     /**
      * Here we save all timekeeping stuff.
      *
      * @var array
      */
-    protected static $_timekeeping = array();
+    protected static $timekeeping = array();
 
     /**
      * More timekeeping stuff.
      *
      * @var array
      */
-    protected static $_counterCache = array();
+    protected static $counterCache = array();
 
     /**
      * Our pool where we keep all relevant classes.
      *
      * @var Pool
      */
-    protected $_pool;
+    protected $pool;
 
     /**
      * Finds our caller.
      *
      * @var AbstractCaller
      */
-    protected $_callerFinder;
+    protected $callerFinder;
 
     /**
      * Injects the pool.
@@ -121,11 +121,11 @@ abstract class AbstractController
      */
     public function __construct(Pool $pool)
     {
-        $this->_pool = $pool;
-        $this->_callerFinder = $pool->createClass('Brainworxx\\Krexx\\Analyse\\Caller\\CallerFinder');
+        $this->pool = $pool;
+        $this->callerFinder = $pool->createClass('Brainworxx\\Krexx\\Analyse\\Caller\\CallerFinder');
 
         // Register our output service.
-        $this->_outputService = $pool->createClass('Brainworxx\\Krexx\\View\\Output\\File');
+        $this->outputService = $pool->createClass('Brainworxx\\Krexx\\View\\Output\\File');
     }
 
     /**
@@ -140,13 +140,13 @@ abstract class AbstractController
     protected function outputHeader($headline)
     {
         // Do we do an output as file?
-        if (static::$_headerSend) {
-            return $this->_pool->render->renderHeader('', $headline, '');
+        if (static::$headerSend) {
+            return $this->pool->render->renderHeader('', $headline, '');
         }
 
         // Send doctype and css/js only once.
-        static::$_headerSend = true;
-        return $this->_pool->render->renderHeader('<!DOCTYPE html>', $headline, $this->outputCssAndJs());
+        static::$headerSend = true;
+        return $this->pool->render->renderHeader('<!DOCTYPE html>', $headline, $this->outputCssAndJs());
     }
 
     /**
@@ -165,25 +165,25 @@ abstract class AbstractController
     {
         // Now we need to stitch together the content of the ini file
         // as well as it's path.
-        $pathToIni = $this->_pool->config->getPathToIniFile();
-        if ($this->_pool->fileService->fileIsReadable($pathToIni)) {
-            $path = $this->_pool->messages->getHelp('currentConfig');
+        $pathToIni = $this->pool->config->getPathToIniFile();
+        if ($this->pool->fileService->fileIsReadable($pathToIni)) {
+            $path = $this->pool->messages->getHelp('currentConfig');
         } else {
             // Project settings are not accessible
             // tell the user, that we are using fallback settings.
-            $path = $this->_pool->messages->getHelp('iniNotFound');
+            $path = $this->pool->messages->getHelp('iniNotFound');
         }
 
-        $model = $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+        $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
             ->setName($path)
-            ->setType($this->_pool->fileService->filterFilePath($pathToIni))
+            ->setType($this->pool->fileService->filterFilePath($pathToIni))
             ->setHelpid('currentSettings')
             ->injectCallback(
-                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughConfig')
+                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughConfig')
             );
 
-        $configOutput = $this->_pool->render->renderExpandableChild($model, $isExpanded);
-        return $this->_pool->render->renderFooter($caller, $configOutput, $isExpanded);
+        $configOutput = $this->pool->render->renderExpandableChild($model, $isExpanded);
+        return $this->pool->render->renderFooter($caller, $configOutput, $isExpanded);
     }
 
     /**
@@ -195,35 +195,35 @@ abstract class AbstractController
     protected function outputCssAndJs()
     {
         // Get the css file.
-        $css = $this->_pool->fileService->getFileContents(
+        $css = $this->pool->fileService->getFileContents(
             KREXX_DIR .
             'resources/skins/' .
-            $this->_pool->config->getSetting('skin') .
+            $this->pool->config->getSetting('skin') .
             '/skin.css'
         );
         // Remove whitespace.
         $css = preg_replace('/\s+/', ' ', $css);
 
         // Adding our DOM tools to the js.
-        if ($this->_pool->fileService->fileIsReadable(KREXX_DIR . 'resources/jsLibs/kdt.min.js')) {
+        if ($this->pool->fileService->fileIsReadable(KREXX_DIR . 'resources/jsLibs/kdt.min.js')) {
             $jsFile = KREXX_DIR . 'resources/jsLibs/kdt.min.js';
         } else {
             $jsFile = KREXX_DIR . 'resources/jsLibs/kdt.js';
         }
 
-        $jsCode = $this->_pool->fileService->getFileContents($jsFile);
+        $jsCode = $this->pool->fileService->getFileContents($jsFile);
 
         // Krexx.js is comes directly form the template.
-        $path = KREXX_DIR . 'resources/skins/' . $this->_pool->config->getSetting('skin');
-        if ($this->_pool->fileService->fileIsReadable($path . '/krexx.min.js')) {
+        $path = KREXX_DIR . 'resources/skins/' . $this->pool->config->getSetting('skin');
+        if ($this->pool->fileService->fileIsReadable($path . '/krexx.min.js')) {
             $jsFile = $path . '/krexx.min.js';
         } else {
             $jsFile = $path . '/krexx.js';
         }
 
-        $jsCode .= $this->_pool->fileService->getFileContents($jsFile);
+        $jsCode .= $this->pool->fileService->getFileContents($jsFile);
 
-        return $this->_pool->render->renderCssJs($css, $jsCode);
+        return $this->pool->render->renderCssJs($css, $jsCode);
     }
 
     /**
@@ -239,9 +239,9 @@ abstract class AbstractController
      */
     public function noFatalForKrexx()
     {
-        if ($this->_fatalShouldActive) {
-            $this->_krexxFatal->setIsActive(false);
-            unregister_tick_function(array($this->_krexxFatal, 'tickCallback'));
+        if ($this->fatalShouldActive) {
+            $this->krexxFatal->setIsActive(false);
+            unregister_tick_function(array($this->krexxFatal, 'tickCallback'));
         }
 
         return $this;
@@ -259,9 +259,9 @@ abstract class AbstractController
      */
     public function reFatalAfterKrexx()
     {
-        if ($this->_fatalShouldActive) {
-            $this->_krexxFatal->setIsActive(true);
-            register_tick_function(array($this->_krexxFatal, 'tickCallback'));
+        if ($this->fatalShouldActive) {
+            $this->krexxFatal->setIsActive(true);
+            register_tick_function(array($this->krexxFatal, 'tickCallback'));
         }
 
         return $this;

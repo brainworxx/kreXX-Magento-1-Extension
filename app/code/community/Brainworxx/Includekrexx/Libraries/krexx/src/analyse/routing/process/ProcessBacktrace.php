@@ -49,7 +49,7 @@ class ProcessBacktrace
      *
      * @var Pool
      */
-    protected $_pool;
+    protected $pool;
 
     /**
      * Injects the pool.
@@ -59,7 +59,7 @@ class ProcessBacktrace
      */
     public function __construct(Pool $pool)
     {
-         $this->_pool = $pool;
+         $this->pool = $pool;
     }
 
     /**
@@ -77,12 +77,12 @@ class ProcessBacktrace
     public function process(array &$backtrace)
     {
         $output = '';
-        $maxStep = (int) $this->_pool->config->getSetting('maxStepNumber');
+        $maxStep = (int) $this->pool->config->getSetting('maxStepNumber');
         $stepCount = count($backtrace);
 
         // Remove steps according to the configuration.
         if ($maxStep < $stepCount) {
-            $this->_pool->messages->addMessage('omittedBacktrace', array(($maxStep + 1), $stepCount));
+            $this->pool->messages->addMessage('omittedBacktrace', array(($maxStep + 1), $stepCount));
         }
 
         // We will not analyse more steps than we actually have.
@@ -91,13 +91,13 @@ class ProcessBacktrace
         }
 
         for ($step = 1; $step <= $maxStep; ++$step) {
-            $output .= $this->_pool->render->renderExpandableChild(
-                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            $output .= $this->pool->render->renderExpandableChild(
+                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                     ->setName($step)
                     ->setType('Stack Frame')
                     ->addParameter('data', $backtrace[$step - 1])
                     ->injectCallback(
-                        $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\BacktraceStep')
+                        $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Analyse\\BacktraceStep')
                     )
             );
         }

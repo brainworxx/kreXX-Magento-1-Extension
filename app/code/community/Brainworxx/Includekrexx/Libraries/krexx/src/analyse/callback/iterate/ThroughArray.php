@@ -59,15 +59,15 @@ class ThroughArray extends AbstractCallback
      */
     public function callMe()
     {
-        $output = $this->_pool->render->renderSingeChildHr();
+        $output = $this->pool->render->renderSingeChildHr();
 
         // Iterate through.
-        foreach ($this->_parameters['data'] as $key => &$value) {
+        foreach ($this->parameters['data'] as $key => &$value) {
             /** @var Model $model */
-            $model = $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model');
+            $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model');
 
             // Are we dealing with multiline code generation?
-            if ($this->_parameters['multiline']) {
+            if ($this->parameters['multiline']) {
                 // Here we tell the Codegen service that we need some
                 // special handling.
                 $model->setMultiLineCodeGen(Codegen::ITERATOR_TO_ARRAY);
@@ -75,7 +75,7 @@ class ThroughArray extends AbstractCallback
 
             if (is_string($key)) {
                 $model->setData($value)
-                    ->setName($this->_pool->encodingService->encodeString($key))
+                    ->setName($this->pool->encodingService->encodeString($key))
                     ->setConnectorType(Connectors::ASSOCIATIVE_ARRAY);
             } else {
                 $model->setData($value)
@@ -83,9 +83,9 @@ class ThroughArray extends AbstractCallback
                     ->setConnectorType(Connectors::NORMAL_ARRAY);
             }
 
-            $output .= $this->_pool->routing->analysisHub($model);
+            $output .= $this->pool->routing->analysisHub($model);
         }
 
-        return $output . $this->_pool->render->renderSingeChildHr();
+        return $output . $this->pool->render->renderSingeChildHr();
     }
 }

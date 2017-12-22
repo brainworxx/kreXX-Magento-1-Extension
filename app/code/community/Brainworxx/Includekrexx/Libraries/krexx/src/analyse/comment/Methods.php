@@ -47,7 +47,7 @@ class Methods extends AbstractComment
      *
      * @var string
      */
-    protected $_methodName;
+    protected $methodName;
 
     /**
      * Get the method comment and resolve the inheritdoc.
@@ -68,15 +68,15 @@ class Methods extends AbstractComment
         // Do some static caching. The comment will not change during a run.
         static $cache = array();
         /** @var \ReflectionMethod $reflectionMethod */
-        $this->_methodName = $reflectionMethod->getName();
-        $cachingKey = $reflectionClass->getName() . '::' . $this->_methodName;
+        $this->methodName = $reflectionMethod->getName();
+        $cachingKey = $reflectionClass->getName() . '::' . $this->methodName;
 
         if (isset($cache[$cachingKey])) {
             return $cache[$cachingKey];
         }
 
         // Cache not found. We need to generate this one.
-        $cache[$cachingKey] = $this->_pool->encodingService->encodeString(
+        $cache[$cachingKey] = $this->pool->encodingService->encodeString(
             $this->getMethodComment($reflectionMethod, $reflectionClass)
         );
         return $cache[$cachingKey];
@@ -122,19 +122,19 @@ class Methods extends AbstractComment
         // Nothing on this level, we need to take a look at the parent.
         $parentReflection = $reflectionClass->getParentClass();
         if ($parentReflection &&
-            $parentReflection->hasMethod($this->_methodName)
+            $parentReflection->hasMethod($this->methodName)
         ) {
             // Going deeper into the rabid hole!
             $comment = trim(
                 $this->getMethodComment(
-                    $parentReflection->getMethod($this->_methodName),
+                    $parentReflection->getMethod($this->methodName),
                     $parentReflection
                 )
             );
         }
 
         // Still here? Tell the dev that we could not resolve the comment.
-        return trim($this->replaceInheritComment($comment, $this->_pool->messages->getHelp('commentResolvingFail')));
+        return trim($this->replaceInheritComment($comment, $this->pool->messages->getHelp('commentResolvingFail')));
     }
 
     /**
@@ -167,9 +167,9 @@ class Methods extends AbstractComment
                 }
 
                 // We need to look further!
-                if ($trait->hasMethod($this->_methodName)) {
+                if ($trait->hasMethod($this->methodName)) {
                     $traitComment = $this->prettifyComment(
-                        $trait->getMethod($this->_methodName)->getDocComment()
+                        $trait->getMethod($this->methodName)->getDocComment()
                     );
                     // Replace it.
                     $originalComment = $this->replaceInheritComment($originalComment, $traitComment);
@@ -207,8 +207,8 @@ class Methods extends AbstractComment
             }
 
             // We need to look further.
-            if ($interface->hasMethod($this->_methodName)) {
-                $interfaceComment = $this->prettifyComment($interface->getMethod($this->_methodName)->getDocComment());
+            if ($interface->hasMethod($this->methodName)) {
+                $interfaceComment = $this->prettifyComment($interface->getMethod($this->methodName)->getDocComment());
                 // Replace it.
                 $originalComment = $this->replaceInheritComment($originalComment, $interfaceComment);
             }

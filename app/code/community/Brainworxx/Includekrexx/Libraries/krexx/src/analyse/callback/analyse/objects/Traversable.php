@@ -52,11 +52,11 @@ class Traversable extends AbstractObjectAnalysis
     public function callMe()
     {
         // Check nesting level, memory and runtime.
-        $this->_pool->emergencyHandler->upOneNestingLevel();
-        if ($this->_pool->emergencyHandler->checkNesting() || $this->_pool->emergencyHandler->checkEmergencyBreak()) {
+        $this->pool->emergencyHandler->upOneNestingLevel();
+        if ($this->pool->emergencyHandler->checkNesting() || $this->pool->emergencyHandler->checkEmergencyBreak()) {
             // We will not be doing this one, but we need to get down with our
             // nesting level again.
-            $this->_pool->emergencyHandler->downOneNestingLevel();
+            $this->pool->emergencyHandler->downOneNestingLevel();
             return '';
         }
 
@@ -72,8 +72,8 @@ class Traversable extends AbstractObjectAnalysis
      */
     protected function getTeversableData()
     {
-        $data = $this->_parameters['data'];
-        $name = $this->_parameters['name'];
+        $data = $this->parameters['data'];
+        $name = $this->parameters['name'];
 
         // Add a try to prevent the hosting CMS from doing something stupid.
         try {
@@ -111,25 +111,25 @@ class Traversable extends AbstractObjectAnalysis
             }
 
             /** @var Model $model */
-            $model = $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setName($name)
                 ->setType('Foreach')
                 ->addParameter('data', $parameter)
                 ->addParameter('multiline', $multiline);
             // This one is huge!
-            if (count($parameter) > $this->_pool->config->arrayCountLimit) {
+            if (count($parameter) > $this->pool->config->arrayCountLimit) {
                 $model->injectCallback(
-                    $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughLargeArray')
+                    $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughLargeArray')
                 )->setNormal('Simplified Traversable Info')
-                    ->addToJson('Help', $this->_pool->messages->getHelp('simpleArray'));
+                    ->addToJson('Help', $this->pool->messages->getHelp('simpleArray'));
             } else {
                 $model->injectCallback(
-                    $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughArray')
+                    $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughArray')
                 )->setNormal('Traversable Info');
             }
 
-            $result = $this->_pool->render->renderExpandableChild($model);
-            $this->_pool->emergencyHandler->downOneNestingLevel();
+            $result = $this->pool->render->renderExpandableChild($model);
+            $this->pool->emergencyHandler->downOneNestingLevel();
             return $result;
         }
 

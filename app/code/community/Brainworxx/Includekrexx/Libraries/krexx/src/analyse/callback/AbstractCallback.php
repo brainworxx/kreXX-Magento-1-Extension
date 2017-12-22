@@ -49,14 +49,14 @@ abstract class AbstractCallback
      *
      * @var Pool
      */
-    protected $_pool;
+    protected $pool;
 
     /**
      * The parameters for the callback.
      *
      * @var array
      */
-    protected $_parameters = array();
+    protected $parameters = array();
 
     /**
      * The actual callback function for the renderer.
@@ -74,7 +74,7 @@ abstract class AbstractCallback
      */
     public function __construct(Pool $pool)
     {
-        $this->_pool = $pool;
+        $this->pool = $pool;
     }
 
     /**
@@ -88,7 +88,7 @@ abstract class AbstractCallback
      */
     public function setParams(array &$params)
     {
-        $this->_parameters = $params;
+        $this->parameters = $params;
 
         return $this;
     }

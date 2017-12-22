@@ -55,14 +55,14 @@ class Codegen
      *
      * @var Pool
      */
-    protected $_pool;
+    protected $pool;
 
     /**
      * Is the code generation allowed? We only allow it during a normal analysis.
      *
      * @var bool
      */
-    protected $_allowCodegen = false;
+    protected $allowCodegen = false;
 
     /**
      * We treat the first run of the code generation different, because then we
@@ -70,7 +70,7 @@ class Codegen
      *
      * @var bool
      */
-    protected $_firstRun = true;
+    protected $firstRun = true;
 
     /**
      * Initializes the code generation.
@@ -80,7 +80,7 @@ class Codegen
      */
     public function __construct(Pool $pool)
     {
-        $this->_pool = $pool;
+        $this->pool = $pool;
     }
 
     /**
@@ -98,11 +98,11 @@ class Codegen
      */
     public function generateSource(Model $model)
     {
-        if ($this->_allowCodegen) {
+        if ($this->allowCodegen) {
             // We handle the first one special, because we need to add the original
             // variable name to the source generation.
-            if ($this->_firstRun) {
-                $this->_firstRun = false;
+            if ($this->firstRun) {
+                $this->firstRun = false;
                 return $this->concatenation($model);
             }
 
@@ -139,7 +139,7 @@ class Codegen
             }
 
             // Test if we are inside the scope. Everything within our scope is reachable.
-            if ($this->_pool->scope->testModelForCodegen($model)) {
+            if ($this->pool->scope->testModelForCodegen($model)) {
                 // We are inside the scope, this value, function or class is reachable.
                 return $this->concatenation($model);
             }
@@ -205,7 +205,7 @@ class Codegen
      */
     public function setAllowCodegen($bool)
     {
-        $this->_allowCodegen = $bool;
+        $this->allowCodegen = $bool;
     }
 
         /**
@@ -257,7 +257,7 @@ class Codegen
     {
         if (is_string($default)) {
             // We need to escape this one.
-            return '\'' . $this->_pool->encodingService->encodeString($default) . '\'';
+            return '\'' . $this->pool->encodingService->encodeString($default) . '\'';
         }
 
         if ($default === null) {

@@ -55,9 +55,9 @@ class Debug extends AbstractCallback
     public function callMe()
     {
         // This could be anything, we need to route it.
-        return $this->_pool->routing->analysisHub(
-            $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
-                ->setData($this->_parameters['data'])
+        return $this->pool->routing->analysisHub(
+            $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+                ->setData($this->parameters['data'])
                 ->setName('result')
         );
     }

@@ -61,12 +61,12 @@ class ThroughConstants extends AbstractCallback
         // We do not need to check the recursionHandler, this is class
         // internal stuff. Is it even possible to create a recursion here?
         // Iterate through.
-        foreach ($this->_parameters['data'] as $k => &$v) {
-            $output .= $this->_pool->routing->analysisHub(
-                $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+        foreach ($this->parameters['data'] as $k => &$v) {
+            $output .= $this->pool->routing->analysisHub(
+                $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                     ->setData($v)
                     ->setName($k)
-                    ->setCustomConnector1($this->_parameters['classname'] . '::')
+                    ->setCustomConnector1($this->parameters['classname'] . '::')
             );
         }
 

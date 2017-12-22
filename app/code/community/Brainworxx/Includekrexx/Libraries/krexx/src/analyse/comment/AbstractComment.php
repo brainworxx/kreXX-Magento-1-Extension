@@ -47,14 +47,14 @@ abstract class AbstractComment
     /**
      * @var Pool
      */
-    protected $_pool;
+    protected $pool;
 
     /**
      * Pattern for the finding of inherited comments.
      *
      * @var array
      */
-    protected $_inheritdocPattern = array(
+    protected $inheritdocPattern = array(
         '{@inheritdoc}',
         '{inheritdoc}',
         '@inheritdoc',
@@ -68,7 +68,7 @@ abstract class AbstractComment
      */
     public function __construct(Pool $pool)
     {
-        $this->_pool = $pool;
+        $this->pool = $pool;
     }
 
     /**
@@ -132,7 +132,7 @@ abstract class AbstractComment
      */
     protected function replaceInheritComment($originalComment, $comment)
     {
-        return str_ireplace($this->_inheritdocPattern, $comment, $originalComment);
+        return str_ireplace($this->inheritdocPattern, $comment, $originalComment);
     }
 
     /**

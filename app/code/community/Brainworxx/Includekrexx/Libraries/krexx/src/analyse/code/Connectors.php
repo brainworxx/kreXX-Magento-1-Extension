@@ -101,7 +101,7 @@ class Connectors
      *
      * @var array
      */
-    protected $_connectorArray;
+    protected $connectorArray;
 
     /**
      * The name of the language here. Will be used as the source generation
@@ -109,14 +109,14 @@ class Connectors
      *
      * @var string
      */
-    protected $_language = 'php';
+    protected $language = 'php';
 
     /**
      * Parameters, in case we are connecting a method or closure.
      *
      * @var string
      */
-    protected $_params = '';
+    protected $params = '';
 
     /**
      * The type of connectors we are rendering.
@@ -125,21 +125,21 @@ class Connectors
      *
      * @var integer
      */
-    protected $_type = 0;
+    protected $type = 0;
 
     /**
      * Special snowflake connector1. will be uses in case it is set.
      *
      * @var string
      */
-    protected $_customConnector1 = '';
+    protected $customConnector1 = '';
 
     /**
      * Initializing the connector array.
      */
     public function __construct()
     {
-        $this->_connectorArray = array(
+        $this->connectorArray = array(
             static::NOTHING => array('', ''),
             static::METHOD => array('->', '(@param@)'),
             static::STATIC_METHOD => array('::', '(@param@)'),
@@ -161,7 +161,7 @@ class Connectors
      */
     public function setParameters($params)
     {
-        $this->_params = $params;
+        $this->params = $params;
     }
 
     /**
@@ -172,18 +172,18 @@ class Connectors
      */
     public function getParameters()
     {
-        return $this->_params;
+        return $this->params;
     }
 
     /**
      * Setter for the type we are rendering, using the class constants.
      *
-     * @param string $_type
+     * @param string $type
      *   The type, @see constants above
      */
-    public function setType($_type)
+    public function setType($type)
     {
-        $this->_type = $_type;
+        $this->type = $type;
     }
 
     /**
@@ -194,11 +194,11 @@ class Connectors
      */
     public function getConnector1()
     {
-        if (empty($this->_customConnector1)) {
-            return $this->_connectorArray[$this->_type][0];
+        if (empty($this->customConnector1)) {
+            return $this->connectorArray[$this->type][0];
         }
 
-        return $this->_customConnector1;
+        return $this->customConnector1;
     }
 
     /**
@@ -213,11 +213,11 @@ class Connectors
     public function getConnector2($cap)
     {
         // Methods always have their parameters.
-        if ($this->_type === static::METHOD || $this->_type === static::STATIC_METHOD) {
-            if (!empty($this->_params)) {
+        if ($this->type === static::METHOD || $this->type === static::STATIC_METHOD) {
+            if (!empty($this->params)) {
                 // Copy the parameters, we will need the original ones later.
                 // This one is only for the quick preview.
-                $params = $this->_params;
+                $params = $this->params;
                 // Capping the parameters for a better readability.
                 if ($cap > 0 && strlen($params) > $cap) {
                     $params = substr($params, 0, $cap) . ' . . . ';
@@ -228,22 +228,22 @@ class Connectors
             } else {
                 $params = '';
             }
-
-            return  str_replace('@param@', $params, $this->_connectorArray[$this->_type][1]);
+            
+            return  str_replace('@param@', $params, $this->connectorArray[$this->type][1]);
         }
 
-        return $this->_connectorArray[$this->_type][1];
+        return $this->connectorArray[$this->type][1];
     }
 
     /**
      * Sets the special snowflake connector1.
      *
-     * @param string $_customConnector1
+     * @param string $customConnector1
      *   The string we want to set.
      */
-    public function setCustomConnector1($_customConnector1)
+    public function setCustomConnector1($customConnector1)
     {
-        $this->_customConnector1 = $_customConnector1;
+        $this->customConnector1 = $customConnector1;
     }
 
     /**
@@ -253,6 +253,6 @@ class Connectors
      */
     public function getLanguage()
     {
-        return $this->_language;
+        return $this->language;
     }
 }

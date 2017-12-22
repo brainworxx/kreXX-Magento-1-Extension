@@ -56,7 +56,7 @@ class ProcessResource extends AbstractProcess
     public function process(Model $model)
     {
         $data = get_resource_type($model->getData());
-        return $this->_pool->render->renderSingleChild(
+        return $this->pool->render->renderSingleChild(
             $model->setData($data)
                 ->setNormal($data)
                 ->setType('resource')

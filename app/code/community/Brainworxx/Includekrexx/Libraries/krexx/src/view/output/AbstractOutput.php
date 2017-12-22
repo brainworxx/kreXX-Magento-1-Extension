@@ -48,7 +48,7 @@ abstract class AbstractOutput
      *
      * @var Pool
      */
-    protected $_pool;
+    protected $pool;
 
     /**
      * Injects the pool and register the shutdown function.
@@ -58,7 +58,7 @@ abstract class AbstractOutput
      */
     public function __construct(Pool $pool)
     {
-        $this->_pool = $pool;
+        $this->pool = $pool;
         register_shutdown_function(array($this, 'shutdownCallback'));
     }
 

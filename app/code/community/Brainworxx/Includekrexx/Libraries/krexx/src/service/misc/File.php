@@ -49,19 +49,19 @@ class File
      *
      * @var array
      */
-    protected static $_isReadableCache = array();
+    protected static $isReadableCache = array();
 
     /**
      * @var Pool
      */
-    protected $_pool;
+    protected $pool;
 
     /**
      * The current docroot.
      *
      * @var string|false
      */
-    protected $_docRoot;
+    protected $docRoot;
 
     /**
      * Injects the pool.
@@ -70,10 +70,10 @@ class File
      */
     public function __construct(Pool $pool)
     {
-        $this->_pool = $pool;
-        $this->_docRoot = \Mage::getBaseDir('base');
-        if (empty($this->_docRoot)) {
-            $this->_docRoot = false;
+        $this->pool = $pool;
+        $this->docRoot = \Mage::getBaseDir('base');
+        if (empty($this->docRoot)) {
+            $this->docRoot = false;
         }
     }
 
@@ -114,16 +114,16 @@ class File
                 $realLineNo = $currentLineNo + 1;
 
                 if ($currentLineNo === $highlight) {
-                    $result .= $this->_pool->render->renderBacktraceSourceLine(
+                    $result .= $this->pool->render->renderBacktraceSourceLine(
                         'highlight',
                         $realLineNo,
-                        $this->_pool->encodingService->encodeString($content[$currentLineNo], true)
+                        $this->pool->encodingService->encodeString($content[$currentLineNo], true)
                     );
                 } else {
-                    $result .= $this->_pool->render->renderBacktraceSourceLine(
+                    $result .= $this->pool->render->renderBacktraceSourceLine(
                         'source',
                         $realLineNo,
-                        $this->_pool->encodingService->encodeString($content[$currentLineNo], true)
+                        $this->pool->encodingService->encodeString($content[$currentLineNo], true)
                     );
                 }
             } else {
@@ -221,7 +221,7 @@ class File
         } else {
             if ($showError) {
                 // This file was not readable! We need to tell the user!
-                $this->_pool->messages->addMessage('fileserviceAccess', array($this->filterFilePath($path)));
+                $this->pool->messages->addMessage('fileserviceAccess', array($this->filterFilePath($path)));
             }
         }
 
@@ -250,7 +250,7 @@ class File
 
         // New file. We tell the caching, that we have read access here.
         file_put_contents($path, $string, FILE_APPEND);
-        static::$_isReadableCache[$path] = true;
+        static::$isReadableCache[$path] = true;
     }
 
     /**
@@ -275,7 +275,7 @@ class File
             }
 
             // We have a permission problem here!
-            $this->_pool->messages->addMessage('fileserviceDelete', array($this->filterFilePath($filename)));
+            $this->pool->messages->addMessage('fileserviceDelete', array($this->filterFilePath($filename)));
             restore_error_handler();
         }
     }
@@ -302,9 +302,9 @@ class File
             $realpath = ltrim($realpath, DIRECTORY_SEPARATOR);
         }
 
-        if ($this->_docRoot !== false && strpos($realpath, $this->_docRoot) === 0) {
+        if ($this->docRoot !== false && strpos($realpath, $this->docRoot) === 0) {
             // Found it on position 0.
-            $realpath = '. . .' . DIRECTORY_SEPARATOR . substr($realpath, strlen($this->_docRoot) + 1);
+            $realpath = '. . .' . DIRECTORY_SEPARATOR . substr($realpath, strlen($this->docRoot) + 1);
         }
 
         return $realpath;
@@ -322,11 +322,11 @@ class File
     public function fileIsReadable($filePath)
     {
         // Return the cache, if we have any.
-        if (isset(static::$_isReadableCache[$filePath])) {
-            return static::$_isReadableCache[$filePath];
+        if (isset(static::$isReadableCache[$filePath])) {
+            return static::$isReadableCache[$filePath];
         }
 
         // Set the cache and return it.
-        return static::$_isReadableCache[$filePath] = is_readable($filePath) && is_file($filePath);
+        return static::$isReadableCache[$filePath] = is_readable($filePath) && is_file($filePath);
     }
 }

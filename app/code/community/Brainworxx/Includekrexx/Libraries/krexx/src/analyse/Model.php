@@ -46,21 +46,21 @@ class Model extends AbstractModel
      *
      * @var mixed
      */
-    protected $_data;
+    protected $data;
 
     /**
      * The name/key of it.
      *
      * @var string|int
      */
-    protected $_name = '';
+    protected $name = '';
 
     /**
      * The short result of the analysis.
      *
      * @var string
      */
-    protected $_normal = '';
+    protected $normal = '';
 
     /**
      * Additional data that gets added to the type. Normally something like
@@ -68,21 +68,21 @@ class Model extends AbstractModel
      *
      * @var string
      */
-    protected $_additional = '';
+    protected $additional = '';
 
     /**
      * The type of the variable we are analysing, in a string.
      *
      * @var string
      */
-    protected $_type = '';
+    protected $type = '';
 
     /**
      * A unique ID for the dom. We use this one for recursion resolving via JS.
      *
      * @var string
      */
-    protected $_domid = '';
+    protected $domid = '';
 
     /**
      * Info, if we have "extra" data to render.
@@ -91,21 +91,21 @@ class Model extends AbstractModel
      *
      * @var bool
      */
-    protected $_hasExtra = false;
+    protected $hasExtra = false;
 
     /**
      * Are we dealing with multiline code generation?
      *
      * @var integer
      */
-    protected $_multiLineCodeGen = 0;
+    protected $multiLineCodeGen = 0;
 
     /**
      * Defines if the content of the variable qualifies as a callback.
      *
      * @var bool
      */
-    protected $_isCallback = false;
+    protected $isCallback = false;
 
     /**
      * We need to know, if we are rendering the expandable child for the
@@ -113,20 +113,20 @@ class Model extends AbstractModel
      *
      * @var bool
      */
-    protected $_isMetaConstants = false;
+    protected $isMetaConstants = false;
 
     /**
      * Setter for the data.
      *
-     * @param mixed $_data
+     * @param mixed $data
      *   The current variable we are rendering.
      *
      * @return $this
      *   $this, for chaining.
      */
-    public function setData(&$_data)
+    public function setData(&$data)
     {
-        $this->_data = $_data;
+        $this->data = $data;
         return $this;
     }
 
@@ -138,21 +138,21 @@ class Model extends AbstractModel
      */
     public function &getData()
     {
-        return $this->_data;
+        return $this->data;
     }
 
     /**
      * Setter for the name.
      *
-     * @param int|string $_name
+     * @param int|string $name
      *   The name/key we are analysing.
      *
      * @return $this
      *   $this, for chaining.
      */
-    public function setName($_name)
+    public function setName($name)
     {
-        $this->_name = $_name;
+        $this->name = $name;
         return $this;
     }
 
@@ -164,21 +164,21 @@ class Model extends AbstractModel
      */
     public function &getName()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
      * Setter for normal.
      *
-     * @param string $_normal
+     * @param string $normal
      *   The short result of the analysis.
      *
      * @return $this
      *   $this, for chaining.
      */
-    public function setNormal($_normal)
+    public function setNormal($normal)
     {
-        $this->_normal = $_normal;
+        $this->normal = $normal;
         return $this;
     }
 
@@ -190,21 +190,21 @@ class Model extends AbstractModel
      */
     public function getNormal()
     {
-        return $this->_normal;
+        return $this->normal;
     }
 
     /**
      * Setter for additional.
      *
-     * @param string $_additional
+     * @param string $additional
      *   The long result of the analysis.
      *
      * @return $this
      *   $this, for chaining.
      */
-    public function setAdditional($_additional)
+    public function setAdditional($additional)
     {
-        $this->_additional = $_additional;
+        $this->additional = $additional;
         return $this;
     }
 
@@ -216,21 +216,21 @@ class Model extends AbstractModel
      */
     public function getAdditional()
     {
-        return $this->_additional;
+        return $this->additional;
     }
 
     /**
      * Setter for the type.
      *
-     * @param string $_type
+     * @param string $type
      *   The type of the variable we are analysing.
      *
      * @return $this
      *   $this, for chaining.
      */
-    public function setType($_type)
+    public function setType($type)
     {
-        $this->_type = $_type;
+        $this->type = $type;
         return $this;
     }
 
@@ -242,7 +242,7 @@ class Model extends AbstractModel
      */
     public function getType()
     {
-        return $this->_additional . $this->_type;
+        return $this->additional . $this->type;
     }
 
     /**
@@ -253,7 +253,7 @@ class Model extends AbstractModel
      */
     public function getConnector1()
     {
-        return $this->_connectorService->getConnector1();
+        return $this->connectorService->getConnector1();
     }
 
     /**
@@ -267,21 +267,21 @@ class Model extends AbstractModel
      */
     public function getConnector2($cap = 0)
     {
-        return $this->_connectorService->getConnector2($cap);
+        return $this->connectorService->getConnector2($cap);
     }
 
     /**
      * Setter for domid.
      *
-     * @param string $_domid
+     * @param string $domid
      *   The dom id, of cause.
      *
      * @return $this
      *   $this, for chaining.
      */
-    public function setDomid($_domid)
+    public function setDomid($domid)
     {
-        $this->_domid = $_domid;
+        $this->domid = $domid;
         return $this;
     }
 
@@ -293,7 +293,7 @@ class Model extends AbstractModel
      */
     public function getDomid()
     {
-        return $this->_domid;
+        return $this->domid;
     }
 
     /**
@@ -304,7 +304,7 @@ class Model extends AbstractModel
      */
     public function getHasExtras()
     {
-        return $this->_hasExtra;
+        return $this->hasExtra;
     }
 
     /**
@@ -315,7 +315,7 @@ class Model extends AbstractModel
      */
     public function hasExtras()
     {
-        $this->_hasExtra = true;
+        $this->hasExtra = true;
         return $this;
     }
 
@@ -326,21 +326,21 @@ class Model extends AbstractModel
      */
     public function getMultiLineCodeGen()
     {
-        return $this->_multiLineCodeGen;
+        return $this->multiLineCodeGen;
     }
 
     /**
      * Setter for the multiline code generation.
      *
-     * @param string $_multiLineCodeGen
+     * @param string $multiLineCodeGen
      *   The constant from the Codegen class.
      *
      * @return $this
      *   $this, for chaining.
      */
-    public function setMultiLineCodeGen($_multiLineCodeGen)
+    public function setMultiLineCodeGen($multiLineCodeGen)
     {
-        $this->_multiLineCodeGen = $_multiLineCodeGen;
+        $this->multiLineCodeGen = $multiLineCodeGen;
         return $this;
     }
 
@@ -351,17 +351,17 @@ class Model extends AbstractModel
      */
     public function getIsCallback()
     {
-        return $this->_isCallback;
+        return $this->isCallback;
     }
 
     /**
      * Setter for the $isCallback.
      *
-     * @param boolean $_isCallback
+     * @param boolean $isCallback
      */
-    public function setIsCallback($_isCallback)
+    public function setIsCallback($isCallback)
     {
-        $this->_isCallback = $_isCallback;
+        $this->isCallback = $isCallback;
     }
 
      /**
@@ -376,7 +376,7 @@ class Model extends AbstractModel
      */
     public function setConnectorParameters($params)
     {
-        $this->_connectorService->setParameters($params);
+        $this->connectorService->setParameters($params);
         return $this;
     }
 
@@ -388,7 +388,7 @@ class Model extends AbstractModel
      */
     public function getConnectorParameters()
     {
-        return $this->_connectorService->getParameters();
+        return $this->connectorService->getParameters();
     }
 
     /**
@@ -401,7 +401,7 @@ class Model extends AbstractModel
      */
     public function setConnectorType($type)
     {
-        $this->_connectorService->setType($type);
+        $this->connectorService->setType($type);
         return $this;
     }
 
@@ -416,7 +416,7 @@ class Model extends AbstractModel
      */
     public function setCustomConnector1($string)
     {
-        $this->_connectorService->setCustomConnector1($string);
+        $this->connectorService->setCustomConnector1($string);
         return $this;
     }
 
@@ -427,7 +427,7 @@ class Model extends AbstractModel
      */
     public function getConnectorLanguage()
     {
-        return $this->_connectorService->getLanguage();
+        return $this->connectorService->getLanguage();
     }
 
     /**
@@ -437,7 +437,7 @@ class Model extends AbstractModel
      */
     public function getParameters()
     {
-        return $this->_parameters;
+        return $this->parameters;
     }
 
     /**
@@ -449,7 +449,7 @@ class Model extends AbstractModel
      */
     public function getIsMetaConstants()
     {
-        return $this->_isMetaConstants;
+        return $this->isMetaConstants;
     }
 
     /**
@@ -462,7 +462,7 @@ class Model extends AbstractModel
      */
     public function setIsMetaConstants($bool)
     {
-        $this->_isMetaConstants = $bool;
+        $this->isMetaConstants = $bool;
         return $this;
     }
 }

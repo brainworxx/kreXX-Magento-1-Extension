@@ -54,7 +54,7 @@ class Recursion
      *
      * @var \SplObjectStorage
      */
-    protected $_recursionHive;
+    protected $recursionHive;
 
     /**
      * The recursion marker for the hive.
@@ -64,21 +64,21 @@ class Recursion
      *
      * @var string
      */
-    protected $_recursionMarker;
+    protected $recursionMarker;
 
     /**
      * Collection of dom ID's of object meta analytic stuff.
      *
      * @var array
      */
-    protected $_metaRecursionHive = array();
+    protected $metaRecursionHive = array();
 
     /**
      * Here we store, if we have rendered the $GLOBALS array so far.
      *
      * @var bool
      */
-    protected $_globalsWereRendered = false;
+    protected $globalsWereRendered = false;
 
 
     /**
@@ -88,8 +88,8 @@ class Recursion
      */
     public function __construct($pool)
     {
-        $this->_recursionMarker = 'Krexx' . substr(str_shuffle(md5(microtime())), 0, 10);
-        $this->_recursionHive = new \SplObjectStorage();
+        $this->recursionMarker = 'Krexx' . substr(str_shuffle(md5(microtime())), 0, 10);
+        $this->recursionHive = new \SplObjectStorage();
     }
 
     /**
@@ -100,7 +100,7 @@ class Recursion
      */
     public function addToHive($bee)
     {
-        $this->_recursionHive->attach($bee);
+        $this->recursionHive->attach($bee);
     }
 
     /**
@@ -116,18 +116,18 @@ class Recursion
     {
         // Check objects.
         if (is_object($bee)) {
-            return $this->_recursionHive->contains($bee);
+            return $this->recursionHive->contains($bee);
         }
 
         // We must not access the $_GLOBALS directly. There are other means of
         // checking if this is this dreaded array.
         if (isset($bee['_GET']) && isset($bee['_POST']) && isset($bee['_COOKIE'])) {
             // We render the $GLOBALS only once.
-            if ($this->_globalsWereRendered) {
+            if ($this->globalsWereRendered) {
                 return true;
             }
 
-            $this->_globalsWereRendered = true;
+            $this->globalsWereRendered = true;
         }
 
         // Should be a normal array. We do not track these, because we can not
@@ -146,7 +146,7 @@ class Recursion
      */
     public function getMarker()
     {
-        return $this->_recursionMarker;
+        return $this->recursionMarker;
     }
 
     /**
@@ -160,7 +160,7 @@ class Recursion
      */
     public function isInMetaHive($domId)
     {
-        return isset($this->_metaRecursionHive[$domId]);
+        return isset($this->metaRecursionHive[$domId]);
     }
 
     /**
@@ -171,6 +171,6 @@ class Recursion
      */
     public function addToMetaHive($domId)
     {
-        $this->_metaRecursionHive[$domId]= true;
+        $this->metaRecursionHive[$domId]= true;
     }
 }

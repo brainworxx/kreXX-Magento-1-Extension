@@ -57,15 +57,15 @@ class DumpController extends AbstractController
      */
     public function dumpAction($data, $headline = '')
     {
-        if ($this->_pool->emergencyHandler->checkMaxCall()) {
+        if ($this->pool->emergencyHandler->checkMaxCall()) {
             // Called too often, we might get into trouble here!
             return $this;
         }
 
-        $this->_pool->reset();
+        $this->pool->reset();
 
         // Find caller.
-        $caller = $this->_callerFinder->findCaller();
+        $caller = $this->callerFinder->findCaller();
 
         // Set the headline, if it's not set already.
         if (empty($headline)) {
@@ -85,7 +85,7 @@ class DumpController extends AbstractController
         // We need to get the footer before the generating of the header,
         // because we need to display messages in the header from the configuration.
         $footer = $this->outputFooter($caller);
-        $this->_pool->scope->setScope($caller['varname']);
+        $this->pool->scope->setScope($caller['varname']);
 
         // Enable code generation only if we were able to determine the varname.
         if ($caller['varname'] !== '. . .') {
@@ -95,29 +95,29 @@ class DumpController extends AbstractController
         }
 
         // Start the magic.
-        $analysis = $this->_pool->routing->analysisHub(
-            $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+        $analysis = $this->pool->routing->analysisHub(
+            $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setData($data)
                 ->setName($caller['varname'])
         );
 
         // Detect the encoding on the start-chunk-string of the analysis
         // for a complete encoding picture.
-        $this->_pool->chunks->detectEncoding($analysis);
+        $this->pool->chunks->detectEncoding($analysis);
 
         // Now that our analysis is done, we must check if there was an emergency
         // break.
-        if ($this->_pool->emergencyHandler->checkEmergencyBreak()) {
+        if ($this->pool->emergencyHandler->checkEmergencyBreak()) {
             return $this;
         }
 
         // Add the caller as metadata to the chunks class. It will be saved as
         // additional info, in case we are logging to a file.
-        $this->_pool->chunks->addMetadata($caller);
+        $this->pool->chunks->addMetadata($caller);
 
-        $this->_outputService->addChunkString($this->outputHeader($headline));
-        $this->_outputService->addChunkString($analysis);
-        $this->_outputService->addChunkString($footer);
+        $this->outputService->addChunkString($this->outputHeader($headline));
+        $this->outputService->addChunkString($analysis);
+        $this->outputService->addChunkString($footer);
 
         return $this;
     }
@@ -135,14 +135,14 @@ class DumpController extends AbstractController
     public function timerAction($string)
     {
         // Did we use this one before?
-        if (isset(static::$_counterCache[$string])) {
+        if (isset(static::$counterCache[$string])) {
             // Add another to the counter.
-            ++static::$_counterCache[$string];
-            static::$_timekeeping['[' . static::$_counterCache[$string] . ']' . $string] = microtime(true);
+            ++static::$counterCache[$string];
+            static::$timekeeping['[' . static::$counterCache[$string] . ']' . $string] = microtime(true);
         } else {
             // First time counter, set it to 1.
-            static::$_counterCache[$string] = 1;
-            static::$_timekeeping[$string] = microtime(true);
+            static::$counterCache[$string] = 1;
+            static::$timekeeping[$string] = microtime(true);
         }
 
         return $this;
@@ -158,10 +158,10 @@ class DumpController extends AbstractController
     {
         $this->timerAction('end');
         // And we are done. Feedback to the user.
-        $this->dumpAction($this->miniBenchTo(static::$_timekeeping), 'kreXX timer');
+        $this->dumpAction($this->miniBenchTo(static::$timekeeping), 'kreXX timer');
         // Reset the timer vars.
-        static::$_timekeeping = array();
-        static::$_counterCache = array();
+        static::$timekeeping = array();
+        static::$counterCache = array();
 
         return $this;
     }

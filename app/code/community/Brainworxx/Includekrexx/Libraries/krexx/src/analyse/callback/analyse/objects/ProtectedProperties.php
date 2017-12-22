@@ -50,7 +50,7 @@ class ProtectedProperties extends AbstractObjectAnalysis
     public function callMe()
     {
         /** @var \ReflectionClass $ref */
-        $ref = $this->_parameters['ref'];
+        $ref = $this->parameters['ref'];
         $refProps = $ref->getProperties(\ReflectionProperty::IS_PROTECTED);
         if (empty($refProps)) {
             return '';
@@ -61,7 +61,7 @@ class ProtectedProperties extends AbstractObjectAnalysis
         return $this->getReflectionPropertiesData(
             $refProps,
             $ref,
-            $this->_parameters['data'],
+            $this->parameters['data'],
             'Protected properties'
         );
     }

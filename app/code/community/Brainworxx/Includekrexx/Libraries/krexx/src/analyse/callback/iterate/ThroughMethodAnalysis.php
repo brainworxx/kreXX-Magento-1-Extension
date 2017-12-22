@@ -57,9 +57,9 @@ class ThroughMethodAnalysis extends AbstractCallback
     {
 
         $output = '';
-        foreach ($this->_parameters['data'] as $key => $string) {
+        foreach ($this->parameters['data'] as $key => $string) {
             /** @var Model $model */
-            $model = $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
+            $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                 ->setData($string)
                 ->setName($key)
                 ->setType('reflection');
@@ -71,7 +71,7 @@ class ThroughMethodAnalysis extends AbstractCallback
                 $model->setNormal($string);
             }
 
-            $output .= $this->_pool->render->renderSingleChild($model);
+            $output .= $this->pool->render->renderSingleChild($model);
         }
         
         return $output;
