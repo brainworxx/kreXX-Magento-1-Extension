@@ -157,6 +157,6 @@ class Methods extends AbstractObjectAnalysis
             $string .= 'pri_';
         }
 
-        return $string . hash('sha256', $data);
+        return $string . md5($data);
     }
 }
