@@ -7,6 +7,12 @@
     </reference>
   </adminhtml_krexx_docu>
 
+  <adminhtml_krexx_editlocalconfig>
+      <reference name="content">
+        <block type="adminhtml/template" name="krexxeditlocalconfig" template="includekrexx/editlocalconfig.phtml"/>
+      </reference>
+  </adminhtml_krexx_editlocalconfig>
+
   <adminhtml_krexx_config>
     <reference name="content">
       <block type="includekrexx/adminhtml_edit_config" name="krexxConfig" template="includekrexx/config.phtml"/>
