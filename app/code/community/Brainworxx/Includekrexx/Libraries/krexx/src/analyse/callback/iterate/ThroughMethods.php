@@ -116,9 +116,7 @@ class ThroughMethods extends AbstractCallback
                     ->setConnectorParameters($paramList)
                     ->addParameter('data', $methodData)
                     ->injectCallback(
-                        $this->_pool->createClass(
-                            'Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughMethodAnalysis'
-                        )
+                        $this->_pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughMethodAnalysis')
                     )
             );
         }
