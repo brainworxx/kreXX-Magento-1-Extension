@@ -245,8 +245,10 @@ class Config extends Fallback
      */
     protected function isRequestAjaxOrCli()
     {
-        $http = new \Zend_Controller_Request_Http();
-        if ($http->isXmlHttpRequest() &&
+        $server = $this->pool->getServer();
+
+        if (isset($server['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' &&
             $this->getSetting('detectAjax')
         ) {
             // Appending stuff after a ajax request will most likely
@@ -302,7 +304,13 @@ class Config extends Fallback
      */
     protected function isAllowedIp($whitelist)
     {
-        $remote = \Mage::helper('core/http')->getRemoteAddr(true);
+        $server = $this->pool->getServer();
+
+        if (empty($server['REMOTE_ADDR'])) {
+            $remote = '';
+        } else {
+            $remote = $server['REMOTE_ADDR'];
+        }
 
         $whitelist = explode(',', $whitelist);
         if (php_sapi_name() === 'cli' || in_array($remote, $whitelist)) {

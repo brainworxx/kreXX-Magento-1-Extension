@@ -313,6 +313,42 @@ abstract class AbstractController
      */
     protected function getCurrentUrl()
     {
-        return \Mage::helper('core/url')->getCurrentUrl();
+        $server = $this->pool->getServer();
+
+        // Check if someone has been messing with the $_SERVER, to prevent
+        // warnings and notices.
+        if (empty($server) ||
+            empty($server['SERVER_PROTOCOL']) ||
+            empty($server['SERVER_PORT']) ||
+            empty($server['SERVER_NAME'])) {
+            return 'n/a';
+        }
+
+        // SSL or no SSL.
+        $ssl = (!empty($server['HTTPS']) && $server['HTTPS'] === 'on');
+
+        $protocol = strtolower($server['SERVER_PROTOCOL']);
+        $protocol = substr($protocol, 0, strpos($protocol, '/'));
+        if ($ssl) {
+            $protocol .= 's';
+        }
+
+        $port = $server['SERVER_PORT'];
+
+        if ((!$ssl && $port === '80') || ($ssl && $port === '443')) {
+            // Normal combo with port and protocol.
+            $port = '';
+        } else {
+            // We have a special port here.
+            $port = ':' . $port;
+        }
+
+        if (isset($server['HTTP_HOST'])) {
+            $host = $server['HTTP_HOST'];
+        } else {
+            $host = $server['SERVER_NAME'] . $port;
+        }
+
+        return $this->pool->encodingService->encodeString($protocol . '://' . $host . $server['REQUEST_URI']);
     }
 }
