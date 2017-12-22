@@ -111,6 +111,15 @@ class Config extends Fallback
             }
         }
 
+        // We may need to change the disabling again, in case we are in cli
+        // or ajax mode and have no fileoutput.
+        if ($this->isRequestAjaxOrCli() &&
+            $this->getSetting('destination') !== 'file'
+        ) {
+            // No kreXX for you!
+            $this->setDisabled(true);
+        }
+
         // Now that our settings are in place, we need to check the
         // ip to decide if we need to deactivate kreXX.
         if (!$this->isAllowedIp($this->getSetting('iprange'))) {

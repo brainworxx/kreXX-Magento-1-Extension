@@ -209,6 +209,41 @@ class Chunks
     /**
      * Replaces all chunk keys from a string with the original data.
      *
+     * Send the output to the browser.
+     *
+     * @param string $string
+     *   The chunk string.
+     */
+    public function sendDechunkedToBrowser($string)
+    {
+        // Do some housekeeping. Unless something dreadful had happened, there
+        // should not be anything to cleanup.
+        $this->cleanupOldChunks();
+
+        $chunkPos = strpos($string, '@@@');
+
+        while ($chunkPos !== false) {
+            // We have a chunk, we send the html part.
+            echo substr($string, 0, $chunkPos);
+            ob_flush();
+            flush();
+            $chunkPart = substr($string, $chunkPos);
+
+            // We translate the first chunk.
+            $result = explode('@@@', $chunkPart, 3);
+            $string = str_replace('@@@' . $result[1] . '@@@', $this->dechunkMe($result[1]), $chunkPart);
+            $chunkPos = strpos($string, '@@@');
+        }
+
+        // No more chunk keys, we send what is left.
+        echo $string;
+        ob_flush();
+        flush();
+    }
+
+    /**
+     * Replaces all chunk keys from a string with the original data.
+     *
      * Saves the output to a file.
      *
      * @param string $string

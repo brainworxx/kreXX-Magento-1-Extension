@@ -113,6 +113,27 @@ class Security extends Fallback
     }
 
     /**
+     * We are expecting 'browser' or 'file'.
+     *
+     * @param string $value
+     *   The value we want to evaluate
+     * @param string $name
+     *   The name of the value we are checking, needed for the feedback text.
+     *
+     * @return boolean
+     *   Whether it does evaluate or not.
+     */
+    protected function evalDestination($value, $name)
+    {
+        $result = ($value === 'browser' || $value === 'file');
+        if (!$result) {
+            $this->pool->messages->addMessage('configError' . ucfirst($name));
+        }
+
+        return $result;
+    }
+
+    /**
      * Evaluating the IP range, by testing that it is not empty.
      *
      * @param string $value

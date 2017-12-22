@@ -102,10 +102,14 @@ class ErrorController extends AbstractController
                 'varname' => ' Fatal Error',
             )
         );
-        
-        // Save it to a file.
-        $this->pool->chunks->saveDechunkedToFile($header . $messages . $main . $backtrace . $footer);
 
+        if ($this->pool->config->getSetting('destination') === 'file') {
+            // Save it to a file.
+            $this->pool->chunks->saveDechunkedToFile($header . $messages . $main . $backtrace . $footer);
+        } else {
+            // Send it to the browser.
+            $this->pool->chunks->sendDechunkedToBrowser($header . $messages . $main . $backtrace . $footer);
+        }
 
         return $this;
     }

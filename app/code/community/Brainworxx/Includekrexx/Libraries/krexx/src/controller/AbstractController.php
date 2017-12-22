@@ -125,7 +125,15 @@ abstract class AbstractController
         $this->callerFinder = $pool->createClass('Brainworxx\\Krexx\\Analyse\\Caller\\CallerFinder');
 
         // Register our output service.
-        $this->outputService = $pool->createClass('Brainworxx\\Krexx\\View\\Output\\File');
+        // Depending on the setting, we use another class here.
+        $outputSetting = $pool->config->getSetting('destination');
+        if ($outputSetting === 'browser') {
+            $this->outputService = $pool->createClass('Brainworxx\\Krexx\\View\\Output\\Shutdown');
+        }
+
+        if ($outputSetting === 'file') {
+            $this->outputService = $pool->createClass('Brainworxx\\Krexx\\View\\Output\\File');
+        }
     }
 
     /**
