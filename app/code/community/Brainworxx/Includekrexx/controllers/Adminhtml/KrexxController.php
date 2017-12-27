@@ -185,14 +185,16 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         // We must preserve the section 'feEditing'.
         // Everything else will be overwritten.
         $ioFile = new Varien_Io_File();
+        
         if ($ioFile->fileExists($filepath)) {
             $iniParser = New Zend_Config_Ini($filepath);
             $values = $iniParser->toArray();
-        } else {
-            $values = array();
+            if (!empty($values['feEditing'])) {
+                $values = array('feEditing' => $values['feEditing']);
+            } else {
+                $values = array();
+            }
         }
-
-        $values = array('feEditing' => $values['feEditing']);
 
         // Iterating through the form.
         foreach ($arguments as $section => $data) {
