@@ -70,9 +70,9 @@ class Brainworxx_Includekrexx_Model_Observer
         if (!$beenHere) {
             // We need to check, if the kreXX overwrite class, as well as the
             // main class have been loaded before. If not, load them.
-            $libPath = Mage::getModuleDir('', 'Brainworxx_Includekrexx') . '/Libraries/';
+            $libPath = Mage::getModuleDir('', 'Brainworxx_Includekrexx') . '/Krexx/';
 
-            $pathToKrexx = $libPath . 'krexx/Krexx.php';
+            $pathToKrexx = $libPath . 'Krexx.php';
             if (!class_exists('\Krexx', false)) {
                 include_once $pathToKrexx;
             }
