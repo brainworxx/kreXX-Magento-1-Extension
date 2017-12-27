@@ -107,6 +107,8 @@ class Brainworxx_Includekrexx_Model_Observer
      *
      * @param string $path
      *   The path to the directory we want to prectect.
+     * @param string $newDir
+     *   The name of the directory we want to create,
      */
     protected function processDir($path, $newDir)
     {
