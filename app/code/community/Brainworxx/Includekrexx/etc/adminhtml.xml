@@ -18,7 +18,7 @@
               <sort_order>10</sort_order>
               <action>adminhtml/krexx/feconfig</action>
             </editfe>
-
+            
             <krexxlog translate="title" module="includekrexx">
               <title>Access logfiles</title>
               <sort_order>15</sort_order>
