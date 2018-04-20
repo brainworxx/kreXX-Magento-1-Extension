@@ -31,13 +31,13 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 ?>
 <h1>Edit kreXX Configuration File</h1>
 <form action="<?php echo $this->escapeHtml($this->getSaveUrl()) ?>" method="post" id="editconfig">
     <table cellpadding="0" cellspacing="2" border="0" class="krexx-config form-list">
 
-
-                <!-- Output -->
+        <!-- Output -->
         <tr><th colspan="4"><b>Output</b></th></tr>
         <tr>
             <td><label for="disabled">Disable output:</label></td>
@@ -613,7 +613,7 @@
 
 
         <!-- Backtrace handling -->
-        <tr><th colspan="4"><b>Backtrace</b></th></tr>
+        <tr><th colspan="4"><b>Prune output</b></th></tr>
         <tr>
             <td><label for="maxStepNumber">Maximum count of steps in the backtrace:</label></td>
             <td>
@@ -622,8 +622,8 @@
             <td>
                 <input
                     type="text"
-                    value="<?php echo $this->escapeHtml($settings['backtrace']['maxStepNumber']); ?>"
-                    name="backtrace[maxStepNumber]"
+                    value="<?php echo $this->escapeHtml($settings['pruneOutput']['maxStepNumber']); ?>"
+                    name="pruneOutput[maxStepNumber]"
                     id="maxStepNumber">
             </td>
             <td>
@@ -635,6 +635,30 @@
                     name="factory"
                     <?php echo $this->escapeHtml($factory['maxStepNumber']); ?>/>
                 <label for="factory.maxStepNumber">Use factory settings</label>
+            </td>
+        </tr>
+
+        <tr>
+            <td><label for="arrayCountLimit">Maximum array size before fallback to simplified analysis:</label></td>
+            <td>
+                <div class="link-store-scope" title="<?php echo $this->escapeHtml($help['arrayCountLimit']); ?>"></div>
+            </td>
+            <td>
+                <input
+                    type="text"
+                    value="<?php echo $this->escapeHtml($settings['pruneOutput']['arrayCountLimit']); ?>"
+                    name="pruneOutput[arrayCountLimit]"
+                    id="arrayCountLimit">
+            </td>
+            <td>
+                <input
+                    id="factory.arrayCountLimit"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['arrayCountLimit']); ?>/>
+                <label for="factory.arrayCountLimit">Use factory settings</label>
             </td>
         </tr>
 

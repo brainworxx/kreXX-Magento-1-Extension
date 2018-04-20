@@ -32,6 +32,9 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+use Brainworxx\Krexx\Service\Factory\Pool;
+use Brainworxx\Krexx\Service\Config\Fallback;
+
 /**
  * Magento backend controller for kreXX
  */
@@ -44,27 +47,28 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      * @var array
      */
     protected $_allowedSettingsNames = array(
-        'skin',
-        'maxfiles',
-        'destination',
-        'maxCall',
-        'disabled',
-        'detectAjax',
-        'analyseProtected',
-        'analysePrivate',
-        'analyseTraversable',
-        'debugMethods',
-        'level',
-        'analyseProtectedMethods',
-        'analysePrivateMethods',
-        'backtraceAnalysis',
-        'analyseConstants',
-        'iprange',
-        'memoryLeft',
-        'maxRuntime',
-        'useScopeAnalysis',
-        'analyseGetter',
-        'maxStepNumber',
+        Fallback::SETTING_DISABLED,
+        Fallback::SETTING_IP_RANGE,
+        Fallback::SETTING_SKIN,
+        Fallback::SETTING_DESTINATION,
+        Fallback::SETTING_MAX_FILES,
+        Fallback::SETTING_DETECT_AJAX,
+        Fallback::SETTING_NESTING_LEVEL,
+        Fallback::SETTING_MAX_CALL,
+        Fallback::SETTING_MAX_RUNTIME,
+        Fallback::SETTING_MEMORY_LEFT,
+        Fallback::SETTING_USE_SCOPE_ANALYSIS,
+        Fallback::SETTING_ANALYSE_PROTECTED,
+        Fallback::SETTING_ANALYSE_PRIVATE,
+        Fallback::SETTING_ANALYSE_CONSTANTS,
+        Fallback::SETTING_ANALYSE_TRAVERSABLE,
+        Fallback::SETTING_ANALYSE_PROTECTED_METHODS,
+        Fallback::SETTING_ANALYSE_PRIVATE_METHODS,
+        Fallback::SETTING_ANALYSE_GETTER,
+        Fallback::SETTING_DEBUG_METHODS,
+        Fallback::SETTING_MAX_STEP_NUMBER,
+        Fallback::SETTING_ARRAY_COUNT_LIMIT,
+        Fallback::SETTING_DEV_HANDLE,
     );
 
     /**
@@ -73,11 +77,11 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      * @var array
      */
     protected $_allowedSections = array(
-        'runtime',
-        'output',
-        'properties',
-        'methods',
-        'backtrace',
+        Fallback::SECTION_OUTPUT,
+        Fallback::SECTION_RUNTIME,
+        Fallback::SECTION_PROPERTIES,
+        Fallback::SECTION_METHODS,
+        Fallback::SECTION_PRUNE_OUTPUT,
     );
 
     /**
@@ -117,8 +121,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      */
     protected function init()
     {
-        Krexx::createPool();
-
+        Pool::createPool();
         Mage::helper('includekrexx')->relayMessages();
         $this->loadLayout();
         $this->_setActiveMenu('system/krexxdocu');
@@ -175,7 +178,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      */
     public function saveconfigAction()
     {
-        Krexx::createPool();
+        Pool::createPool();
 
         $arguments = $this->getRequest()->getPost();
         $allOk = true;
@@ -185,7 +188,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         // We must preserve the section 'feEditing'.
         // Everything else will be overwritten.
         $ioFile = new Varien_Io_File();
-        
+
         if ($ioFile->fileExists($filepath)) {
             $iniParser = New Zend_Config_Ini($filepath);
             $values = $iniParser->toArray();
@@ -219,7 +222,6 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
 
         $this->finalizeIni($filepath, $values, $allOk);
         $this->_redirect('*/*/config');
-
     }
 
     /**
@@ -227,7 +229,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
      */
     public function savefeconfigAction()
     {
-        Krexx::createPool();
+        Pool::createPool();
 
         $arguments = $this->getRequest()->getPost();
         $allOk = true;
@@ -240,7 +242,7 @@ class Brainworxx_Includekrexx_Adminhtml_KrexxController extends Mage_Adminhtml_C
         // Get the old values . . .
         $ioFile = new Varien_Io_File();
         if ($ioFile->fileExists($filepath)) {
-            $iniParser = New Zend_Config_Ini($filepath);
+            $iniParser = new Zend_Config_Ini($filepath);
             $values = $iniParser->toArray();
             unset($values['feEditing']);
         } else {

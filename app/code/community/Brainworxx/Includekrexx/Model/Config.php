@@ -32,49 +32,25 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+use Brainworxx\Krexx\Service\Factory\Pool;
+use Brainworxx\Krexx\Service\Config\Fallback;
 /**
  * 'Custom' debug methods for magento.
  */
 class Brainworxx_Includekrexx_Model_Config extends Brainworxx\Krexx\Service\Config\Config
 {
-    /**
-     * {@inheritdoc}
+        /**
+     * Injects the pool and initializes the security.
      *
-     * We are using fewer debuMethods for magento, to prevent an
-     * overkill-output.
-     *
-     * @var array
+     * @param Pool $pool
      */
-    public $configFallback = array(
-        'output' => array(
-            'disabled' => 'false',
-            'iprange' => '*',
-            'skin' => 'smokygrey',
-            'destination' => 'browser',
-            'maxfiles' => '10',
-        ),
-        'runtime' => array(
-            'detectAjax' => 'true',
-            'level' => '5',
-            'maxCall' => '10',
-            'maxRuntime' => '60',
-            'memoryLeft' => '64',
-            'useScopeAnalysis' => 'true',
-        ),
-        'properties' => array(
-            'analyseProtected' => 'false',
-            'analysePrivate' => 'false',
-            'analyseConstants' => 'true',
-            'analyseTraversable' => 'true',
-        ),
-        'methods' => array(
-            'analyseProtectedMethods' => 'false',
-            'analysePrivateMethods' => 'false',
-            'analyseGetter' => 'true',
-            'debugMethods' => '__toArray,toString',
-        ),
-        'backtrace' => array(
-            'maxStepNumber' => 10,
-        ),
-    );
+    public function __construct(Pool $pool)
+    {
+        parent::__construct($pool);
+
+        $this->pool = $pool;
+
+        $this->feConfigFallback[Fallback::SETTING_DEBUG_METHODS][Fallback::VALUE]
+            = '__toArray,toString';
+    }
 }

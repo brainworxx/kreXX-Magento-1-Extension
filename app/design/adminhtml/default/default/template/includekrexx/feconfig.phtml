@@ -508,9 +508,10 @@
         <tr>
             <td><label for="maxStepNumber">Maximum count of steps in the backtrace:</label></td>
             <td>
-                <select name="backtrace[maxStepNumber]" id="maxStepNumber">
-                    <?php foreach ($data['settings'] as $key => $value) {
-                        if ($key == $settings['backtrace']['maxStepNumber']) {
+                <select name="pruneOutput[maxStepNumber]" id="maxStepNumber">
+                    <?php
+                    foreach ($data['settings'] as $key => $value) {
+                        if ($key == $settings['pruneOutput']['maxStepNumber']) {
                             $selected = 'selected="selected"';
                         } else {
                             $selected = '';
@@ -533,7 +534,35 @@
                 <label for="factory.maxStepNumber">Use factory settings</label>
             </td>
         </tr>
-
+        <tr>
+            <td><label for="arrayCountLimit">Maximum array size before fallback to simplified analysis:</label></td>
+            <td>
+                <select name="pruneOutput[arrayCountLimit]" id="arrayCountLimit">
+                    <?php
+                    foreach ($data['settings'] as $key => $value) {
+                        if ($key == $settings['pruneOutput']['arrayCountLimit']) {
+                            $selected = 'selected="selected"';
+                        } else {
+                            $selected = '';
+                        } ?>
+                        <option value="<?php echo $this->escapeHtml($key); ?>"
+                            <?php echo $this->escapeHtml($selected); ?> >
+                            <?php echo $this->escapeHtml($value); ?>
+                        </option>
+                    <?php } ?>
+                </select>
+            </td>
+            <td>
+                <input
+                    id="factory.arrayCountLimit"
+                    class="checkbox"
+                    type="checkbox"
+                    value="1"
+                    name="factory"
+                    <?php echo $this->escapeHtml($factory['arrayCountLimit']); ?>/>
+                <label for="factory.arrayCountLimit">Use factory settings</label>
+            </td>
+        </tr>
 
     </table>
     <br/>

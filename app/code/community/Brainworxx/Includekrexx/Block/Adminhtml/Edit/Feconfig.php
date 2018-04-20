@@ -32,13 +32,14 @@
  *   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+use \Brainworxx\Krexx\Service\Config\Fallback;
+
 /**
  * Block for the frontend configuration in the backend.
  */
 class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminhtml_Block_Template
 {
-
-
+    
     /**
      * Return save url for edit form
      *
@@ -78,68 +79,18 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
         );
 
         // See, if we have any values in the configuration file.
-        // See, if we have any values in the configuration file.
-        $settings['output']['skin'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('skin')
-        );
-        $settings['runtime']['maxCall'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('maxCall')
-        );
-        $settings['output']['disabled'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('disabled')
-        );
-        $settings['runtime']['detectAjax'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('detectAjax')
-        );
-        $settings['properties']['analyseProtected'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('analyseProtected')
-        );
-        $settings['properties']['analysePrivate'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('analysePrivate')
-        );
-        $settings['properties']['analyseTraversable'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('analyseTraversable')
-        );
-        $settings['properties']['analyseConstants'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('analyseConstants')
-        );
-        $settings['runtime']['level'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('level')
-        );
-        $settings['methods']['analyseProtectedMethods'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('analyseProtectedMethods')
-        );
-        $settings['methods']['analysePrivateMethods'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('analysePrivateMethods')
-        );
-        $settings['backtrace']['maxStepNumber'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('maxStepNumber')
-        );
-        $settings['runtime']['memoryLeft'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('memoryLeft')
-        );
-        $settings['runtime']['maxRuntime'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('maxRuntime')
-        );
-        $settings['methods']['analyseGetter'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('analyseGetter')
-        );
-        $settings['runtime']['useScopeAnalysis'] = $this->convertKrexxFeSetting(
-            $pool->config->iniConfig->getFeConfigFromFile('useScopeAnalysis')
-        );
-
-        // Are these actually set?
-        foreach ($settings as $mainkey => $setting) {
-            foreach ($setting as $attribute => $config) {
-                if ($config === null) {
-                    $factory[$attribute] = ' checked="checked" ';
+        foreach ($pool->config->configFallback as $sectionName => $sectionSettings) {
+            foreach ($sectionSettings as $settingName) {
+                $settings[$sectionName][$settingName] = $pool->config->iniConfig->getFeConfigFromFile($settingName);
+                if ($settings[$sectionName][$settingName] === null) {
+                    $factory[$settingName] = ' checked="checked" ';
                     // We need to fill these values with the stuff from the
                     // factory settings!
-                    $settings[$mainkey][$attribute] = $this->convertKrexxFeSetting(
-                        $pool->config->feConfigFallback[$attribute]
+                    $settings[$sectionName][$settingName] = $this->convertKrexxFeSetting(
+                        $pool->config->feConfigFallback[$settingName][Fallback::RENDER]
                     );
                 } else {
-                    $factory[$attribute] = '';
+                    $factory[$settingName] = '';
                 }
             }
         }
@@ -171,17 +122,17 @@ class Brainworxx_Includekrexx_Block_Adminhtml_Edit_Feconfig extends Mage_Adminht
             // display -> we will only display the settings
             // The original values include the name of a template partial
             // with the form element.
-            if ($values['type'] == 'None') {
+            if ($values[Fallback::RENDER_TYPE] == Fallback::RENDER_TYPE_NONE) {
                 // It's not visible, thus we do not accept any values from it.
-                $result = 'none';
+                $result = Fallback::RENDER_TYPE_NONE;
             }
 
-            if ($values['editable'] == 'true' && $values['type'] != 'None') {
+            if ($values[Fallback::RENDER_EDITABLE] == 'true' && $values[Fallback::RENDER_TYPE] != Fallback::RENDER_TYPE_NONE) {
                 // It's editable and visible.
                 $result = 'full';
             }
 
-            if ($values['editable'] == 'false' && $values['type'] != 'None') {
+            if ($values[Fallback::RENDER_EDITABLE] == 'false' && $values[Fallback::RENDER_TYPE] != Fallback::RENDER_TYPE_NONE) {
                 // It's only visible.
                 $result = 'display';
             }
