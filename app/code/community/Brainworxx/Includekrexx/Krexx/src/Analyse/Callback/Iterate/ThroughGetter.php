@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -37,14 +37,22 @@ namespace Brainworxx\Krexx\Analyse\Callback\Iterate;
 use Brainworxx\Krexx\Analyse\Callback\AbstractCallback;
 use Brainworxx\Krexx\Analyse\Model;
 use Brainworxx\Krexx\Analyse\Code\Connectors;
+use Brainworxx\Krexx\Service\Factory\Pool;
 
 /**
  * Getter method analysis methods.
  *
  * @package Brainworxx\Krexx\Analyse\Callback\Iterate
  *
- * @uses array methodList
- *   The list of all reflection methods we are analysing
+ * @uses array normalGetter
+ *   The list of all reflection methods we are analysing, hosting the
+ *   get methods starting with 'get'
+ * @uses array isGetter
+ *   The list of all reflection methods we are analysing, hosting the
+ *   get methods starting with 'is'
+ * @uses array hasGetter
+ *   The list of all reflection methods we are analysing, hosting the
+ *   get methods starting with 'has'
  * @uses \ReflectionClass $ref
  *   A reflection class of the object we are analysing.
  * @uses object $data
@@ -61,6 +69,33 @@ class ThroughGetter extends AbstractCallback
     protected $deep = 0;
 
     /**
+     * Class for the comment analysis.
+     *
+     * @var \Brainworxx\Krexx\Analyse\comment\Methods
+     */
+    protected $commentAnalysis;
+
+    /**
+     * The current prefix we are analysing (get, is, has).
+     *
+     * @see $this->preparePropertyName()
+     *
+     * @var string
+     */
+    protected $currentPrefix;
+
+    /**
+     * Injects the pool and initializes the comment analysis.
+     *
+     * @param \Brainworxx\Krexx\Service\Factory\Pool $pool
+     */
+    public function __construct(Pool $pool)
+    {
+        parent::__construct($pool);
+        $this->commentAnalysis = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Methods');
+    }
+
+    /**
      * Try to get the possible result of all getter methods.
      *
      * @return string
@@ -68,12 +103,31 @@ class ThroughGetter extends AbstractCallback
      */
     public function callMe()
     {
+        $this->currentPrefix = 'get';
+        $output = $this->goThroughMethodList($this->parameters['normalGetter']);
+
+        $this->currentPrefix = 'is';
+        $output .= $this->goThroughMethodList($this->parameters['isGetter']);
+
+        $this->currentPrefix = 'has';
+        return $output . $this->goThroughMethodList($this->parameters['hasGetter']);
+    }
+
+    /**
+     * Iterating through a list of reflection methods.
+     *
+     * @param array $methodList
+     *   The list of methods we are going through, consisting of \ReflectionMethod
+     *
+     * @return string
+     *   The generated DOM.
+     */
+    protected function goThroughMethodList(array $methodList)
+    {
         $output = '';
-        /** @var \Brainworxx\Krexx\Analyse\comment\Methods $commentAnalysis */
-        $commentAnalysis = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Comment\\Methods');
 
         /** @var \ReflectionMethod $reflectionMethod */
-        foreach ($this->parameters['methodList'] as $reflectionMethod) {
+        foreach ($methodList as $reflectionMethod) {
             // Back to level 0, we reset the deep counter.
             $this->deep = 0;
 
@@ -81,7 +135,7 @@ class ThroughGetter extends AbstractCallback
             // 1.) We have an actual value
             // 2.) We got NULL as a value
             // 3.) We were unable to get any info at all.
-            $comments = nl2br($commentAnalysis->getComment($reflectionMethod, $this->parameters['ref']));
+            $comments = nl2br($this->commentAnalysis->getComment($reflectionMethod, $this->parameters['ref']));
 
             /** @var Model $model */
             $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
@@ -89,7 +143,7 @@ class ThroughGetter extends AbstractCallback
                 ->addToJson('method comment', $comments);
 
             // We need to decide if we are handling static getters.
-            if ($reflectionMethod->isStatic()) {
+            if ($reflectionMethod->isStatic() === true) {
                 $model->setConnectorType(Connectors::STATIC_METHOD);
             } else {
                 $model->setConnectorType(Connectors::METHOD);
@@ -117,7 +171,7 @@ class ThroughGetter extends AbstractCallback
     {
         $refProp = $this->getReflectionProperty($this->parameters['ref'], $reflectionMethod);
 
-        if (empty($refProp)) {
+        if (empty($refProp) === true) {
             // Found nothing  :-(
             // We literally have no info. We need to tell the user.
             $noInfoMessage = 'unknown';
@@ -178,49 +232,49 @@ class ThroughGetter extends AbstractCallback
 
         // myProperty
         // Most should be handled here.
-        if ($classReflection->hasProperty($propertyName)) {
+        if ($classReflection->hasProperty($propertyName) === true) {
             return $classReflection->getProperty($propertyName);
         }
 
         // _myProperty
         $testName = '_' . $propertyName;
-        if ($classReflection->hasProperty($testName)) {
+        if ($classReflection->hasProperty($testName) === true) {
             return $classReflection->getProperty($testName);
         }
 
         // MyProperty
         $testName = ucfirst($propertyName);
-        if ($classReflection->hasProperty($testName)) {
+        if ($classReflection->hasProperty($testName) === true) {
             return $classReflection->getProperty($testName);
         }
 
         // _MyProperty
         $testName = '_' . ucfirst($propertyName);
-        if ($classReflection->hasProperty($testName)) {
+        if ($classReflection->hasProperty($testName) === true) {
             return $classReflection->getProperty($testName);
         }
 
         // myproperty
         $testName = strtolower($propertyName);
-        if ($classReflection->hasProperty($testName)) {
+        if ($classReflection->hasProperty($testName) === true) {
             return $classReflection->getProperty($testName);
         }
 
         // _myproperty
         $testName = '_' . strtolower($propertyName);
-        if ($classReflection->hasProperty($testName)) {
+        if ($classReflection->hasProperty($testName) === true) {
             return $classReflection->getProperty($testName);
         }
 
         // my_property
         $testName = $this->convertToSnakeCase($propertyName);
-        if ($classReflection->hasProperty($testName)) {
+        if ($classReflection->hasProperty($testName) === true) {
             return $classReflection->getProperty($testName);
         }
 
         // _my_property
         $testName = '_' . $this->convertToSnakeCase($propertyName);
-        if ($classReflection->hasProperty($testName)) {
+        if ($classReflection->hasProperty($testName) === true) {
             return $classReflection->getProperty($testName);
         }
 
@@ -239,16 +293,18 @@ class ThroughGetter extends AbstractCallback
      */
     protected function preparePropertyName(\ReflectionMethod $reflectionMethod)
     {
-         // Get the name and remove the 'get' or the '_get'.
+         // Get the name and remove the 'get' . . .
         $getterName = $reflectionMethod->getName();
-        if (strpos($getterName, 'get') === 0) {
-            $getterName = substr($getterName, 3);
-        }
-        
-        if (strpos($getterName, '_get') === 0) {
-            $getterName = substr($getterName, 4);
+        if (strpos($getterName, $this->currentPrefix) === 0) {
+            return lcfirst(substr($getterName, strlen($this->currentPrefix)));
         }
 
+        // . . .  or the '_get'.
+        if (strpos($getterName, '_' . $this->currentPrefix) === 0) {
+            return lcfirst(substr($getterName, strlen($this->currentPrefix) + 1));
+        }
+
+        // Still here?!? At least make the first letter lowercase.
         return lcfirst($getterName);
     }
 
@@ -281,13 +337,13 @@ class ThroughGetter extends AbstractCallback
         // Later on, we may also try to parse deeper for stuff.
         foreach ($this->findIt(array('return $this->', ';'), $sourcecode) as $propertyName) {
             // Check if this is a property and return the first we find.
-            if ($classReflection->hasProperty($propertyName)) {
+            if ($classReflection->hasProperty($propertyName) === true) {
                 return $classReflection->getProperty($propertyName);
             }
 
             // Check if this is a method and go deeper!
             $methodName = rtrim($propertyName, '()');
-            if ($classReflection->hasMethod($methodName)) {
+            if ($classReflection->hasMethod($methodName) === true) {
                 // We need to be careful not to goo too deep, we might end up
                 // in a loop.
                 ++$this->deep;

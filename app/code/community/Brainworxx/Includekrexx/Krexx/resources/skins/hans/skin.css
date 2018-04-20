@@ -15,7 +15,7 @@
  * @license http://opensource.org/licenses/LGPL-2.1
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -73,6 +73,7 @@ div.kwrapper {
     border: none;
     text-align: left;
     line-height: normal;
+    width: unset;
 }
 
 .kwrapper small {
@@ -85,6 +86,7 @@ div.kwrapper {
 .kwrapper hr,
 .kwrapper option {
     display: block;
+    z-index: 0;
 }
 
 .kwrapper span,
@@ -201,6 +203,7 @@ div.kwrapper {
     padding: 2px 0 3px 0;
     margin: 0 0 5px;
     background: #444444 5px center;
+    position: relative;
 }
 
 .kwrapper .kel-bg {
@@ -267,6 +270,7 @@ div.kwrapper {
 .kwrapper em.ktype {
     font-style: normal;
     margin: 0 2px;
+    padding-right: 35px;
 }
 
 .kwrapper .kbg-wrapper.knormal {
@@ -427,27 +431,27 @@ div.kwrapper {
     padding: 0 20px;
 }
 
+.kwrapper .search-wrapper {
+    z-index: 10;
+}
+
 .kwrapper .search-wrapper .ksearch input,
 .keditable input,
 .keditable select {
     font: 10px tahoma, verdana;
 }
-
+/*
 .kwrapper .khelp {
     position: absolute;
     border: solid 1px black;
     background-color: #f2f2f2;
     padding: 2px 5px;
-    margin-top: 10px;
-    display: none;
-    margin-left: 250px;
+    top: 10px;
+    left: 250px;
     color: #303030;
+    z-index: 1;
 }
-
-.kwrapper .kel:hover .khelp {
-    display: block;
-}
-
+*/
 .kwrapper .kclose.kfatal {
     cursor: pointer;
     display: inline-table;
@@ -760,11 +764,27 @@ div.kwrapper {
     font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
 }
 
-.kwrapper .kchild .kgencode:hover {
+.kwrapper .kchild .kgencode:hover,
+.kwrapper .kchild .kinfobutton:hover {
     color: #dbdbdb;
 }
 
-.kwrapper .kodsp {
+.kwrapper .kchild .kinfobutton {
+    margin: 0 5px;
+    display: table-cell;
+    position: absolute;
+    right: 45px;
+    top: 2px;
+}
+
+.kwrapper .kchild .kinfobutton .kinfoinner {
+    padding: 0 2px;
+    color: #e2db74;
+    font: bold 12px tahoma, verdana;
+}
+
+.kwrapper .kodsp,
+.kwrapper .khelp {
     color: #303030;
     background-color: #dbdbdb;
     padding: 5px;

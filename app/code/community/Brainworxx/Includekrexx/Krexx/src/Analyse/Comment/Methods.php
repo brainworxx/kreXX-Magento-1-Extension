@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -71,7 +71,7 @@ class Methods extends AbstractComment
         $this->methodName = $reflectionMethod->getName();
         $cachingKey = $reflectionClass->getName() . '::' . $this->methodName;
 
-        if (isset($cache[$cachingKey])) {
+        if (isset($cache[$cachingKey]) === true) {
             return $cache[$cachingKey];
         }
 
@@ -98,31 +98,30 @@ class Methods extends AbstractComment
         // Get a first impression.
         $comment = $this->prettifyComment($reflectionMethod->getDocComment());
 
-        if ($this->checkComment($comment)) {
+        if ($this->checkComment($comment) === true) {
             // Found it!
             return trim($comment);
         }
 
         // Check for interfaces.
         $comment = $this->getInterfaceComment($comment, $reflectionClass);
-
-        if ($this->checkComment($comment)) {
+        if ($this->checkComment($comment) === true) {
             // Found it!
             return trim($comment);
         }
 
         // Check for traits.
         $comment = $this->getTraitComment($comment, $reflectionClass);
-
-        if ($this->checkComment($comment)) {
+        if ($this->checkComment($comment) === true) {
             // Found it!
             return trim($comment);
         }
 
         // Nothing on this level, we need to take a look at the parent.
+        /** @var \ReflectionClass $parentReflection */
         $parentReflection = $reflectionClass->getParentClass();
-        if ($parentReflection &&
-            $parentReflection->hasMethod($this->methodName)
+        if ($parentReflection instanceof \ReflectionClass &&
+            $parentReflection->hasMethod($this->methodName) === true
         ) {
             // Going deeper into the rabid hole!
             $comment = trim(
@@ -156,18 +155,18 @@ class Methods extends AbstractComment
     protected function getTraitComment($originalComment, \ReflectionClass $reflection)
     {
         // We need to check if we can get traits here.
-        if (method_exists($reflection, 'getTraits')) {
+        if (method_exists($reflection, 'getTraits') === true) {
             // Get the traits from this class.
             // Now we should have an array with reflections of all
             // traits in the class we are currently looking at.
             foreach ($reflection->getTraits() as $trait) {
-                if ($this->checkComment($originalComment)) {
+                if ($this->checkComment($originalComment) === true) {
                     // Looks like we've resolved them all.
                     return $originalComment;
                 }
 
                 // We need to look further!
-                if ($trait->hasMethod($this->methodName)) {
+                if ($trait->hasMethod($this->methodName) === true) {
                     $traitComment = $this->prettifyComment(
                         $trait->getMethod($this->methodName)->getDocComment()
                     );
@@ -201,17 +200,16 @@ class Methods extends AbstractComment
     protected function getInterfaceComment($originalComment, \ReflectionClass $reflectionClass)
     {
         foreach ($reflectionClass->getInterfaces() as $interface) {
-            if ($this->checkComment($originalComment)) {
-                // Looks like we've resolved them all.
-                return $originalComment;
-            }
-
-            // We need to look further.
-            if ($interface->hasMethod($this->methodName)) {
+            if ($interface->hasMethod($this->methodName) === true) {
                 $interfaceComment = $this->prettifyComment($interface->getMethod($this->methodName)->getDocComment());
                 // Replace it.
                 $originalComment = $this->replaceInheritComment($originalComment, $interfaceComment);
             }
+            if ($this->checkComment($originalComment) === true) {
+                // Looks like we've resolved them all.
+                return $originalComment;
+            }
+            // We need to look further.
         }
 
         // Return what we could resolve so far.

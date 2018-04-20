@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -74,7 +74,7 @@ class Fatal extends AbstractError
      * anything during shutdown, in case we decide after
      * registering, that we do not want to interfere.
      *
-     * @param bool $value
+     * @param boolean $value
      *   Whether the handler is active or not.
      */
     public function setIsActive($value)
@@ -95,7 +95,7 @@ class Fatal extends AbstractError
         $error = error_get_last();
 
         // Do we have an error at all?
-        if ($error  !== null && $this->getIsActive()) {
+        if ($error  !== null && $this->getIsActive() === true) {
             // Do we need to check this one, according to our settings?
             $translatedError = $this->translateErrorType($error['type']);
             if ($translatedError[1] === 'traceFatals') {

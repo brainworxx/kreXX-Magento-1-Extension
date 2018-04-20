@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -34,6 +34,7 @@
 
 namespace Brainworxx\Krexx\Service\Flow;
 
+use Brainworxx\Krexx\Service\Config\Fallback;
 use Brainworxx\Krexx\Service\Factory\Pool;
 
 /**
@@ -142,10 +143,10 @@ class Emergency
         }
 
         // Cache some settings.
-        $this->maxRuntime = (int) $pool->config->getSetting('maxRuntime');
-        $this->minMemoryLeft = ((int) $pool->config->getSetting('memoryLeft'))  * 1024 * 1024;
-        $this->maxCall = (int) $this->pool->config->getSetting('maxCall');
-        $this->maxNestingLevel = (int) $this->pool->config->getSetting('level');
+        $this->maxRuntime = (int) $pool->config->getSetting(Fallback::SETTING_MAX_RUNTIME);
+        $this->minMemoryLeft = ((int) $pool->config->getSetting(Fallback::SETTING_MEMORY_LEFT))  * 1024 * 1024;
+        $this->maxCall = (int) $this->pool->config->getSetting(Fallback::SETTING_MAX_CALL);
+        $this->maxNestingLevel = (int) $this->pool->config->getSetting(Fallback::SETTING_NESTING_LEVEL);
     }
 
     /**
@@ -169,7 +170,7 @@ class Emergency
      */
     public function checkEmergencyBreak()
     {
-        if ($this->disabled) {
+        if ($this->disabled === true) {
             // Tell them, everything is OK!
             return false;
         }
@@ -279,7 +280,7 @@ class Emergency
      */
     public function resetTimer()
     {
-        if (empty($this->timer)) {
+        if (empty($this->timer) === true) {
             $this->timer = time() + $this->maxRuntime;
         }
     }

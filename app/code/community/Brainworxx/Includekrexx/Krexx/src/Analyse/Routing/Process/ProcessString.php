@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -35,6 +35,7 @@
 namespace Brainworxx\Krexx\Analyse\Routing\Process;
 
 use Brainworxx\Krexx\Analyse\Model;
+use Brainworxx\Krexx\Service\Factory\Pool;
 
 /**
  * Processing of strings.
@@ -43,6 +44,19 @@ use Brainworxx\Krexx\Analyse\Model;
  */
 class ProcessString extends AbstractProcess
 {
+    /**
+     * The buffer info class. We use it to get the mimetype from a string.
+     *
+     * @var \finfo
+     */
+    protected $bufferInfo;
+
+    public function __construct(Pool $pool)
+    {
+        parent::__construct($pool);
+        $this->bufferInfo = new \finfo(FILEINFO_MIME);
+    }
+
     /**
      * Render a dump for a string value.
      *
@@ -58,16 +72,27 @@ class ProcessString extends AbstractProcess
 
         // Checking the encoding.
         $encoding = mb_detect_encoding($data);
-        if ($encoding !== false) {
-            // Normal encoding, nothing special here.
-            $length = $strlen = mb_strlen($data, $encoding);
-        } else {
+        if ($encoding === false) {
             // Looks like we have a mixed encoded string.
             // We need to tell the dev!
             $length = mb_strlen($data);
             $strlen = ' broken encoding ' . $length;
             $encoding = 'broken';
+        } else {
+            // Normal encoding, nothing special here.
+            $length = $strlen = mb_strlen($data, $encoding);
+            $encoding = '';
         }
+
+        // Check if this is a possible callback.
+        // We are not going to analyse this further, because modern systems
+        // do not use these anymore.
+        if (function_exists($data) === true) {
+            $model->setIsCallback(true);
+        }
+
+        // Getting mimetype from the string.
+        $mimetype = $this->bufferInfo->buffer($data);
 
         // Check, if we are handling large string, and if we need to use a
         // preview (which we call "extra").
@@ -75,24 +100,16 @@ class ProcessString extends AbstractProcess
         // display those.
         if ($length > 50 || strstr($data, PHP_EOL) !== false) {
             $cut = $this->pool->encodingService->encodeString(mb_substr($data, 0, 50)) . '. . .';
-            $model->hasExtras();
+            $data = $this->pool->encodingService->encodeString($data);
+            $model->setHasExtra(true)->setNormal($cut)->setData($data);
         } else {
-            $cut = $this->pool->encodingService->encodeString($data);
+            $model->setNormal($this->pool->encodingService->encodeString($data));
         }
 
-        // Check if this is a possible callback.
-        // We are not going to analyse this further, because modern systems
-        // do not use these anymore.
-        if (function_exists($data)) {
-            $model->setIsCallback(true);
-        }
-
-        $data = $this->pool->encodingService->encodeString($data);
         return $this->pool->render->renderSingleChild(
-            $model->setData($data)
-                ->setNormal($cut)
-                ->setType('string ' . $strlen)
+            $model->setType('string ' . $strlen)
                 ->addToJson('encoding', $encoding)
+                ->addToJson('mimetype', $mimetype)
                 ->addToJson('length', $length)
         );
     }

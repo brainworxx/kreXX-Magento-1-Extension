@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -38,6 +38,11 @@ namespace Brainworxx\Krexx\Analyse\Callback\Analyse\Objects;
  * Analysis of all getter methods.
  *
  * @package Brainworxx\Krexx\Analyse\Callback\Analyse\Objects
+ *
+ * @uses mixed data
+ *   The class we are currently analsysing.
+ * @uses \ReflectionClass ref
+ *   A reflection of the class we are currently analysing.
  */
 class Getter extends AbstractObjectAnalysis
 {
@@ -55,7 +60,7 @@ class Getter extends AbstractObjectAnalysis
         // Get all public methods.
         $methodList = $ref->getMethods(\ReflectionMethod::IS_PUBLIC);
 
-        if ($this->pool->scope->isInScope()) {
+        if ($this->pool->scope->isInScope() === true) {
             // Looks like we also need the protected and private methods.
             $methodList = array_merge(
                 $methodList,
@@ -63,26 +68,45 @@ class Getter extends AbstractObjectAnalysis
             );
         }
 
-        if (empty($methodList)) {
+        if (empty($methodList) === true) {
             // There are no getter methods in here.
             return '';
         }
 
+        $normalGetter = array();
+        $isGetter = array();
+        $hasGetter = array();
+
         // Filter them.
-        foreach ($methodList as $key => $method) {
+        // We only dump those that have no parameters and start with
+        // has, is or get.
+        /** @var \ReflectionMethod $method */
+        foreach ($methodList as $method) {
             if (strpos($method->getName(), 'get') === 0) {
-                // We only dump those that have no parameters.
                 /** @var \ReflectionMethod $method */
                 $parameters = $method->getParameters();
-                if (!empty($parameters)) {
-                    unset($methodList[$key]);
+                if (empty($parameters)) {
+                    $normalGetter[] = $method;
                 }
-            } else {
-                unset($methodList[$key]);
+            } elseif (strpos($method->getName(), 'is') === 0) {
+                /** @var \ReflectionMethod $method */
+                $parameters = $method->getParameters();
+                if (empty($parameters)) {
+                    $isGetter[] = $method;
+                }
+            } elseif (strpos($method->getName(), 'has') === 0) {
+                /** @var \ReflectionMethod $method */
+                $parameters = $method->getParameters();
+                if (empty($parameters)) {
+                    $hasGetter[] = $method;
+                }
             }
         }
 
-        if (empty($methodList)) {
+        if (empty($normalGetter) === true &&
+            empty($isGetter) === true &&
+            empty($hasGetter) === true
+        ) {
             // There are no getter methods in here.
             return '';
         }
@@ -96,7 +120,9 @@ class Getter extends AbstractObjectAnalysis
                 ->setType('class internals')
                 ->setHelpid('getterHelpInfo')
                 ->addParameter('ref', $ref)
-                ->addParameter('methodList', $methodList)
+                ->addParameter('normalGetter', $normalGetter)
+                ->addParameter('isGetter', $isGetter)
+                ->addParameter('hasGetter', $hasGetter)
                 ->addParameter('data', $data)
                 ->injectCallback(
                     $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughGetter')

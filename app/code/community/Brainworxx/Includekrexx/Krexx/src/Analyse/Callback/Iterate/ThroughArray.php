@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -46,7 +46,7 @@ use Brainworxx\Krexx\Analyse\Model;
  *
  * @uses array data
  *   The array want to iterate.
- * @uses bool multiline
+ * @uses boolean multiline
  *   Do we need a multiline code generation?
  */
 class ThroughArray extends AbstractCallback
@@ -76,13 +76,13 @@ class ThroughArray extends AbstractCallback
             $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model');
 
             // Are we dealing with multiline code generation?
-            if ($this->parameters['multiline']) {
+            if ($this->parameters['multiline'] === true) {
                 // Here we tell the Codegen service that we need some
                 // special handling.
                 $model->setMultiLineCodeGen(Codegen::ITERATOR_TO_ARRAY);
             }
 
-            if (is_string($key)) {
+            if (is_string($key) === true) {
                 $model->setData($value)
                     ->setName($this->pool->encodingService->encodeString($key))
                     ->setConnectorType(Connectors::ASSOCIATIVE_ARRAY);

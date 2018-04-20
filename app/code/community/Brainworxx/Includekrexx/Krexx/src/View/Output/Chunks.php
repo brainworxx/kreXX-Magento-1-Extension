@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -34,6 +34,7 @@
 
 namespace Brainworxx\Krexx\View\Output;
 
+use Brainworxx\Krexx\Service\Config\Fallback;
 use Brainworxx\Krexx\Service\Factory\Pool;
 
 /**
@@ -153,7 +154,7 @@ class Chunks
      */
     public function chunkMe($string)
     {
-        if ($this->useChunks && strlen($string) > 10000) {
+        if ($this->useChunks === true && strlen($string) > 10000) {
             // Get the key.
             $key = $this->genKey();
             // Detect the encoding in the chunk.
@@ -253,7 +254,7 @@ class Chunks
     {
         $this->cleanupOldChunks();
 
-        if (!$this->useLogging) {
+        if ($this->useLogging === false) {
             // We have no write access. Do nothing.
             return;
         }
@@ -283,7 +284,7 @@ class Chunks
         $this->pool->fileService->putFileContents($filename, $string);
         // Save our metadata, so a potential backend module can display it.
         // We may or may not have already some output for this file.
-        if (!empty($this->metadata)) {
+        if (empty($this->metadata) === false) {
             // Remove the old metadata file. We still have all it's content
             // available in $this->metadata.
             $this->pool->fileService->deleteFile($filename . '.json');
@@ -297,7 +298,7 @@ class Chunks
      */
     protected function cleanupOldChunks()
     {
-        if (!$this->useChunks) {
+        if ($this->useChunks === false) {
             // We have no write access. Do nothing.
             return;
         }
@@ -305,14 +306,14 @@ class Chunks
         static $beenHere = false;
 
         // We only do this once.
-        if ($beenHere) {
+        if ($beenHere === true) {
             return;
         }
 
         $beenHere = true;
         // Clean up leftover files.
         $chunkList = glob($this->chunkDir . '*.Krexx.tmp');
-        if (!empty($chunkList)) {
+        if (empty($chunkList) === false) {
             $now = time();
             foreach ($chunkList as $file) {
                 // We delete everything that is older than 15 minutes.
@@ -331,19 +332,19 @@ class Chunks
      */
     protected function cleanupOldLogs($logDir)
     {
-        if (!$this->useLogging) {
+        if ($this->useLogging === false) {
             // We have no write access. Do nothing.
             return;
         }
 
         // Cleanup old logfiles to prevent a overflow.
         $logList = glob($logDir . '*.Krexx.html');
-        if (empty($logList)) {
+        if (empty($logList) === true) {
             return;
         }
 
         array_multisort(array_map('filemtime', $logList), SORT_DESC, $logList);
-        $maxFileCount = (int)$this->pool->config->getSetting('maxfiles');
+        $maxFileCount = (int)$this->pool->config->getSetting(Fallback::SETTING_MAX_FILES);
         $count = 1;
         // Cleanup logfiles.
         foreach ($logList as $file) {
@@ -399,7 +400,7 @@ class Chunks
     {
         // Get a list of all chunk files from the run.
         $chunkList = glob($this->chunkDir . $this->fileStamp . '_*');
-        if (empty($chunkList)) {
+        if (empty($chunkList) === true) {
             return;
         }
 

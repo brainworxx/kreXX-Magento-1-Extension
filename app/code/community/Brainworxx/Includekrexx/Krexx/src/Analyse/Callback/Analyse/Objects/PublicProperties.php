@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -38,11 +38,18 @@ namespace Brainworxx\Krexx\Analyse\Callback\Analyse\Objects;
  * Analysis of public properties.
  *
  * @package Brainworxx\Krexx\Analyse\Callback\Analyse\Objects
+ *
+ * @uses mixed data
+ *   The class we are currently analsysing.
+ * @uses \ReflectionClass ref
+ *   A reflection of the class we are currently analysing.
  */
 class PublicProperties extends AbstractObjectAnalysis
 {
     /**
      * Dump all public properties.
+     *
+     * @throws \ReflectionException
      *
      * @return string
      *   The generated HTML markup.
@@ -70,7 +77,7 @@ class PublicProperties extends AbstractObjectAnalysis
         foreach ($refProps as $refProp) {
             $publicProps[$refProp->name] = true;
         }
-        
+
         // For every not-declared property, we add a another reflection.
         // Those are simply added during runtime
         foreach (array_keys(array_diff_key(get_object_vars($data), $publicProps)) as $key) {
@@ -79,7 +86,7 @@ class PublicProperties extends AbstractObjectAnalysis
             $refProps[] = $undeclaredProp;
         }
 
-        if (empty($refProps)) {
+        if (empty($refProps) === true) {
             return '';
         }
 

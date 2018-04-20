@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -34,10 +34,15 @@
 
 namespace Brainworxx\Krexx\Analyse\Callback\Analyse\Objects;
 
+use Brainworxx\Krexx\Service\Config\Fallback;
+
 /**
  * Method analysis for objects.
  *
  * @package Brainworxx\Krexx\Analyse\Callback\Analyse\Objects
+ *
+ * @uses \ReflectionClass ref
+ *   A reflection of the class we are currently analysing.
  */
 class Methods extends AbstractObjectAnalysis
 {
@@ -54,13 +59,13 @@ class Methods extends AbstractObjectAnalysis
 
         // We need to check, if we have a meta recursion here.
 
-        $doProtected = $this->pool->config->getSetting('analyseProtectedMethods') ||
+        $doProtected = $this->pool->config->getSetting(Fallback::SETTING_ANALYSE_PROTECTED_METHODS) ||
             $this->pool->scope->isInScope();
-        $doPrivate = $this->pool->config->getSetting('analysePrivateMethods') ||
+        $doPrivate = $this->pool->config->getSetting(Fallback::SETTING_ANALYSE_PRIVATE_METHODS) ||
             $this->pool->scope->isInScope();
         $domId = $this->generateDomIdFromClassname($ref->getName(), $doProtected, $doPrivate);
 
-        if ($this->pool->recursionHandler->isInMetaHive($domId)) {
+        if ($this->pool->recursionHandler->isInMetaHive($domId) === true) {
             // We have been here before.
             // We skip this one, and leave it to the js recursion handler!
             return $this->pool->render->renderRecursion(
@@ -92,27 +97,27 @@ class Methods extends AbstractObjectAnalysis
      */
     protected function analyseMethods(\ReflectionClass $ref, $domId, $doProtected, $doPrivate)
     {
-        // Add it to the meta hive.
-        $this->pool->recursionHandler->addToMetaHive($domId);
-
         // Dumping all methods but only if we have any.
         $protected = array();
         $private = array();
         $public = $ref->getMethods(\ReflectionMethod::IS_PUBLIC);
 
-        if ($doProtected) {
+        if ($doProtected === true) {
             $protected = $ref->getMethods(\ReflectionMethod::IS_PROTECTED);
         }
 
-        if ($doPrivate) {
+        if ($doPrivate === true) {
             $private = $ref->getMethods(\ReflectionMethod::IS_PRIVATE);
         }
 
         // Is there anything to analyse?
         $methods = array_merge($public, $protected, $private);
-        if (empty($methods)) {
+        if (empty($methods) === true) {
             return '';
         }
+
+        // Now that we have something to analyse, register the DOM ID.
+        $this->pool->recursionHandler->addToMetaHive($domId);
 
         // We need to sort these alphabetically.
         usort($methods, array($this, 'reflectionSorting'));
@@ -138,9 +143,9 @@ class Methods extends AbstractObjectAnalysis
      *
      * @param string $data
      *   The object from which we want the ID.
-     * @param bool $doProtected
+     * @param boolean $doProtected
      *   Are we analysing the protected methods here?
-     * @param bool $doPrivate
+     * @param boolean $doPrivate
      *   Are we analysing private methods here?
      *
      * @return string
@@ -149,11 +154,11 @@ class Methods extends AbstractObjectAnalysis
     protected function generateDomIdFromClassname($data, $doProtected, $doPrivate)
     {
         $string = 'k' . $this->pool->emergencyHandler->getKrexxCount() . '_m_';
-        if ($doProtected) {
+        if ($doProtected === true) {
             $string .= 'pro_';
         }
 
-        if ($doPrivate) {
+        if ($doPrivate === true) {
             $string .= 'pri_';
         }
 

@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -50,7 +50,7 @@ class BacktraceController extends AbstractController
      */
     public function backtraceAction()
     {
-        if ($this->pool->emergencyHandler->checkMaxCall()) {
+        if ($this->pool->emergencyHandler->checkMaxCall() === true) {
             // Called too often, we might get into trouble here!
             return $this;
         }
@@ -58,8 +58,7 @@ class BacktraceController extends AbstractController
         $this->pool->reset();
 
         // Find caller.
-        $caller = $this->callerFinder->findCaller();
-        $caller['type'] = 'Backtrace';
+        $caller = $this->callerFinder->findCaller('Backtrace', array());
 
         $this->pool->scope->setScope($caller['varname']);
 
@@ -82,7 +81,7 @@ class BacktraceController extends AbstractController
 
         // Now that our analysis is done, we must check if there was an emergency
         // break.
-        if ($this->pool->emergencyHandler->checkEmergencyBreak()) {
+        if ($this->pool->emergencyHandler->checkEmergencyBreak() === true) {
             return $this;
         }
 

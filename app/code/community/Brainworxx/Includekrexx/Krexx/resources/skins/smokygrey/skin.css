@@ -15,7 +15,7 @@
  * @license http://opensource.org/licenses/LGPL-2.1
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,7 @@
  *
  */
 .kwrapper, .kfatalwrapper-outer {
-  position: absolute;
+  position: absolute !important;
   z-index: 10000;
   text-align: left;
   color: #555555;
@@ -63,7 +63,8 @@
     border: none;
     text-align: left;
     line-height: normal;
-    float: none; }
+    float: none;
+    width: unset; }
   .kwrapper small, .kfatalwrapper-outer small {
     line-height: normal;
     font-size: 80%; }

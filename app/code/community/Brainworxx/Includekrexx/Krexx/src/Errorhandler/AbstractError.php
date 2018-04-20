@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -34,6 +34,7 @@
 
 namespace Brainworxx\Krexx\Errorhandler;
 
+use Brainworxx\Krexx\Service\Config\Fallback;
 use Brainworxx\Krexx\Service\Factory\Pool;
 
 /**
@@ -107,7 +108,7 @@ abstract class AbstractError
     {
         // We will only handle errors when kreXX and the handler
         // itself is enabled.
-        return $this->isActive && !$this->pool->config->getSetting('disabled');
+        return $this->isActive && !$this->pool->config->getSetting(Fallback::SETTING_DISABLED);
     }
 
     /**
@@ -125,7 +126,7 @@ abstract class AbstractError
      */
     protected function translateErrorType($errorint)
     {
-        if (isset($this->errorTranslation[$errorint])) {
+        if (isset($this->errorTranslation[$errorint]) === true) {
             return $this->errorTranslation[$errorint];
         }
 

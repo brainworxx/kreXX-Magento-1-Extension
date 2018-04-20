@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -84,7 +84,7 @@ class ThroughProperties extends AbstractCallback
 
         foreach ($this->parameters['data'] as $refProperty) {
             // Check memory and runtime.
-            if ($this->pool->emergencyHandler->checkEmergencyBreak()) {
+            if ($this->pool->emergencyHandler->checkEmergencyBreak() === true) {
                 return '';
             }
 
@@ -101,7 +101,7 @@ class ThroughProperties extends AbstractCallback
             // Every other additional string requires a special connector,
             // so we do this here.
             $connectorType = Connectors::NORMAL_PROPERTY;
-            if ($refProperty->isStatic()) {
+            if ($refProperty->isStatic() === true) {
                 $additional .= 'static ';
                 $connectorType = Connectors::STATIC_PROPERTY;
                 // There is always a $ in front of a static property.
@@ -109,7 +109,7 @@ class ThroughProperties extends AbstractCallback
             }
 
 
-            if (isset($refProperty->isUndeclared)) {
+            if (isset($refProperty->isUndeclared) === true) {
                 // The property 'isUndeclared' is not a part of the reflectionProperty.
                 // @see \Brainworxx\Krexx\Analyse\Callback\Analyse\Objects
                 $additional .= 'dynamic property ';
@@ -178,17 +178,27 @@ class ThroughProperties extends AbstractCallback
         return $value;
     }
 
+    /**
+     * Adding declaration keywords to our data in the additional field.
+     *
+     * @param \ReflectionProperty $refProperty
+     *   A reflection of the property we ara analysing.
+     * @param \ReflectionClass $ref
+     *   A reflection of the class we are analysing.
+     *
+     * @return string
+     */
     protected function getAdditionalData(\ReflectionProperty $refProperty, \ReflectionClass $ref)
     {
         // Now that we have the key and the value, we can analyse it.
         // Stitch together our additional info about the data:
         // public access, protected access, private access, static declaration.
         $additional = '';
-        if ($refProperty->isProtected()) {
+        if ($refProperty->isProtected() === true) {
             $additional .= 'protected ';
-        } elseif ($refProperty->isPublic()) {
+        } elseif ($refProperty->isPublic() === true) {
             $additional .= 'public ';
-        } elseif ($refProperty->isPrivate()) {
+        } elseif ($refProperty->isPrivate() === true) {
             $additional .= 'private ';
         }
 

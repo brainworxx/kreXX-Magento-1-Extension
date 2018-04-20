@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -38,6 +38,11 @@ namespace Brainworxx\Krexx\Analyse\Callback\Analyse\Objects;
  * Analysis of protected properties.
  *
  * @package Brainworxx\Krexx\Analyse\Callback\Analyse\Objects
+ *
+ * @uses mixed data
+ *   The class we are currently analsysing.
+ * @uses \ReflectionClass ref
+ *   A reflection of the class we are currently analysing.
  */
 class ProtectedProperties extends AbstractObjectAnalysis
 {
@@ -52,7 +57,7 @@ class ProtectedProperties extends AbstractObjectAnalysis
         /** @var \ReflectionClass $ref */
         $ref = $this->parameters['ref'];
         $refProps = $ref->getProperties(\ReflectionProperty::IS_PROTECTED);
-        if (empty($refProps)) {
+        if (empty($refProps) === true) {
             return '';
         }
         

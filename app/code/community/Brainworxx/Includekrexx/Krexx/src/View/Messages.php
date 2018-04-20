@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -165,7 +165,7 @@ class Messages
     public function getHelp($key, array $args = array())
     {
         // Check if we can get a value, at all.
-        if (empty($this->helpArray[$key])) {
+        if (empty($this->helpArray[$key]) === true) {
             return '';
         }
 

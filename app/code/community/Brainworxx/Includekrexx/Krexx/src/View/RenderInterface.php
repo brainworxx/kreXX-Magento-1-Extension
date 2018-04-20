@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -44,6 +44,7 @@ use Brainworxx\Krexx\Service\Factory\Pool;
  */
 interface RenderInterface
 {
+
     /**
      * Injects the pool and initialize the skin path.
      *
@@ -127,7 +128,7 @@ interface RenderInterface
      *
      * @param Model $model
      *   The model, which hosts all the data we need.
-     * @param bool $isExpanded
+     * @param boolean $isExpanded
      *   Is this one expanded from the beginning?
      *   TRUE when we render the settings menu only.
      *

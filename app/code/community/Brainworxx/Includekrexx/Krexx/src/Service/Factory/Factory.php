@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -67,7 +67,7 @@ class Factory
     public function createClass($classname)
     {
         // Check for possible overwrite.
-        if (isset($this->rewrite[$classname])) {
+        if (isset($this->rewrite[$classname]) === true) {
             $classname = $this->rewrite[$classname];
         }
 
@@ -110,7 +110,7 @@ class Factory
      */
     public function &getGlobals($what)
     {
-        if (empty($what)) {
+        if (empty($what) === true) {
             return $GLOBALS;
         }
 
@@ -126,5 +126,27 @@ class Factory
     public function &getServer()
     {
         return $_SERVER;
+    }
+
+    /**
+     * Create the pool, but only if it is not alredy there.
+     *
+     * @internal
+     */
+    public static function createPool()
+    {
+        if (\Krexx::$pool !== null) {
+            // The pool is there, do nothing.
+            return;
+        }
+
+        // Create a new pool where we store all our classes.
+        // We also need to check if we have an overwrite for the pool.
+        if (empty(Overwrites::$classes['Brainworxx\\Krexx\\Service\\Factory\\Pool']) === true) {
+            \Krexx::$pool = new Pool();
+            return;
+        }
+        $classname = Overwrites::$classes['Brainworxx\\Krexx\\Service\\Factory\\Pool'];
+        \Krexx::$pool = new $classname();
     }
 }

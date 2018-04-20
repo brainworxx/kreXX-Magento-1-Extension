@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -49,7 +49,7 @@ class EditSettingsController extends AbstractController
      */
     public function editSettingsAction()
     {
-        if ($this->pool->emergencyHandler->checkMaxCall()) {
+        if ($this->pool->emergencyHandler->checkMaxCall() === true) {
             // Called too often, we might get into trouble here!
             return $this;
         }
@@ -60,10 +60,8 @@ class EditSettingsController extends AbstractController
         // themselves out.
         $this->pool->emergencyHandler->setDisable(true);
 
-
         // Find caller.
-        $caller = $this->callerFinder->findCaller();
-        $caller['type'] = 'Cookie Configuration';
+        $caller = $this->callerFinder->findCaller('Cookie Configuration', array());
         $this->pool->chunks->addMetadata($caller);
 
         // Render it.

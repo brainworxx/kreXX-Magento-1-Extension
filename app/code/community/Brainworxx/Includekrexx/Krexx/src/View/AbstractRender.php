@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -35,6 +35,7 @@
 namespace Brainworxx\Krexx\View;
 
 use Brainworxx\Krexx\Analyse\Model;
+use Brainworxx\Krexx\Service\Config\Fallback;
 use Brainworxx\Krexx\Service\Factory\Pool;
 
 /**
@@ -44,6 +45,17 @@ use Brainworxx\Krexx\Service\Factory\Pool;
  */
 abstract class AbstractRender implements RenderInterface
 {
+    const MARKER_CALLER_FILE = '{callerFile}';
+    const MARKER_CALLER_LINE = '{callerLine}';
+    const MARKER_HELP = '{help}';
+    const MARKER_HELP_TITLE = '{helptitle}';
+    const MARKER_HELP_TEXT = '{helptext}';
+    const MARKER_CONNECTOR = '{connector}';
+    const MARKER_KREXX_ID = '{KrexxId}';
+    const MARKER_STYLE = '{style}';
+    const MARKER_MAIN_FUNCTION = '{mainfunction}';
+    const MARKER_DOM_ID = '{domId}';
+
     /**
      * Here we store all relevant data.
      *
@@ -64,7 +76,8 @@ abstract class AbstractRender implements RenderInterface
     public function __construct(Pool $pool)
     {
         $this->pool = $pool;
-        $this->skinPath = KREXX_DIR . 'resources/skins/' . $this->pool->config->getSetting('skin') . '/';
+        $this->skinPath = KREXX_DIR . 'resources/skins/' .
+            $this->pool->config->getSetting(Fallback::SETTING_SKIN) . '/';
     }
 
     /**
@@ -82,8 +95,8 @@ abstract class AbstractRender implements RenderInterface
     {
         return str_replace(
             array(
-                '{callerFile}',
-                '{callerLine}',
+                static::MARKER_CALLER_FILE,
+                static::MARKER_CALLER_LINE,
             ),
             array(
                 $file,
@@ -109,7 +122,7 @@ abstract class AbstractRender implements RenderInterface
         $data = $model->getJson();
 
         // Test if we have anything to display at all.
-        if (empty($data)) {
+        if (empty($data) === true) {
             return '';
         }
 
@@ -118,18 +131,16 @@ abstract class AbstractRender implements RenderInterface
         $helpContent = '';
 
         // Add the stuff from the json after the help text, if any.
-        if (!empty($data)) {
-            foreach ($data as $title => $text) {
-                $helpContent .= str_replace(
-                    array('{helptitle}', '{helptext}'),
-                    array($title, $text),
-                    $helpRow
-                );
-            }
+        foreach ($data as $title => $text) {
+            $helpContent .= str_replace(
+                array(static::MARKER_HELP_TITLE, static::MARKER_HELP_TEXT),
+                array($title, $text),
+                $helpRow
+            );
         }
 
         // Add it into the wrapper.
-        return str_replace('{help}', $helpContent, $this->getTemplateFileContent('help'));
+        return str_replace(static::MARKER_HELP, $helpContent, $this->getTemplateFileContent('help'));
     }
 
     /**
@@ -143,12 +154,12 @@ abstract class AbstractRender implements RenderInterface
      */
     protected function renderConnector($connector)
     {
-        if (empty($connector)) {
+        if (empty($connector) === true) {
             return '';
         }
 
         return str_replace(
-            '{connector}',
+            static::MARKER_CONNECTOR,
             $connector,
             $this->getTemplateFileContent('connector')
         );
@@ -163,7 +174,7 @@ abstract class AbstractRender implements RenderInterface
     protected function renderSearch()
     {
         return str_replace(
-            '{KrexxId}',
+            static::MARKER_KREXX_ID,
             $this->pool->recursionHandler->getMarker(),
             $this->getTemplateFileContent('search')
         );
@@ -177,7 +188,7 @@ abstract class AbstractRender implements RenderInterface
         // Static cache to make it a little bit faster.
         static $list = array();
 
-        if (empty($list)) {
+        if (empty($list) === true) {
             // Get the list.
             $list = array_filter(glob(KREXX_DIR . 'resources/skins/*'), 'is_dir');
             // Now we need to filter it, we only want the names, not the full path.
@@ -194,7 +205,7 @@ abstract class AbstractRender implements RenderInterface
      *
      * @param Model $model
      *   The model, which hosts all the data we need.
-     * @param bool $isExpanded
+     * @param boolean $isExpanded
      *   The only expanded nest is the settings menu, when we render only the
      *   settings menu.
      *
@@ -210,7 +221,7 @@ abstract class AbstractRender implements RenderInterface
         }
 
         // Are we expanding this one?
-        if ($isExpanded) {
+        if ($isExpanded === true) {
             $style = '';
         } else {
             $style = 'khidden';
@@ -218,9 +229,9 @@ abstract class AbstractRender implements RenderInterface
 
         return str_replace(
             array(
-                '{style}',
-                '{mainfunction}',
-                '{domId}',
+                static::MARKER_STYLE,
+                static::MARKER_MAIN_FUNCTION,
+                static::MARKER_DOM_ID,
             ),
             array(
                 $style,
@@ -244,7 +255,7 @@ abstract class AbstractRender implements RenderInterface
     {
         static $fileCache = array();
 
-        if (isset($fileCache[$what])) {
+        if (isset($fileCache[$what]) === true) {
             return $fileCache[$what];
         }
 
@@ -267,7 +278,7 @@ abstract class AbstractRender implements RenderInterface
     protected function encodeJson(array $array)
     {
         // No data, no json!
-        if (empty($array)) {
+        if (empty($array) === true) {
             return '';
         }
 

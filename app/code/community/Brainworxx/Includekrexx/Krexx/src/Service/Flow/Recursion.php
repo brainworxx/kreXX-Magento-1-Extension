@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -133,14 +133,14 @@ class Recursion
     public function isInHive($bee)
     {
         // Check objects.
-        if (is_object($bee)) {
+        if (is_object($bee) === true) {
             return $this->recursionHive->contains($bee);
         }
 
         // Check arrays (only the $GLOBAL array may apply).
-        if (isset($bee[$this->recursionMarker])) {
+        if (isset($bee[$this->recursionMarker]) === true) {
             // We render the $GLOBALS only once.
-            if ($this->globalsWereRendered) {
+            if ($this->globalsWereRendered === true) {
                 return true;
             }
 

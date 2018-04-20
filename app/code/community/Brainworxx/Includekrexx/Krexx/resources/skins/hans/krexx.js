@@ -16,7 +16,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -70,14 +70,18 @@
             '.kheadnote',
             function () {
                 var searchWrapper = document.querySelectorAll('.search-wrapper');
+                var viewportOffset;
                 for (var i = 0; i < searchWrapper.length; i++) {
+                    viewportOffset = searchWrapper[i].getBoundingClientRect();
                     searchWrapper[i].style.position = 'fixed';
+                    searchWrapper[i].style.top = viewportOffset.top + 'px';
                 }
             },
             function () {
                 var searchWrapper = document.querySelectorAll('.search-wrapper');
                 for (var i = 0; i < searchWrapper.length; i++) {
                     searchWrapper[i].style.position = 'absolute';
+                    searchWrapper[i].style.top = '';
                 }
             }
         );
@@ -222,6 +226,13 @@
          */
         kdt.addEvent('.koptions', 'click', krexx.displaySearchOptions);
 
+        /**
+         * Display the content of the info box.
+         *
+         * @event click
+         */
+        kdt.addEvent('.kwrapper .kchild .kinfobutton', 'click', krexx.displayInfoBox);
+
         // Disable form-buttons in case a logfile is opened local.
         if (window.location.protocol === 'file:') {
             krexx.disableForms();
@@ -275,6 +286,27 @@
             // make sure to always produce the right path to this value during source
             // generation.
             kdt.setDataset(newEl.parentNode, 'domid', domid);
+
+            // Remove the infobox from the copy, if available and add the one from the
+            // recursion.
+            var newInfobox = newEl.querySelector('.khelp');
+            var newButton = newEl.querySelector('.kinfobutton');
+            var realInfobox = element.querySelector('.khelp');
+            var realButton = element.querySelector('.kinfobutton');
+
+            // We don't need the infobox on newEl, so we will remove it.
+            if (newInfobox !== null) {
+                newInfobox.parentNode.removeChild(newInfobox);
+            }
+            if (newButton !== null) {
+                newButton.parentNode.removeChild(newButton);
+            }
+
+            // We copy the Infobox from the recursion to the newEl, if it exists.
+            if (realInfobox !== null) {
+                newEl.appendChild(realButton);
+                newEl.appendChild(realInfobox);
+            }
 
             // Remove the recursion EL.
             element.parentNode.removeChild(element);
@@ -499,19 +531,26 @@
 
         var instance = kdt.getDataset(element, 'instance');
         var search = document.querySelector('#search-' + instance);
+        var viewportOffset;
 
         // Toggle display / hidden.
         if (kdt.hasClass(search, 'hidden')) {
             // Display it.
             kdt.toggleClass(search, 'hidden');
             search.querySelector('.ksearchfield').focus();
+            search.style.position = 'absolute';
+            search.style.top = '';
+            viewportOffset = search.getBoundingClientRect();
             search.style.position = 'fixed';
+            console.log(viewportOffset.top);
+            search.style.top = viewportOffset.top + 'px';
         }
         else {
             // Hide it.
             kdt.toggleClass(search, 'hidden');
             kdt.removeClass('.ksearch-found-highlight', 'ksearch-found-highlight');
-            search.style.position = 'fixed';
+            search.style.position = 'absolute';
+            search.style.top = '';
             // Clear the results.
            krexx.performSearch.results = [];
         }
@@ -575,6 +614,9 @@
         if (container.length === 0) {
             // Normal scrolling
             container = document.querySelectorAll('html');
+            if (container[0].scrollHeight === container[0].clientHeight) {
+                container = document.querySelectorAll('body');
+            }
             destination = el.getBoundingClientRect().top + container[0].scrollTop - 50;
         }
         else {
@@ -672,8 +714,8 @@
         var resultString = '';
         var sourcedata;
         var domid;
-        var wrapper1 = '';
-        var wrapper2 = '';
+        var wrapperLeft = '';
+        var wrapperRight = '';
 
         // Get the first element
         var el = kdt.getParents(element, 'li.kchild')[0];
@@ -684,8 +726,8 @@
             domid = kdt.getDataset(el, 'domid');
             sourcedata = kdt.getDataset(el, 'source');
 
-            wrapper1 = kdt.getDataset(el, 'codewrapper1');
-            wrapper2 = kdt.getDataset(el, 'codewrapper2');
+            wrapperLeft = kdt.getDataset(el, 'codewrapperLeft');
+            wrapperRight = kdt.getDataset(el, 'codewrapperRight');
 
             if (sourcedata === '. . .') {
                 if (domid !== '') {
@@ -731,7 +773,7 @@
         }
 
         // Add the wrapper that we collected so far
-        resultString = wrapper1 + resultString + wrapper2;
+        resultString = wrapperLeft + resultString + wrapperRight;
 
         // 3. Add the text
         codedisplay.innerHTML = '<div class="kcode-inner">' + resultString + '</div>';
@@ -828,5 +870,26 @@
 
         kdt.trigger(this.parentNode.querySelectorAll('.ksearchnow')[1], 'click');
     };
+
+    /**
+     * Toggle the display of t he infobox.
+     *
+     * @param {Event} event
+     * @event keyUp
+     */
+    krexx.displayInfoBox = function (event, element) {
+        // We don't want to bubble the click any further.
+        event.stop = true;
+
+        // Find the corresponding info box.
+        var box = element.nextElementSibling;
+
+        if (box.style.display === 'none') {
+            box.style.display = '';
+        }
+        else {
+            box.style.display = 'none';
+        }
+    }
 
 })(kreXXdomTools);

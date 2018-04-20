@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -35,6 +35,7 @@
 namespace Brainworxx\Krexx\Analyse\Routing\Process;
 
 use Brainworxx\Krexx\Analyse\Model;
+use Brainworxx\Krexx\Analyse\Code\Connectors;
 
 /**
  * Processing of closures.
@@ -48,6 +49,8 @@ class ProcessClosure extends AbstractProcess
      *
      * @param Model $model
      *   The closure we want to analyse.
+     *
+     * @throws \ReflectionException
      *
      * @return string
      *   The generated markup.
@@ -78,7 +81,7 @@ class ProcessClosure extends AbstractProcess
 
         // Adding the namespace, but only if we have one.
         $namespace = $ref->getNamespaceName();
-        if (!empty($namespace)) {
+        if (empty($namespace) === false) {
             $result['namespace'] = $namespace;
         }
 
@@ -90,6 +93,9 @@ class ProcessClosure extends AbstractProcess
             $paramList .=  $result['Parameter #' . $key] = $this->pool
                 ->codegenHandler
                 ->parameterToString($reflectionParameter);
+            // We add a comme to the parameter list, to separate them for a
+            // better readability.
+            $paramList .= ', ';
         }
 
         return $this->pool->render->renderExpandableChild(
@@ -98,6 +104,7 @@ class ProcessClosure extends AbstractProcess
                 // Remove the ',' after the last char.
                 ->setConnectorParameters(trim($paramList, ', '))
                 ->setDomid($this->generateDomIdFromObject($model->getData()))
+                ->setConnectorType(Connectors::METHOD)
                 ->addParameter('data', $result)
                 ->injectCallback(
                     $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughMethodAnalysis')

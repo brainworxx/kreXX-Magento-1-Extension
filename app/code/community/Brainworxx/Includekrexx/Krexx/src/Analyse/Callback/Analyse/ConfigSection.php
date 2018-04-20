@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -36,6 +36,7 @@ namespace Brainworxx\Krexx\Analyse\Callback\Analyse;
 
 use Brainworxx\Krexx\Analyse\Callback\AbstractCallback;
 use Brainworxx\Krexx\Analyse\Model;
+use Brainworxx\Krexx\Service\Config\Fallback;
 
 /**
  * Configuration "analysis" methods. Meh, naming conventions suck sometimes.
@@ -64,7 +65,7 @@ class ConfigSection extends AbstractCallback
             // Render the single value.
             // We need to find out where the value comes from.
             /** @var \Brainworxx\Krexx\Service\Config\Model $setting */
-            if ($setting->getType() !== 'None') {
+            if ($setting->getType() !== Fallback::RENDER_TYPE_NONE) {
                 $value = $setting->getValue();
                 // We need to re-translate booleans to something the
                 // frontend can understand.
@@ -79,7 +80,7 @@ class ConfigSection extends AbstractCallback
                 /** @var Model $model */
                 $model = $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')->setHelpid($id . 'Help');
                 $name = $this->pool->messages->getHelp($id . 'Readable');
-                if ($setting->getEditable()) {
+                if ($setting->getEditable() === true) {
                     $model->setData($name)
                         ->setDomid($id)
                         ->setName($value)
@@ -95,7 +96,7 @@ class ConfigSection extends AbstractCallback
                 }
             }
         }
-        
+
         return $sectionOutput;
     }
 }

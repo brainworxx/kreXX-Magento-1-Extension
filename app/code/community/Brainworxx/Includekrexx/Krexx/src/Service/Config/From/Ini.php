@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -93,40 +93,35 @@ class Ini extends Fallback
     /**
      * Get the configuration of the frontend config form.
      *
-     * @param string $parameterName
-     *   The parameter you want to render.
+     * @param string $name
+     *   The parameter name you want to render.
      *
      * @return array
      *   The configuration (is it editable, a dropdown, a textfield, ...)
      */
-    public function getFeConfig($parameterName)
+    public function getFeConfig($name)
     {
         // Load it from the file.
-        $filevalue = $this->getFeConfigFromFile($parameterName);
+        $filevalue = $this->getFeConfigFromFile($name);
 
         // Do we have a value?
-        if (empty($filevalue)) {
+        if (empty($filevalue) === true) {
             // Fallback to factory settings.
-            if (isset($this->feConfigFallback[$parameterName])) {
-                $type = $this->feConfigFallback[$parameterName]['type'];
-                $editable = $this->feConfigFallback[$parameterName]['editable'];
-            } else {
-                // Unknown parameter.
-                $type = 'None';
-                $editable = 'false';
+            if (isset($this->feConfigFallback[$name]) === true) {
+                return array(
+                    ($this->feConfigFallback[$name][static::RENDER][static::RENDER_EDITABLE] === static::VALUE_TRUE),
+                    $this->feConfigFallback[$name][static::RENDER][static::RENDER_TYPE]
+                );
             }
-        } else {
-            $type = $filevalue['type'];
-            $editable = $filevalue['editable'];
+            // Unknown parameter and nothing in the fallback!
+            // This should never happan, btw.
+            return array(false, static::RENDER_TYPE_NONE);
         }
 
-        if ($editable === 'true') {
-            $editable = true;
-        } else {
-            $editable = false;
-        }
-
-        return array($editable, $type);
+        return array(
+            ($filevalue[static::RENDER_EDITABLE] === static::VALUE_TRUE),
+            $filevalue[static::RENDER_TYPE]
+        );
     }
 
     /**
@@ -143,40 +138,40 @@ class Ini extends Fallback
         // Get the human readable stuff from the ini file.
         $value = $this->getConfigFromFile('feEditing', $parameterName);
 
-        if (empty($value)) {
+        if (empty($value) === true) {
             // Sorry, no value stored.
             return null;
         }
 
         // Get the rendering type.
-        $type = $this->feConfigFallback[$parameterName]['type'];
+        $type = $this->feConfigFallback[$parameterName][static::RENDER][static::RENDER_TYPE];
 
         // Stitch together the setting.
         switch ($value) {
-            case 'none':
-                $type = 'None';
-                $editable = 'false';
+            case static::RENDER_TYPE_NONE:
+                $type = static::RENDER_TYPE_NONE;
+                $editable = static::VALUE_FALSE;
                 break;
 
             case 'display':
-                $editable = 'false';
+                $editable = static::VALUE_FALSE;
                 break;
 
             case 'full':
-                $editable = 'true';
+                $editable = static::VALUE_TRUE;
                 break;
 
             default:
                 // Unknown setting.
                 // Fallback to no display, just in case.
-                $type = 'None';
-                $editable = 'false';
+                $type = static::RENDER_TYPE_NONE;
+                $editable = static::VALUE_FALSE;
                 break;
         }
 
         return array(
-            'type' => $type,
-            'editable' => $editable,
+            static::RENDER_TYPE => $type,
+            static::RENDER_EDITABLE => $editable,
         );
     }
 
@@ -195,8 +190,8 @@ class Ini extends Fallback
     {
         // Do we have a value in the ini?
         // Does it validate?
-        if (isset($this->iniSettings[$group][$name]) &&
-            $this->security->evaluateSetting($group, $name, $this->iniSettings[$group][$name])
+        if (isset($this->iniSettings[$group][$name]) === true &&
+            $this->security->evaluateSetting($group, $name, $this->iniSettings[$group][$name]) === true
         ) {
             return $this->iniSettings[$group][$name];
         }

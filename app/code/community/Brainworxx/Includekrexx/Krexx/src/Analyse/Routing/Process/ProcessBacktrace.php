@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -34,6 +34,7 @@
 
 namespace Brainworxx\Krexx\Analyse\Routing\Process;
 
+use Brainworxx\Krexx\Service\Config\Fallback;
 use Brainworxx\Krexx\Service\Factory\Pool;
 
 /**
@@ -77,7 +78,7 @@ class ProcessBacktrace
     public function process(array &$backtrace)
     {
         $output = '';
-        $maxStep = (int) $this->pool->config->getSetting('maxStepNumber');
+        $maxStep = (int) $this->pool->config->getSetting(Fallback::SETTING_MAX_STEP_NUMBER);
         $stepCount = count($backtrace);
 
         // Remove steps according to the configuration.

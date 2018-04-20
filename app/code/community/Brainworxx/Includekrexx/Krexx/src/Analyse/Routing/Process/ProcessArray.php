@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -35,6 +35,7 @@
 namespace Brainworxx\Krexx\Analyse\Routing\Process;
 
 use Brainworxx\Krexx\Analyse\Model;
+use Brainworxx\Krexx\Service\Config\Fallback;
 
 /**
  * Processing of arrays.
@@ -58,7 +59,7 @@ class ProcessArray extends AbstractProcess
         $multiline = false;
         $count = count($model->getData());
 
-        if ($count > $this->pool->config->arrayCountLimit) {
+        if ($count > (int) $this->pool->config->getSetting(Fallback::SETTING_ARRAY_COUNT_LIMIT)) {
             // Budget array analysis.
             $model->injectCallback(
                 $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughLargeArray')

@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -35,6 +35,7 @@
 namespace Brainworxx\Krexx\Controller;
 
 use Brainworxx\Krexx\Analyse\Caller\AbstractCaller;
+use Brainworxx\Krexx\Service\Config\Fallback;
 use Brainworxx\Krexx\Service\Factory\Pool;
 use Brainworxx\Krexx\View\Output\AbstractOutput;
 
@@ -73,7 +74,7 @@ abstract class AbstractController
      *
      * @var \Brainworxx\Krexx\Errorhandler\Fatal
      */
-    protected $krexxFatal;
+    protected static $krexxFatal;
 
     /**
      * Stores whether out fatal error handler should be active.
@@ -126,12 +127,10 @@ abstract class AbstractController
 
         // Register our output service.
         // Depending on the setting, we use another class here.
-        $outputSetting = $pool->config->getSetting('destination');
-        if ($outputSetting === 'browser') {
+        $outputSetting = $pool->config->getSetting(Fallback::SETTING_DESTINATION);
+        if ($outputSetting === Fallback::VALUE_BROWSER) {
             $this->outputService = $pool->createClass('Brainworxx\\Krexx\\View\\Output\\Shutdown');
-        }
-
-        if ($outputSetting === 'file') {
+        } elseif ($outputSetting === Fallback::VALUE_FILE) {
             $this->outputService = $pool->createClass('Brainworxx\\Krexx\\View\\Output\\File');
         }
     }
@@ -148,7 +147,7 @@ abstract class AbstractController
     protected function outputHeader($headline)
     {
         // Do we do an output as file?
-        if (static::$headerSend) {
+        if (static::$headerSend === true) {
             return $this->pool->render->renderHeader('', $headline, '');
         }
 
@@ -162,7 +161,7 @@ abstract class AbstractController
      *
      * @param array $caller
      *   Where was kreXX initially invoked from.
-     * @param bool $isExpanded
+     * @param boolean $isExpanded
      *   Are we rendering an expanded footer?
      *   TRUE when we render the settings menu only.
      *
@@ -174,7 +173,7 @@ abstract class AbstractController
         // Now we need to stitch together the content of the ini file
         // as well as it's path.
         $pathToIni = $this->pool->config->getPathToIniFile();
-        if ($this->pool->fileService->fileIsReadable($pathToIni)) {
+        if ($this->pool->fileService->fileIsReadable($pathToIni) === true) {
             $path = $this->pool->messages->getHelp('currentConfig');
         } else {
             // Project settings are not accessible
@@ -206,14 +205,14 @@ abstract class AbstractController
         $css = $this->pool->fileService->getFileContents(
             KREXX_DIR .
             'resources/skins/' .
-            $this->pool->config->getSetting('skin') .
+            $this->pool->config->getSetting(Fallback::SETTING_SKIN) .
             '/skin.css'
         );
         // Remove whitespace.
         $css = preg_replace('/\s+/', ' ', $css);
 
         // Adding our DOM tools to the js.
-        if ($this->pool->fileService->fileIsReadable(KREXX_DIR . 'resources/jsLibs/kdt.min.js')) {
+        if ($this->pool->fileService->fileIsReadable(KREXX_DIR . 'resources/jsLibs/kdt.min.js') === true) {
             $jsFile = KREXX_DIR . 'resources/jsLibs/kdt.min.js';
         } else {
             $jsFile = KREXX_DIR . 'resources/jsLibs/kdt.js';
@@ -222,8 +221,8 @@ abstract class AbstractController
         $jsCode = $this->pool->fileService->getFileContents($jsFile);
 
         // Krexx.js is comes directly form the template.
-        $path = KREXX_DIR . 'resources/skins/' . $this->pool->config->getSetting('skin');
-        if ($this->pool->fileService->fileIsReadable($path . '/krexx.min.js')) {
+        $path = KREXX_DIR . 'resources/skins/' . $this->pool->config->getSetting(Fallback::SETTING_SKIN);
+        if ($this->pool->fileService->fileIsReadable($path . '/krexx.min.js') === true) {
             $jsFile = $path . '/krexx.min.js';
         } else {
             $jsFile = $path . '/krexx.js';
@@ -247,9 +246,9 @@ abstract class AbstractController
      */
     public function noFatalForKrexx()
     {
-        if ($this->fatalShouldActive) {
-            $this->krexxFatal->setIsActive(false);
-            unregister_tick_function(array($this->krexxFatal, 'tickCallback'));
+        if ($this->fatalShouldActive === true) {
+            $this::$krexxFatal->setIsActive(false);
+            unregister_tick_function(array($this::$krexxFatal, 'tickCallback'));
         }
 
         return $this;
@@ -267,9 +266,9 @@ abstract class AbstractController
      */
     public function reFatalAfterKrexx()
     {
-        if ($this->fatalShouldActive) {
-            $this->krexxFatal->setIsActive(true);
-            register_tick_function(array($this->krexxFatal, 'tickCallback'));
+        if ($this->fatalShouldActive === true) {
+            $this::$krexxFatal->setIsActive(true);
+            register_tick_function(array($this::$krexxFatal, 'tickCallback'));
         }
 
         return $this;
@@ -325,10 +324,10 @@ abstract class AbstractController
 
         // Check if someone has been messing with the $_SERVER, to prevent
         // warnings and notices.
-        if (empty($server) ||
-            empty($server['SERVER_PROTOCOL']) ||
-            empty($server['SERVER_PORT']) ||
-            empty($server['SERVER_NAME'])) {
+        if (empty($server) === true ||
+            empty($server['SERVER_PROTOCOL']) === true ||
+            empty($server['SERVER_PORT']) === true ||
+            empty($server['SERVER_NAME'])=== true) {
             return 'n/a';
         }
 
@@ -337,13 +336,13 @@ abstract class AbstractController
 
         $protocol = strtolower($server['SERVER_PROTOCOL']);
         $protocol = substr($protocol, 0, strpos($protocol, '/'));
-        if ($ssl) {
+        if ($ssl === true) {
             $protocol .= 's';
         }
 
         $port = $server['SERVER_PORT'];
 
-        if ((!$ssl && $port === '80') || ($ssl && $port === '443')) {
+        if (($ssl === false && $port === '80') || ($ssl === true && $port === '443')) {
             // Normal combo with port and protocol.
             $port = '';
         } else {
@@ -351,7 +350,7 @@ abstract class AbstractController
             $port = ':' . $port;
         }
 
-        if (isset($server['HTTP_HOST'])) {
+        if (isset($server['HTTP_HOST']) === true) {
             $host = $server['HTTP_HOST'];
         } else {
             $host = $server['SERVER_NAME'] . $port;

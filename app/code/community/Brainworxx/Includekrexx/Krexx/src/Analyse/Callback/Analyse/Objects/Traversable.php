@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -35,11 +35,18 @@
 namespace Brainworxx\Krexx\Analyse\Callback\Analyse\Objects;
 
 use Brainworxx\Krexx\Analyse\Model;
+use Brainworxx\Krexx\Service\Config\Fallback;
 
 /**
  * Object traversable analysis.
  *
  * @package Brainworxx\Krexx\Analyse\Callback\Analyse\Objects
+ *
+ * @uses mixed data
+ *   The class we are currently analsysing.
+ * @uses string name
+ *   The variavble name or key in the parrent object / array where the current
+ *   class is stored.
  */
 class Traversable extends AbstractObjectAnalysis
 {
@@ -53,7 +60,8 @@ class Traversable extends AbstractObjectAnalysis
     {
         // Check nesting level, memory and runtime.
         $this->pool->emergencyHandler->upOneNestingLevel();
-        if ($this->pool->emergencyHandler->checkNesting() || $this->pool->emergencyHandler->checkEmergencyBreak()) {
+        if ($this->pool->emergencyHandler->checkNesting() === true ||
+        $this->pool->emergencyHandler->checkEmergencyBreak() === true) {
             // We will not be doing this one, but we need to get down with our
             // nesting level again.
             $this->pool->emergencyHandler->downOneNestingLevel();
@@ -94,7 +102,7 @@ class Traversable extends AbstractObjectAnalysis
         // Reactivate whatever error handling we had previously.
         restore_error_handler();
 
-        if (is_array($parameter)) {
+        if (is_array($parameter) === true) {
             // Special Array Access here, resulting in more complicated source
             // generation. So we tell the callback to to that.
             $multiline = true;
@@ -116,8 +124,11 @@ class Traversable extends AbstractObjectAnalysis
                 ->setType('Foreach')
                 ->addParameter('data', $parameter)
                 ->addParameter('multiline', $multiline);
-            // This one is huge!
-            if (count($parameter) > $this->pool->config->arrayCountLimit) {
+
+            // Check, if we are handling a huge array. Huge arrays tend to result in a huge
+            // output, maybe even triggering a emergency break. t oavoid this, we give them
+            // a special callback.
+            if (count($parameter) > (int) $this->pool->config->getSetting(Fallback::SETTING_ARRAY_COUNT_LIMIT)) {
                 $model->injectCallback(
                     $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Callback\\Iterate\\ThroughLargeArray')
                 )->setNormal('Simplified Traversable Info')

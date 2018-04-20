@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -68,7 +68,7 @@ class CallerFinder extends AbstractCaller
     /**
      * {@inheritdoc}
      */
-    public function findCaller()
+    public function findCaller($headline, $data)
     {
         $backtrace = debug_backtrace();
         $pattern = strtolower($this->pattern);
@@ -87,12 +87,15 @@ class CallerFinder extends AbstractCaller
             }
         }
 
+        $varname = $this->getVarName($caller['file'], $caller['line']);
+
         // We will not keep the whole backtrace im memory. We only return what we
         // actually need.
         return array(
             'file' => htmlspecialchars($this->pool->fileService->filterFilePath($caller['file'])),
             'line' => (int)$caller['line'],
-            'varname' => $this->getVarName($caller['file'], $caller['line']),
+            'varname' => $varname,
+            'type' => $this->getType($headline, $varname, $data),
         );
     }
 
@@ -110,7 +113,7 @@ class CallerFinder extends AbstractCaller
     protected function getVarName($file, $line)
     {
         // Retrieve the call from the sourcecode file.
-        if (!$this->pool->fileService->fileIsReadable($file)) {
+        if ($this->pool->fileService->fileIsReadable($file) === false) {
             return '. . .';
         }
 
@@ -135,7 +138,7 @@ class CallerFinder extends AbstractCaller
                 // This little baby tries to resolve everything inside the
                 // brackets of the kreXX call.
                 preg_match('/' . $funcname . '\s*\((.*)\)\s*/u', reset($possibleCommands), $name);
-                if (isset($name[1])) {
+                if (isset($name[1]) === true) {
                     $varname = $this->pool->encodingService->encodeString(trim($name[1], " \t\n\r\0\x0B'\""));
                     break;
                 }
@@ -143,7 +146,7 @@ class CallerFinder extends AbstractCaller
         }
 
         // Check if we have a value.
-        if (empty($varname)) {
+        if (empty($varname) === true) {
             $varname = '. . .';
         }
 

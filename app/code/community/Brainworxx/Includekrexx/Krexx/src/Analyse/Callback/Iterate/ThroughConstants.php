@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -66,7 +66,7 @@ class ThroughConstants extends AbstractCallback
                 $this->pool->createClass('Brainworxx\\Krexx\\Analyse\\Model')
                     ->setData($v)
                     ->setName($k)
-                    ->setCustomConnector1($this->parameters['classname'] . '::')
+                    ->setCustomConnectorLeft($this->parameters['classname'] . '::')
             );
         }
 

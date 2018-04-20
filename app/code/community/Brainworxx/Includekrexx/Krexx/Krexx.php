@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,7 @@
 
 use Brainworxx\Krexx\Service\Factory\Pool;
 use Brainworxx\Krexx\Controller\AbstractController;
-use Brainworxx\Krexx\Service\Overwrites;
+use Brainworxx\Krexx\Service\Config\Fallback;
 
 // Include some files and set some internal values.
 \Krexx::bootstrapKrexx();
@@ -57,28 +57,6 @@ class Krexx
     public static $pool;
 
     /**
-     * Create the pool, but only if it is not alredy there.
-     *
-     * @internal
-     */
-    public static function createPool()
-    {
-        if (static::$pool !== null) {
-            // The ppol is there, do nothing.
-            return;
-        }
-
-        // Create a new pool where we store all our classes.
-        // We also need to check if we have an overwrite for the pool.
-        if (empty(Overwrites::$classes['Brainworxx\\Krexx\\Service\\Factory\\Pool'])) {
-            static::$pool = new Pool();
-        } else {
-            $classname = Overwrites::$classes['Brainworxx\\Krexx\\Service\\Factory\\Pool'];
-            static::$pool = new $classname();
-        }
-    }
-
-    /**
      * Includes all needed files and sets some internal values.
      *
      * @internal
@@ -90,7 +68,7 @@ class Krexx
         // unwanted interaction with the rest of the system when registering
         // another autoloader. This leaves us with loading every single file
         // via include_once.
-        define('KREXX_DIR', __DIR__ . '/');
+        define('KREXX_DIR', __DIR__ . DIRECTORY_SEPARATOR);
         include_once 'src/Analyse/Callback/AbstractCallback.php';
 
         include_once 'src/Analyse/Callback/Analyse/Objects/AbstractObjectAnalysis.php';
@@ -143,6 +121,7 @@ class Krexx
         include_once 'src/Analyse/Routing/Process/ProcessObject.php';
         include_once 'src/Analyse/Routing/Process/ProcessResource.php';
         include_once 'src/Analyse/Routing/Process/ProcessString.php';
+        include_once 'src/Analyse/Routing/Process/ProcessOther.php';
 
         include_once 'src/Analyse/AbstractModel.php';
         include_once 'src/Analyse/Model.php';
@@ -203,9 +182,10 @@ class Krexx
             {
                 if (empty($handle)) {
                     \Krexx::open($data);
-                } else {
-                    \Krexx::$handle($data);
+                    return;
                 }
+
+                \Krexx::$handle($data);
             }
         }
     }
@@ -222,16 +202,17 @@ class Krexx
      */
     public static function __callStatic($name, array $arguments)
     {
-        static::createPool();
+        Pool::createPool();
 
-        // Do we gave a handle?
+        // Do we have a handle?
         if ($name === static::$pool->config->getDevHandler()) {
             // We do a standard-open.
             if (isset($arguments[0])) {
                 static::open($arguments[0]);
-            } else {
-                static::open();
+                return;
             }
+
+            static::open();
         }
     }
 
@@ -246,10 +227,10 @@ class Krexx
      */
     public static function timerMoment($string)
     {
-        static::createPool();
+        Pool::createPool();
 
         // Disabled?
-        if (static::$pool->config->getSetting('disabled') || AbstractController::$analysisInProgress) {
+        if (static::$pool->config->getSetting(Fallback::SETTING_DISABLED) || AbstractController::$analysisInProgress) {
             return;
         }
 
@@ -270,10 +251,10 @@ class Krexx
      */
     public static function timerEnd()
     {
-        static::createPool();
+        Pool::createPool();
 
         // Disabled ?
-        if (static::$pool->config->getSetting('disabled') || AbstractController::$analysisInProgress) {
+        if (static::$pool->config->getSetting(Fallback::SETTING_DISABLED) || AbstractController::$analysisInProgress) {
             return;
         }
 
@@ -297,10 +278,10 @@ class Krexx
      */
     public static function open($data = null)
     {
-        static::createPool();
+        Pool::createPool();
 
         // Disabled?
-        if (static::$pool->config->getSetting('disabled') || AbstractController::$analysisInProgress) {
+        if (static::$pool->config->getSetting(Fallback::SETTING_DISABLED) || AbstractController::$analysisInProgress) {
             return;
         }
 
@@ -325,10 +306,10 @@ class Krexx
      */
     public static function backtrace()
     {
-        static::createPool();
+        Pool::createPool();
 
         // Disabled?
-        if (static::$pool->config->getSetting('disabled') || AbstractController::$analysisInProgress) {
+        if (static::$pool->config->getSetting(Fallback::SETTING_DISABLED) || AbstractController::$analysisInProgress) {
             return;
         }
 
@@ -349,13 +330,11 @@ class Krexx
      */
     public static function disable()
     {
-        static::createPool();
+        Pool::createPool();
 
         static::$pool->config->setDisabled(true);
         static::$pool->createClass('Brainworxx\\Krexx\\Controller\\DumpController')
             ->noFatalForKrexx();
-        // We will not re-enable it afterwards, because kreXX
-        // is disabled and the handler would not show up anyway.
     }
 
     /**
@@ -367,11 +346,11 @@ class Krexx
      */
     public static function editSettings()
     {
-        static::createPool();
+        Pool::createPool();
 
         // Disabled?
         // We are ignoring local settings here.
-        if (static::$pool->config->getSetting('disabled')) {
+        if (static::$pool->config->getSetting(Fallback::SETTING_DISABLED)) {
             return;
         }
 
@@ -390,10 +369,10 @@ class Krexx
      */
     public static function registerFatal()
     {
-        static::createPool();
+        Pool::createPool();
 
         // Disabled?
-        if (static::$pool->config->getSetting('disabled')) {
+        if (static::$pool->config->getSetting(Fallback::SETTING_DISABLED)) {
             return;
         }
 
@@ -421,10 +400,10 @@ class Krexx
      */
     public static function unregisterFatal()
     {
-        static::createPool();
+        Pool::createPool();
 
         // Disabled?
-        if (static::$pool->config->getSetting('disabled')) {
+        if (static::$pool->config->getSetting(Fallback::SETTING_DISABLED)) {
             return;
         }
 

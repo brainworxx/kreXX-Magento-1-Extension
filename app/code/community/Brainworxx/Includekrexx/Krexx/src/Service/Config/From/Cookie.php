@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -68,10 +68,10 @@ class Cookie
         $this->security = $pool->createClass('Brainworxx\\Krexx\\Service\\Config\\Security');
         $cookies = $pool->getGlobals('_COOKIE');
 
-        if (isset($cookies['KrexxDebugSettings'])) {
+        if (isset($cookies['KrexxDebugSettings']) === true) {
             // We have local settings.
             $settings = json_decode($cookies['KrexxDebugSettings'], true);
-            if (is_array($settings)) {
+            if (is_array($settings) === true) {
                 $this->settings = $settings;
             }
         }
@@ -91,7 +91,9 @@ class Cookie
     public function getConfigFromCookies($group, $name)
     {
         // Do we have a value in the cookies?
-        if (isset($this->settings[$name]) && $this->security->evaluateSetting($group, $name, $this->settings[$name])) {
+        if (isset($this->settings[$name]) === true &&
+            $this->security->evaluateSetting($group, $name, $this->settings[$name]) === true
+        ) {
             // We escape them, just in case.
             return htmlspecialchars($this->settings[$name]);
         }

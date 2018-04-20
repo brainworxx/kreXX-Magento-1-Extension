@@ -17,7 +17,7 @@
  *
  *   GNU Lesser General Public License Version 2.1
  *
- *   kreXX Copyright (C) 2014-2017 Brainworxx GmbH
+ *   kreXX Copyright (C) 2014-2018 Brainworxx GmbH
  *
  *   This library is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU Lesser General Public License as published by
@@ -36,6 +36,7 @@ namespace Brainworxx\Krexx\Service\Factory;
 
 use Brainworxx\Krexx\Analyse\Code\Scope;
 use Brainworxx\Krexx\Service\Config\Config;
+use Brainworxx\Krexx\Service\Config\Fallback;
 use Brainworxx\Krexx\Service\Flow\Emergency;
 use Brainworxx\Krexx\Service\Flow\Recursion;
 use Brainworxx\Krexx\Service\Misc\Registry;
@@ -154,7 +155,7 @@ class Pool extends Factory
      */
     public function init()
     {
-        // Get the rewrites from the $GLOBALS.
+        // Get the rewrites from the rewrite class.
         $this->flushRewrite();
         // Initialize the encoding service.
         $this->encodingService = $this->createClass('Brainworxx\\Krexx\\Service\\Misc\\Encoding');
@@ -191,7 +192,7 @@ class Pool extends Factory
         // Check chunk folder is writable.
         // If not, give feedback!
         $chunkFolder = $this->config->getChunkDir();
-        if (!is_writeable($chunkFolder)) {
+        if (is_writeable($chunkFolder) === false) {
             $chunkFolder = $this->fileService->filterFilePath($chunkFolder);
             $this->messages->addMessage('chunksNotWritable', array($chunkFolder));
             // We can work without chunks, but this will require much more memory!
@@ -201,7 +202,7 @@ class Pool extends Factory
         // Check if the log folder is writable.
         // If not, give feedback!
         $logFolder = $this->config->getLogDir();
-        if (!is_writeable($logFolder)) {
+        if (is_writeable($logFolder) === false) {
             $logFolder = $this->fileService->filterFilePath($logFolder);
             $this->messages->addMessage('logNotWritable', array($logFolder));
             // Tell the chunk output that we have no write access in the logging
@@ -234,7 +235,7 @@ class Pool extends Factory
      */
     protected function initRenderer()
     {
-        $skin = $this->config->getSetting('skin');
+        $skin = $this->config->getSetting(Fallback::SETTING_SKIN);
         $classname = 'Brainworxx\\Krexx\\View\\' . ucfirst($skin) . '\\Render';
         include_once KREXX_DIR . 'resources/skins/' . $skin . '/Render.php';
         $this->render =  $this->createClass($classname);
